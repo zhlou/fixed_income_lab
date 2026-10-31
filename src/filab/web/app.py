@@ -1,0 +1,337 @@
+"""Lesson pages and numerical endpoints. Run with uvicorn filab.web.app:app."""
+
+from math import fsum, isclose
+from dataclasses import asdict
+from datetime import date, timedelta
+from pathlib import Path
+from typing import Literal
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from markdown_it import MarkdownIt
+from mdit_py_plugins.dollarmath import dollarmath_plugin
+from pydantic import BaseModel, ConfigDict, Field
+
+from filab.pricing import fixed_coupon_cashflows, price_coupon_bond, price_zero_coupon, yield_to_maturity
+from filab.pricing import coupon_schedule, settled_bond_valuation, settled_yield_to_maturity, treasury_bill
+from filab.pricing.settlement import SettlementError
+
+HERE = Path(__file__).resolve().parent
+LESSONS = [
+    dict(slug="bond-basics", title="Bond basics", headline="Meet the cash flows.",
+         description="A bond is a promise about money and time. Change the terms and see exactly what gets paid.",
+         tag="The building blocks", duration="15 min", file="basics.md"),
+    dict(slug="present-value", title="Present value & bond pricing", headline="Bring the future back.",
+         description="Discount future payments, understand annual rate conventions, and add them up to price a bond.",
+         tag="The time value of money", duration="25 min", file="present-value.md"),
+    dict(slug="bond-pricing-lab", title="Bond pricing lab", headline="Change one thing.",
+         description="Hold the assumptions still. Move yield, maturity, or coupon—and learn from what changes.",
+         tag="Experiment & explain", duration="30 min", file="lab.md"),
+    dict(slug="yield-to-maturity", title="Yield to maturity", headline="What yield does this price imply?",
+         description="Work backward from a bond price, then compare coupon rate, current yield, and yield to maturity.",
+         tag="Price to yield", duration="20 min", file="yield-to-maturity.md"),
+    dict(slug="settlement-and-accrued-interest", title="Settlement & accrued interest", headline="What do you actually pay?",
+         description="Move between coupon dates, separate clean and dirty prices, and follow a bond toward maturity.",
+         tag="Dates and dollars", duration="30 min", file="settlement.md"),
+    dict(slug="treasury-bill-yields", title="Treasury bill yields", headline="One bill. Different quoted yields.",
+         description="Translate a bank discount quote into price, holding-period return, and coupon-equivalent yield.",
+         tag="Read the convention", duration="20 min", file="bills.md"),
+]
+ROADMAP = [
+    ("01", "Bond mathematics", "Weeks 1–2", "Available"),
+    ("02", "Duration & convexity", "Weeks 3–4", "Coming later"),
+    ("03", "Treasury yield history", "Week 5", "Coming later"),
+    ("04", "Spot & forward curves", "Weeks 6–7", "Coming later"),
+    ("05", "Holding-period returns", "Week 8", "Coming later"),
+    ("06", "Yield-curve risk", "Week 9", "Coming later"),
+    ("07", "Inflation & TIPS", "Week 10", "Coming later"),
+    ("08", "Monetary policy", "Week 11", "Coming later"),
+    ("09", "Strategy laboratory", "Week 12", "Coming later"),
+]
+
+markdown = MarkdownIt("commonmark", {"html": False}).enable("table").use(
+    dollarmath_plugin, allow_space=False, allow_digits=False,
+)
+default_fence = markdown.renderer.rules["fence"]
+
+
+def optional_code(tokens, idx, options, env):
+    if env.get("expand_code"):
+        return default_fence(tokens, idx, options, env)
+    label = "Python implementation" if tokens[idx].info.strip() == "python" else "Example output"
+    return '<details class="code-example"><summary>' + label + '</summary>' + default_fence(tokens, idx, options, env) + '</details>'
+
+
+markdown.renderer.rules["fence"] = optional_code
+templates = Jinja2Templates(directory=str(HERE / "templates"))
+app = FastAPI(title="Fixed-Income Lab", version="0.1.0")
+app.mount("/static", StaticFiles(directory=str(HERE / "static")), name="static")
+
+
+class Inputs(BaseModel):
+    model_config = ConfigDict(allow_inf_nan=False, extra="forbid")
+
+
+class BondInputs(Inputs):
+    instrument: Literal["coupon", "zero"] = "coupon"
+    face_value: float = Field(default=1000, gt=0, le=1e9)
+    coupon_rate: float = Field(default=0.04, ge=0, le=0.20)
+    ytm: float = Field(default=0.05, ge=-0.02, le=0.30)
+    maturity_years: float = Field(default=2, ge=0, le=50)
+    frequency: Literal[1, 2, 4, 12] = 2
+
+
+class RateInputs(Inputs):
+    convention: Literal["nominal", "effective"] = "nominal"
+    rate: float = Field(default=0.04, ge=0, le=0.30)
+    frequency: Literal[1, 2, 4, 12] = 2
+    face_value: float = Field(default=1000, gt=0, le=1e9)
+
+
+class YieldInputs(Inputs):
+    face_value: float = Field(default=100, gt=0, le=1e9)
+    price: float = Field(default=98.12, gt=0, le=1e9)
+    coupon_rate: float = Field(default=0.04, ge=0, le=0.20)
+    maturity_years: float = Field(default=2, gt=0, le=50)
+    frequency: Literal[1, 2, 4, 12] = 2
+
+
+class ExperimentInputs(Inputs):
+    mode: Literal["maturity", "coupon", "sensitivity"] = "maturity"
+    coupon_rate: float = Field(default=0.06, ge=0, le=0.12)
+    ytm: float = Field(default=0.05, ge=0, le=0.10)
+    maturity_years: float = Field(default=20, gt=0, le=30)
+    payment_type: Literal["coupon", "zero"] = "zero"
+
+
+class SettlementInputs(Inputs):
+    mode: Literal['price', 'yield'] = 'price'
+    issue_date: date = date(2025, 11, 15)
+    settlement_date: date = date(2026, 8, 15)
+    maturity_date: date = date(2028, 11, 15)
+    face_value: float = Field(default=100, gt=0, le=1e9)
+    coupon_rate: float = Field(default=0.04, ge=0, le=0.20)
+    ytm: float = Field(default=0.05, ge=-0.02, le=0.30)
+    price: float = Field(default=98, gt=0, le=1e9)
+    price_type: Literal['clean', 'dirty'] = 'clean'
+    frequency: Literal[2] = 2
+
+
+class BillInputs(Inputs):
+    face_value: float = Field(default=100, gt=0, le=1e9)
+    discount_rate: float = Field(default=0.05, ge=0, le=0.30)
+    days_to_maturity: int = Field(default=182, ge=1, le=366)
+    year_days: Literal[365, 366] = 365
+
+
+def input_error(field, message):
+    raise HTTPException(status_code=422, detail=[{"loc": ["body", field], "msg": message}])
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error(request, exc):
+    # Avoid echoing invalid non-finite JSON values back into a JSON response.
+    return JSONResponse(status_code=422, content={"detail": [
+        {"loc": list(error["loc"]), "msg": error["msg"]} for error in exc.errors()
+    ]})
+
+
+@app.get("/")
+def home(request: Request):
+    return templates.TemplateResponse(request=request, name="home.html", context={
+        "lessons": LESSONS, "roadmap": ROADMAP, "active": "home", "page_title": "Your learning desk",
+    })
+
+
+@app.get("/lessons/{slug}")
+def lesson(request: Request, slug: str):
+    if slug == "cash-flows-and-pricing":
+        return RedirectResponse("/lessons/present-value#under-the-hood", status_code=308)
+    index = next((i for i, item in enumerate(LESSONS) if item["slug"] == slug), None)
+    if index is None:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+    item = LESSONS[index]
+    content = (HERE / "content" / item["file"]).read_text()
+    return templates.TemplateResponse(request=request, name="lesson.html", context={
+        "lessons": LESSONS, "lesson": item, "lesson_number": index + 1,
+        "active": slug, "page_title": item["title"], "body": markdown.render(content),
+        "implementation": markdown.render((HERE / "content" / "pricing.md").read_text(), {"expand_code": True}) if slug == "present-value" else None,
+        "previous": LESSONS[index - 1] if index > 0 else None,
+        "next": LESSONS[index + 1] if index + 1 < len(LESSONS) else None,
+    })
+
+
+@app.post("/api/valuation")
+def valuation(data: BondInputs):
+    args = dict(face_value=data.face_value, ytm=data.ytm,
+                maturity_years=data.maturity_years, frequency=data.frequency)
+    if data.instrument == "zero":
+        price = price_zero_coupon(**args)
+        payments = [(data.maturity_years, 0.0, data.face_value)]
+    else:
+        try:
+            flows = fixed_coupon_cashflows(face_value=data.face_value, coupon_rate=data.coupon_rate,
+                                           maturity_years=data.maturity_years, frequency=data.frequency)
+        except ValueError as exc:
+            input_error("maturity_years", str(exc))
+        price = price_coupon_bond(coupon_rate=data.coupon_rate, **args)
+        coupon = data.face_value * data.coupon_rate / data.frequency
+        payments = [(flow.time_years, coupon, data.face_value if i == len(flows) - 1 else 0)
+                    for i, flow in enumerate(flows)]
+    cashflows = []
+    for time, coupon, principal in payments:
+        factor = (1 + data.ytm / data.frequency) ** (-data.frequency * time)
+        cashflows.append(dict(time_years=time, coupon=coupon, principal=principal,
+                              amount=coupon + principal, discount_factor=factor,
+                              coupon_present_value=coupon * factor,
+                              principal_present_value=principal * factor,
+                              present_value=(coupon + principal) * factor))
+    principal_pv = fsum(flow["principal"] * flow["discount_factor"] for flow in cashflows)
+    coupon_pv = fsum(flow["coupon"] * flow["discount_factor"] for flow in cashflows)
+    return dict(price=price, principal_pv=principal_pv, coupon_pv=coupon_pv,
+                total_received=fsum(flow["amount"] for flow in cashflows),
+                total_coupons=fsum(flow["coupon"] for flow in cashflows),
+                payment_coupon=cashflows[0]["coupon"],
+                classification="At par" if isclose(price, data.face_value, rel_tol=1e-9) else
+                ("Premium" if price > data.face_value else "Discount"), cashflows=cashflows)
+
+
+@app.post("/api/yield")
+def implied_yield(data: YieldInputs):
+    args = dict(face_value=data.face_value, coupon_rate=data.coupon_rate,
+                maturity_years=data.maturity_years, frequency=data.frequency)
+    try:
+        flows = fixed_coupon_cashflows(**args)
+    except ValueError as exc:
+        input_error("maturity_years", str(exc))
+    try:
+        ytm = yield_to_maturity(price=data.price, **args)
+        cashflows = []
+        for flow in flows:
+            factor = (1 + ytm / data.frequency) ** (-data.frequency * flow.time_years)
+            cashflows.append(dict(time_years=flow.time_years, amount=flow.amount,
+                                  discount_factor=factor, present_value=flow.amount * factor))
+        repriced = price_coupon_bond(ytm=ytm, **args)
+    except (ValueError, OverflowError, ZeroDivisionError) as exc:
+        input_error("price", str(exc))
+    return dict(ytm=ytm, coupon_rate=data.coupon_rate,
+                current_yield=data.face_value * data.coupon_rate / data.price,
+                price=data.price, repriced=repriced, residual=repriced - data.price,
+                cashflows=cashflows)
+
+
+@app.post("/api/rates")
+def rates(data: RateInputs):
+    nominal = data.rate if data.convention == "nominal" else data.frequency * ((1 + data.rate) ** (1 / data.frequency) - 1)
+    effective = (1 + nominal / data.frequency) ** data.frequency - 1
+    held_interest = data.face_value * nominal
+    reinvested_interest = data.face_value * effective
+    return dict(nominal_rate=nominal, effective_rate=effective, period_rate=nominal / data.frequency,
+                coupon_per_payment=data.face_value * nominal / data.frequency,
+                held_interest=held_interest, reinvested_interest=reinvested_interest,
+                extra_interest=reinvested_interest - held_interest)
+
+
+@app.post('/api/settlement')
+def settlement(data: SettlementInputs):
+    args = dict(face_value=data.face_value, coupon_rate=data.coupon_rate, frequency=data.frequency,
+                issue_date=data.issue_date, maturity_date=data.maturity_date,
+                settlement_date=data.settlement_date)
+    try:
+        if (data.maturity_date - data.issue_date).days > 366 * 50:
+            raise SettlementError('maturity_date', 'The lesson supports at most 50 years.')
+        ytm = data.ytm if data.mode == 'price' else settled_yield_to_maturity(
+            price=data.price, price_type=data.price_type, **args)
+        result = settled_bond_valuation(ytm=ytm, **args)
+        schedule = coupon_schedule(issue_date=data.issue_date, maturity_date=data.maturity_date)
+        horizon = (data.maturity_date - data.settlement_date).days - 1
+        offsets = {round(horizon * k / 40) for k in range(41)}
+        for payment in schedule:
+            offset = (payment - data.settlement_date).days
+            offsets.update(k for k in [offset - 1, offset] if 0 <= k <= horizon)
+        path = []
+        for offset in sorted(offsets):
+            when = data.settlement_date + timedelta(days=offset)
+            value = settled_bond_valuation(ytm=ytm, **dict(args, settlement_date=when))
+            path.append(dict(date=when, x=offset / 365.25, clean=value.clean_price,
+                             dirty=value.dirty_price, accrued=value.accrued_interest))
+    except SettlementError as exc:
+        input_error(exc.field, str(exc))
+    except (ValueError, OverflowError) as exc:
+        input_error('price' if data.mode == 'yield' else 'ytm', str(exc))
+    return dict(asdict(result), ytm=ytm, path=path,
+                price_residual=None if data.mode == 'price' else
+                (result.clean_price if data.price_type == 'clean' else result.dirty_price) - data.price)
+
+
+@app.post('/api/bills')
+def bills(data: BillInputs):
+    try:
+        result = treasury_bill(**data.model_dump())
+        days = sorted({1, 366, data.days_to_maturity} | set(range(7, 367, 7)))
+        samples = [treasury_bill(**dict(data.model_dump(), days_to_maturity=day)) for day in days]
+        result['curves'] = [dict(label=label, points=[dict(x=day, y=value[key]) for day, value in zip(days, samples)],
+                                 marker=dict(x=data.days_to_maturity, y=result[key]))
+                            for label, key in [('Bank discount yield', 'discount_rate'),
+                                               ('Coupon-equivalent yield', 'investment_rate')]]
+        return result
+    except ValueError as exc:
+        input_error('discount_rate', str(exc))
+
+
+@app.post("/api/experiments")
+def experiments(data: ExperimentInputs):
+    if not isclose(data.maturity_years * 2, round(data.maturity_years * 2), abs_tol=1e-9):
+        input_error("maturity_years", "Choose a whole number of half-year periods.")
+
+    def price(coupon, maturity, ytm):
+        return price_coupon_bond(face_value=100, coupon_rate=coupon,
+                                 maturity_years=maturity, ytm=ytm, frequency=2)
+
+    if data.mode == "maturity":
+        coupon, maturity = 0.04, data.maturity_years
+        title = "Change maturity. Keep the coupon fixed."
+        insight = (f"Selected maturity: {maturity:g} years; baseline: 10 years. "
+                   "Both pay $2 every six months. Changing maturity changes the number of "
+                   "coupons and the date principal is repaid. "
+                   "Compare the percentage response to the same yield shock below.")
+    elif data.mode == "coupon":
+        coupon, maturity = data.coupon_rate, 10
+        title = "Change the coupon. Keep maturity fixed."
+        insight = (f"Both bonds mature in 10 years. The selected bond pays ${100 * coupon / 2:.2f} "
+                   "every six months; the baseline pays $2. Larger payments have a higher "
+                   "price at the same YTM.")
+    else:
+        coupon, maturity = (0 if data.payment_type == "zero" else 0.04), 10
+        title = "Change when the money arrives."
+        insight = ("The zero-coupon bond pays only $100 at year 10. The baseline pays $2 "
+                   "every six months as well as principal at maturity. The dollar-price "
+                   "axis stays the same; use the table to compare percentage sensitivity. "
+                   "Removing coupons changes the total cash received as well as its timing.")
+    identical = coupon == 0.04 and maturity == 10
+    if identical:
+        insight = "The selected bond matches the baseline, so the curves coincide. " + insight
+    grid = [i / 1000 for i in range(101)]
+    selected_label = f"Selected · {maturity:g}y · {coupon * 100:g}% coupon"
+    specs = [("Baseline · 10y · 4% coupon", 0.04, 10, True),
+             (selected_label, coupon, maturity, False)]
+    curves, rows = [], []
+    for label, rate, years, baseline in specs:
+        current = price(rate, years, data.ytm)
+        shocked = price(rate, years, data.ytm + 0.01)
+        curves.append(dict(label=label, baseline=baseline,
+                           points=[dict(x=y, y=price(rate, years, y)) for y in grid],
+                           marker=dict(x=data.ytm, y=current)))
+        rows.append([label, f"{current:.2f}", f"{shocked:.2f}", f"{shocked / current - 1:+.2%}"])
+    timeline = valuation(BondInputs(instrument="zero" if coupon == 0 else "coupon", face_value=100, coupon_rate=coupon,
+                                    maturity_years=maturity, ytm=data.ytm))
+    return dict(curves=curves, rows=rows,
+                headers=["Bond", f"Price at {data.ytm:.2%}", f"Price at {data.ytm + 0.01:.2%}", "Price change (%)"],
+                title=title, x_label="Annual nominal YTM · semiannual compounding",
+                y_label="Price per $100 face", percent_y=False, y_domain=[0, 250],
+                reference_x=data.ytm, reference_y=100, insight=insight,
+                timeline=timeline, timeline_label=f"{maturity:g}-year bond · {coupon * 100:g}% coupon · $100 principal",
+                identical=identical)

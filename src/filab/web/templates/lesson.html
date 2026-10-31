@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+{% macro control(name, label, value, min, max, step, unit='', hint='', input_name='') %}
+<div class="control" data-control="{{ name }}"><label for="{{ name }}">{{ label }} <span class="unit">{{ unit }}</span></label><div class="number-wrap"><input id="{{ name }}" name="{{ input_name or name }}" type="number" inputmode="decimal" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" aria-describedby="{{ name }}-error{% if hint %} {{ name }}-hint{% endif %}"></div><input class="range" type="range" min="{{ min }}" max="{{ max }}" step="{{ step }}" value="{{ value }}" aria-label="{{ label }} slider" data-pair="{{ name }}">{% if hint %}<small id="{{ name }}-hint">{{ hint }}</small>{% endif %}<small class="field-error" id="{{ name }}-error" data-error-for="{{ input_name or name }}"></small></div>
+{% endmacro %}
+{% macro date_control(name, label, value) %}
+<div class="control"><label for="{{ name }}">{{ label }}</label><div class="number-wrap"><input id="{{ name }}" name="{{ name }}" type="date" value="{{ value }}" required aria-describedby="{{ name }}-error"></div><small class="field-error" id="{{ name }}-error" data-error-for="{{ name }}"></small></div>
+{% endmacro %}
+{% macro choices(id, name, label, options, hint='', selected='') %}
+<fieldset class="choice-group" id="{{ id }}"><legend>{{ label }}</legend><div class="choice-options">
+{% for value, title, detail in options %}<label class="choice-option"><input type="radio" name="{{ name }}" value="{{ value }}" id="{{ id }}-{{ value }}" {% if value == selected or (not selected and loop.first) %}checked{% endif %} aria-describedby="{{ id }}-error{% if hint %} {{ id }}-hint{% endif %}"><span><strong>{{ title }}</strong>{% if detail %}<small>{{ detail }}</small>{% endif %}</span></label>{% endfor %}
+</div>{% if hint %}<small class="choice-hint" id="{{ id }}-hint">{{ hint }}</small>{% endif %}<small class="field-error" id="{{ id }}-error" data-error-for="{{ name }}"></small></fieldset>
+{% endmacro %}
+{% block content %}
+<div class="lesson-heading"><div class="eyebrow"><span class="eyebrow-line"></span> LESSON {{ '%02d'|format(lesson_number) }} <span class="eyebrow-divider">/</span> {{ lesson.tag|upper }}</div><h1>{{ lesson.headline }}</h1><p>{{ lesson.description }}</p></div>
+{% if active == 'bond-pricing-lab' %}
+<section class="lab-section" data-experiment>
+<div class="experiment-tabs" role="group" aria-label="Choose an experiment"><button class="selected" data-mode="maturity" aria-pressed="true">01 <span>Maturity</span></button><button data-mode="coupon" aria-pressed="false">02 <span>Coupon</span></button><button data-mode="sensitivity" aria-pressed="false">03 <span>Payment timing</span></button></div>
+<div class="workspace"><form class="controls card" novalidate>
+<div class="card-overline">ONE BOND · ONE CHANGING VARIABLE</div><h2>Compare with the original.</h2>
+<p class="experiment-instruction" data-variable-instruction>Change maturity. The annual coupon stays at 4%.</p>
+{{ control('maturity_years', 'Remaining maturity', 20, 0.5, 30, 0.5, 'years') }}
+{{ control('coupon_rate', 'Annual coupon', 4, 0, 12, 0.5, '%') }}
+<div data-timing-control hidden>{{ choices('payment_type', 'payment_type', 'Selected payment type', [('zero', 'Zero coupon', 'principal only'), ('coupon', 'Coupon bond', '4% annual coupon')], '') }}</div>
+{{ control('ytm', 'Compare at YTM', 5, 0, 10, 0.25, '%', 'Moves the markers and yield-shock comparison, not the curves.') }}
+<div class="convention"><strong>Baseline: 10 years · 4% coupon</strong><br>Face value: $100 for both bonds.<br>Semiannual coupons & compounding.<br>Disabled inputs stay fixed.</div>
+<button type="button" class="reset" data-custom-reset>↺ Reset experiment</button><p class="error" role="alert" data-error></p></form>
+<div class="results"><div class="card chart-card"><div class="chart-heading"><div><div class="card-overline">SAME AXES IN EVERY TAB</div><h2 data-chart-title>Change maturity. Keep the coupon fixed.</h2></div><span class="live-tag">LIVE MODEL</span></div>
+<div class="chart" data-chart></div><p class="experiment-baseline">Dashed: original 10-year, 4% coupon bond. Solid: your selected bond.<br>Both axes stay fixed: YTM from 0–10%, price from $0–250 per $100 face.</p><div class="insight" data-insight>Change one input and compare the new curve with the original.</div></div>
+<div class="card table-card"><div class="card-overline">SAME +100 BP YIELD SHOCK · COMPARE PERCENTAGE RESPONSE</div><div data-table class="table-scroll" tabindex="0" aria-label="Experiment results"></div><p class="tiny-note">The plot shows dollar prices. Percentage changes are reported here, using each bond’s own starting price. No time passes: this is not a holding-period return.</p></div>
+<div class="card chart-card selected-timeline-card"><div class="card-overline">WHY THE CURVE CHANGES</div><h2>The selected bond’s payments</h2><p class="tiny-note" data-timeline-label></p><div class="chart" data-selected-timeline></div></div>
+<details class="card chart-data"><summary>View all plotted prices</summary><div data-plot-table class="table-scroll" tabindex="0" aria-label="Plotted values"></div></details>
+</div></div>
+</section>
+{% elif active == 'yield-to-maturity' %}
+<section class="yield-section" data-yield aria-labelledby="yield-heading">
+<div class="section-heading"><div><div class="eyebrow">WORK BACKWARD FROM PRICE</div><h2 id="yield-heading">Compare three rates.</h2></div></div>
+<div class="workspace"><form class="controls card" novalidate>
+<div class="card-overline">PRICE → YIELD</div><h2>Set the purchase price.</h2>
+{{ control('yield-price', 'Bond price', '98.12', 0.01, 300, 0.01, '$', 'Dollars per $100 face. Type a price or move the slider.', 'price') }}
+{{ control('yield-coupon', 'Annual coupon', 4, 0, 12, 0.5, '%', input_name='coupon_rate') }}
+{{ control('yield-maturity', 'Remaining maturity', 2, 0.5, 30, 0.5, 'years', 'Whole coupon periods; a zero coupon rate is supported.', 'maturity_years') }}
+{{ choices('yield-frequency', 'frequency', 'Payments & compounding', [('1', 'Annual', '1 per year'), ('2', 'Semiannual', '2 per year'), ('4', 'Quarterly', '4 per year')], '', selected='2') }}
+<div class="convention">Face value: $100.<br>Valued just after a coupon date.<br>Clean price = dirty price; accrued interest is zero.<br>YTM is an implied rate, not a forecast.</div>
+<button type="button" class="reset">↺ Reset inputs</button><p class="error" role="alert" data-error></p></form>
+<div class="results"><div class="metrics" aria-live="polite" aria-atomic="true">
+<div class="metric primary-metric"><span>Annual nominal YTM</span><strong data-yield-metric="ytm">—</strong><small>Discounts all payments to your price</small></div>
+<div class="metric"><span>Current yield</span><strong data-yield-metric="current_yield">—</strong><small>Annual coupon dollars ÷ price</small></div>
+<div class="metric"><span>Coupon rate</span><strong data-yield-metric="coupon_rate">—</strong><small>Annual coupon dollars ÷ $100 face</small></div>
+</div><div class="card table-card"><div class="card-overline">VERIFY THE IMPLIED YIELD</div>
+<p class="tiny-note" data-yield-check>Discounting at the solved yield should reproduce the entered price.</p>
+<div data-table class="table-scroll" tabindex="0" aria-label="Payments discounted at implied yield"></div>
+<div class="insight" data-yield-insight></div></div></div></div></section>
+{% elif active == 'settlement-and-accrued-interest' %}
+<section class="workspace" data-settlement><form class="controls card" novalidate>
+<div class="card-overline">A DATED SEMIANNUAL BOND</div><h2>Set the settlement.</h2>
+{{ choices('settlement-mode', 'mode', 'Calculate', [('price', 'Prices from YTM', ''), ('yield', 'YTM from price', '')], '') }}
+{{ date_control('issue_date', 'Issue / accrual start date', '2025-11-15') }}
+{{ date_control('settlement_date', 'Settlement date', '2026-08-15') }}
+{{ date_control('maturity_date', 'Maturity date', '2028-11-15') }}
+{{ control('settlement-coupon', 'Annual coupon', 4, 0, 12, 0.5, '%', input_name='coupon_rate') }}
+{{ control('settlement-ytm', 'Annual nominal YTM', 5, -2, 20, 0.25, '%', input_name='ytm') }}
+{{ control('settlement-price', 'Purchase price', '98.00', 0.01, 300, 0.01, '$', input_name='price') }}
+{{ choices('price_type', 'price_type', 'Entered price is', [('clean', 'Clean', 'excludes accrued interest'), ('dirty', 'Dirty', 'full settlement amount')], '') }}
+<div class="convention">$100 face · semiannual coupons.<br>Actual/Actual coupon-period accrual.<br>First fractional period: simple discounting.<br>Regular dates; no holiday adjustments.<br>Settlement on a coupon date is after payment.</div>
+<button type="button" class="reset">↺ Reset inputs</button><p class="error" role="alert" data-error></p></form>
+<div class="results"><div class="metrics" aria-live="polite" aria-atomic="true">
+<div class="metric primary-metric"><span>Dirty price · amount paid</span><strong data-settlement-metric="dirty_price">—</strong><small>Clean price + accrued interest</small></div>
+<div class="metric"><span>Clean price</span><strong data-settlement-metric="clean_price">—</strong><small>Excludes accrued interest</small></div>
+<div class="metric"><span>Accrued interest</span><strong data-settlement-metric="accrued_interest">—</strong><small>Compensates for elapsed coupon time</small></div></div>
+<div class="card table-card settlement-summary"><p data-settlement-summary aria-live="polite"></p><div data-accrual-table class="table-scroll" tabindex="0" aria-label="Actual coupon period day counts"></div></div>
+<div class="card chart-card"><div class="card-overline">HOLD YTM FIXED · LET TIME PASS</div><h2>Watch clean and dirty prices approach maturity.</h2><div data-chart class="chart"></div><div class="insight">Dirty price drops when a coupon is paid. That drop is accompanied by cash received. The last point is the day before maturity: clean price approaches $100; dirty price includes the final coupon. This chart is not total return.</div></div>
+<div class="card table-card"><div class="card-overline">PAYMENTS AFTER SETTLEMENT</div><div data-table class="table-scroll" tabindex="0" aria-label="Dated payment present values"></div></div>
+<details class="card chart-data"><summary>View the price path</summary><div data-path-table class="table-scroll" tabindex="0" aria-label="Clean and dirty price path"></div></details>
+</div></section>
+{% elif active == 'treasury-bill-yields' %}
+<section class="workspace" data-bills><form class="controls card" novalidate>
+<div class="card-overline">NO COUPONS · ONE REDEMPTION</div><h2>Read a discount quote.</h2>
+{{ control('bill-discount', 'Bank discount rate', 5, 0, 20, 0.125, '%', input_name='discount_rate') }}
+{{ control('days_to_maturity', 'Days to maturity', 182, 1, 366, 1, 'days') }}
+{{ choices('year_days', 'year_days', 'Investment-yield year basis', [('365', '365 days', 'ordinary year'), ('366', '366 days', 'includes February 29')], '') }}
+<div class="convention">$100 face value.<br>Discount quote: actual days / 360.<br>Investment yield: 365 or 366 days.<br>Beyond half a year: coupon-equivalent quadratic.<br>Full precision calculations; dollar displays round to cents.</div>
+<button type="button" class="reset">↺ Reset inputs</button><p class="error" role="alert" data-error></p></form>
+<div class="results"><div class="metrics" aria-live="polite" aria-atomic="true">
+<div class="metric primary-metric"><span>Purchase price</span><strong data-bill-price>—</strong><small>Dollars per $100 face</small></div>
+<div class="metric"><span>Bank discount yield</span><strong data-bill-metric="discount_rate">—</strong><small>Discount / face · 360-day year</small></div>
+<div class="metric"><span>Coupon-equivalent yield</span><strong data-bill-metric="investment_rate">—</strong><small>Also called bond-equivalent / investment yield</small></div></div>
+<div class="card table-card"><div class="card-overline">SAME BILL · DIFFERENT DENOMINATORS</div><div data-table class="table-scroll" tabindex="0" aria-label="Treasury bill quotation comparison"></div><p class="insight" data-bill-insight></p></div>
+<div class="card chart-card"><div class="card-overline">KEEP THE DISCOUNT QUOTE FIXED</div><h2>How the conversion changes with maturity.</h2><div data-chart class="chart"></div><div class="insight"><strong>Why the bend?</strong> The dotted line marks half a year: one interest period in the semiannual coupon-bond benchmark. Shorter bills use simple annualization; longer bills include a compounding adjustment. The formulas meet at the line, but their slopes differ. The bill itself still pays only at maturity.<br>Markers show your selected maturity. These are hypothetical bills, not historical market observations.</div></div>
+</div></section>
+{% else %}
+<section class="workspace" data-valuation data-lesson="{{ active }}"><form class="controls card" novalidate><div class="card-overline">YOUR HYPOTHETICAL BOND</div><h2>{{ 'Build the schedule.' if active == 'bond-basics' else 'Set the inputs.' }}</h2>
+{% if active != 'bond-basics' %}{{ choices('instrument', 'instrument', 'Payment type', [('coupon', 'Fixed-coupon bond', ''), ('zero', 'Zero-coupon bond', '')], '') }}{% endif %}
+{{ control('face_value', 'Face value', 1000, 100, 10000, 100, '$') }}
+{{ control('coupon_rate', 'Annual coupon', 4, 0, 12, 0.5, '%') }}
+{{ control('maturity_years', 'Remaining maturity', 2, 0.5, 30, 0.5, 'years', 'Coupon bonds require whole coupon periods.') }}
+{% if active != 'bond-basics' %}{{ control('ytm', 'Annual nominal YTM', 5, 0, 12, 0.25, '%') }}{% endif %}
+{{ choices('frequency', 'frequency', 'Coupon frequency' if active == 'bond-basics' else 'Payments & compounding', [('1', 'Annual', '1 per year'), ('2', 'Semiannual', '2 per year'), ('4', 'Quarterly', '4 per year')], 'Annual compounding makes the nominal and effective rates equal.', selected='2') }}<div class="convention">Valued just after a coupon date.<br>Fixed payments. No accrued interest.<br>{{ 'Coupon rate determines payments.' if active == 'bond-basics' else 'YTM is supplied, not forecast.' }}</div><button type="button" class="reset">↺ Reset inputs</button><p class="error" role="alert" data-error></p></form>
+<div class="results"><div class="metrics" aria-live="polite" aria-atomic="true"><div class="metric primary-metric"><span>{{ 'Each coupon' if active == 'bond-basics' else 'Present value / price' }}</span><strong data-metric="main">—</strong><small data-price-label>{{ 'Interest paid on a coupon date' if active == 'bond-basics' else 'Calculated from every payment' }}</small></div><div class="metric"><span>{{ 'Total coupons' if active == 'bond-basics' else 'PV of coupons' }}</span><strong data-metric="coupon">—</strong><small>{{ 'Over the remaining life' if active == 'bond-basics' else 'Payments before and at maturity' }}</small></div><div class="metric"><span>{{ 'Principal repaid' if active == 'bond-basics' else 'PV of principal' }}</span><strong data-metric="principal">—</strong><small>{{ 'At maturity' if active == 'bond-basics' else 'Face value, discounted to today' }}</small></div></div>
+<div class="card chart-card"><div class="chart-heading"><div><div class="card-overline">{{ 'FOLLOW THE MONEY' if active == 'bond-basics' else 'CASH FLOW → PRESENT VALUE' }}</div><h2>{{ 'The payment timeline' if active == 'bond-basics' else 'Every payment has a present value.' }}</h2></div><span class="live-tag">LIVE MODEL</span></div><div data-chart class="chart"></div><div class="insight">{{ 'The final payment combines the last coupon and principal. See the table for exact amounts.' if active == 'bond-basics' else 'The payments stay fixed when YTM changes. Their present values change.' }}</div></div>
+<div class="card table-card"><div class="table-heading"><div class="card-overline">PAYMENT-BY-PAYMENT BREAKDOWN</div><span data-count></span></div><div data-table class="table-scroll" tabindex="0" aria-label="Cash-flow breakdown"></div></div></div></section>
+{% endif %}
+{% if active == 'present-value' %}
+<section class="rate-section card" data-rates><div class="section-heading"><div><div class="eyebrow">A RATE IS ALSO A CONVENTION</div><h2>What does “4% a year” mean?</h2></div></div><p>A bond pays coupons on fixed dates. Reinvestment is a separate action. Compare the same annual coupon stream with and without reinvesting it.</p><form class="rate-controls" novalidate>{{ choices('convention', 'convention', 'The rate I know', [('nominal', 'Annual nominal rate', ''), ('effective', 'Effective annual rate', '')], '') }}{{ control('rate', 'Known annual rate', 4, 0, 20, 0.25, '%') }}{{ choices('rate-frequency', 'frequency', 'Compounding / coupon frequency', [('1', 'Annual', '1'), ('2', 'Semiannual', '2'), ('4', 'Quarterly', '4'), ('12', 'Monthly', '12')], '', selected='2') }}</form><p class="error" role="alert" data-error></p><div class="rate-result" aria-live="polite"><div><span>ANNUAL NOMINAL RATE</span><strong data-rate="nominal_rate">—</strong></div><span class="rate-arrow" aria-hidden="true">⇄</span><div><span>EFFECTIVE ANNUAL RATE</span><strong data-rate="effective_rate">—</strong></div></div><div class="reinvestment"><div><span class="reinvestment-label">Hold coupons as cash</span><strong data-rate="held_interest">—</strong><small>One year of interest / $1,000 face</small></div><div><span class="reinvestment-label">Reinvest every coupon</span><strong data-rate="reinvested_interest">—</strong><small>One year of interest, including interest on interest</small></div><div class="reinvestment-extra"><span>FROM REINVESTMENT</span><strong data-rate="extra_interest">—</strong></div></div><p class="tiny-note">Assumes purchase at par, unchanged value or redemption at par after one year, and reinvestment at the same periodic rate. The bond itself does not compound your coupons.</p></section>
+{% endif %}
+<section class="reading-section"><div class="section-heading"><div><div class="eyebrow">CONNECT THE DOTS</div><h2>The explanation behind the experiment</h2></div></div><article class="prose">{{ body|safe }}</article></section>
+{% if implementation %}
+<details class="card under-hood" id="under-the-hood"><summary>Under the hood <span>Optional Python examples</span></summary><div class="prose">{{ implementation|safe }}</div></details>
+{% endif %}
+<nav class="lesson-pagination" aria-label="Previous and next lesson">{% if previous %}<a href="/lessons/{{ previous.slug }}"><small>← PREVIOUS LESSON</small><span>{{ previous.title }}</span></a>{% else %}<a href="/"><small>← YOUR LEARNING DESK</small><span>Course overview</span></a>{% endif %}{% if next %}<a href="/lessons/{{ next.slug }}" class="next-lesson"><small>NEXT LESSON →</small><span>{{ next.title }}</span></a>{% else %}<a href="/#curriculum" class="next-lesson"><small>WHAT COMES NEXT →</small><span>The full curriculum</span></a>{% endif %}</nav>
+{% endblock %}

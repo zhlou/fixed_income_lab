@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fixed-income-lab"
+version = "0.1.0"
+description = "A learning-driven fixed-income research laboratory."
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib",
+]
+
+[project.optional-dependencies]
+web = [
+    "fastapi>=0.115",
+    "uvicorn>=0.30",
+    "jinja2>=3.1",
+    "markdown-it-py>=3",
+    "mdit-py-plugins>=0.4",
+]
+dev = [
+    "jupyterlab",
+    "ipykernel",
+    "ipywidgets",
+    "pytest",
+    "httpx",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.setuptools.package-data]
+"filab.web" = ["templates/*.html", "content/*.md", "static/*", "static/vendor/katex/*", "static/vendor/katex/fonts/*"]
