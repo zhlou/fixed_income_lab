@@ -48,3 +48,9 @@ The bill calculator uses actual/360 bank discount pricing and an explicit
 365/366 investment-year basis. It applies the coupon-equivalent quadratic
 beyond half a year. No online data or QuantLib installation is required to
 repeat the published-reference checks.
+
+## M1 follow-on
+
+The pricing interfaces and conventions above remain unchanged. Duration,
+convexity, numerical dated sensitivities, and yield-shock approximation checks
+are documented separately in [M1 validation](m1_validation.md).

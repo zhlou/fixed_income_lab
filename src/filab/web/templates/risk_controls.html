@@ -1,0 +1,35 @@
+{% from 'controls.html' import control, date_control, choices %}
+<section class="risk-explorer" data-risk>
+<div class="risk-toolbar card"><div><strong>Keep this comparison</strong><p class="tiny-note">Export your current valid inputs, then import them on any risk page. Results are recalculated locally.</p></div><div class="risk-file-actions"><button type="button" class="button" data-risk-export disabled>Export comparison</button><label class="button risk-file-label">Import comparison<input type="file" accept=".json,application/json" data-risk-import aria-label="Import comparison JSON file"></label></div><p class="error" role="alert" data-file-error></p><p class="tiny-note" role="status" data-file-status></p></div>
+<div class="workspace"><form class="controls card risk-form" novalidate>
+<div class="card-overline">TWO BONDS · SAME FACE & YIELD</div><h2>Set the comparison.</h2>
+{{ choices('risk-mode', 'mode', 'Valuation timing', [('regular', 'Regular periods', 'just after a coupon'), ('dated', 'Dated settlement', 'numerical dirty-price risk')], selected='regular') }}
+{{ control('risk-face', 'Face value · each bond', 100, 100, 10000000, 100, '$', 'Equal face value, not equal market value.', 'face_value') }}
+{{ control('risk-ytm', 'Annual nominal YTM · both', 5, -2, 20, 0.25, '%', input_name='ytm') }}
+{{ choices('risk-frequency', 'frequency', 'Payments & compounding', [('1', 'Annual', '1 per year'), ('2', 'Semiannual', '2 per year'), ('4', 'Quarterly', '4 per year'), ('12', 'Monthly', '12 per year')], selected='2') }}
+<div class="risk-dates" data-risk-dated hidden>
+{{ date_control('issue_date', 'Issue / accrual start · both', '2025-11-15') }}
+{{ date_control('settlement_date', 'Settlement date · both', '2026-08-15') }}
+</div>
+<div class="risk-bond"><h3>Bond A · inspect its payments</h3>
+{{ control('risk-coupon', 'Coupon · A', 4, 0, 20, 0.25, '%', 'Set to zero for principal-only payments.', 'coupon_rate') }}
+<div data-risk-regular>{{ control('risk-maturity', 'Remaining maturity · A', 2, 1, 30, 1, 'years', 'Whole years keep all frequency choices comparable.', 'maturity_years') }}</div>
+<div data-risk-dated hidden>{{ date_control('maturity_date', 'Maturity date · A', '2028-11-15') }}</div></div>
+<div class="risk-bond"><h3>Bond B · comparison</h3>
+{{ control('risk-comparison-coupon', 'Coupon · B', 4, 0, 20, 0.25, '%', input_name='comparison_coupon_rate') }}
+<div data-risk-regular>{{ control('risk-comparison-maturity', 'Remaining maturity · B', 10, 1, 30, 1, 'years', input_name='comparison_maturity_years') }}</div>
+<div data-risk-dated hidden>{{ date_control('comparison_maturity_date', 'Maturity date · B', '2036-11-15') }}</div></div>
+{{ choices('risk-shock', 'shock_bp', 'Highlighted yield shock', [('-200', '−200 bp', ''), ('-100', '−100 bp', ''), ('-50', '−50 bp', ''), ('-25', '−25 bp', ''), ('0', '0 bp', ''), ('25', '+25 bp', ''), ('50', '+50 bp', ''), ('100', '+100 bp', ''), ('200', '+200 bp', '')], selected='100') }}
+<div class="convention" data-risk-convention>Hypothetical bonds. No time passes.<br>Rates are supplied, not forecast.<br>Price and dollar risk use the selected face value.</div>
+<button type="button" class="reset">↺ Reset comparison</button><p class="error" role="alert" data-error></p></form>
+<div class="results" data-risk-results>
+<p class="tiny-note" role="status" data-risk-state>Calculating…</p>
+<div class="metrics" aria-live="polite" aria-atomic="true"><div class="metric primary-metric"><span>Bond A · modified duration</span><strong data-risk-duration>—</strong><small>Years · sensitivity to its own YTM</small></div><div class="metric"><span>Bond A · DV01</span><strong data-risk-dv01>—</strong><small>Positive dollars per 1 bp</small></div><div class="metric"><span>Bond A · convexity</span><strong data-risk-convexity>—</strong><small>Years² · P″ / P</small></div></div>
+<div class="card table-card"><div class="card-overline">COMPARE CASH-FLOW TIMING AND RISK</div><div data-risk-summary class="table-scroll" tabindex="0" aria-label="Risk measures for both bonds"></div><p class="tiny-note">Dollar duration = −dP/dy per unit decimal yield. DV01 = dollar duration × 0.0001. Both are positive magnitudes for these bonds; a yield increase produces a negative first-order price change. Small dollar exposures can round to $0.00; increase face value to inspect them.</p></div>
+<div class="card chart-card"><div class="card-overline">EXACT REPRICING · BOTH BONDS</div><h2>Same yield shock. Different response.</h2><div class="chart" data-risk-comparison-chart></div><div class="insight" data-risk-insight></div></div>
+<div class="card table-card"><div class="card-overline">HIGHLIGHTED SHOCK · DOLLARS AND PERCENT</div><div data-risk-selected class="table-scroll" tabindex="0" aria-label="Selected shock for both bonds"></div><p class="tiny-note">Percentages use each bond's own initial dirty price. No coupons, time passage, or reinvestment: this is not total return.</p></div>
+<details class="card risk-details" {% if active == 'macaulay-duration' %}open{% endif %}><summary>Why timing matters · Bond A's payment weights</summary><div data-risk-weights-chart class="chart"></div><p class="tiny-note" data-risk-weights-note></p><div data-risk-weights class="table-scroll" tabindex="0" aria-label="Present value weights for Bond A"></div></details>
+<div class="card chart-card"><div class="card-overline">BOND A · EXACT VERSUS APPROXIMATE</div><h2>How much does the straight line miss?</h2><div class="chart" data-risk-approximation-chart></div><div class="insight">Duration is the tangent at the starting yield. Convexity adds curvature. Neither estimate is guaranteed accurate for a large shock. The table reports signed error: estimate minus exact change.</div></div>
+<details class="card risk-details" open><summary>Shock grid · inspect both bonds and approximation errors</summary><p class="tiny-note">Δ means change from the initial price. Error % is the dollar error divided by that same initial price, displayed as percentage points.</p><div data-risk-shocks class="table-scroll" tabindex="0" aria-label="Exact and approximate yield shocks and signed errors"></div></details>
+<details class="card risk-details"><summary>Numerical check · does a smaller bump agree?</summary><p class="tiny-note">Bumps are ±1, ±0.5, and ±0.25 bp. Regular-period results have an analytical reference. Dated results use ±0.5 bp and the original dirty-price pricer; smaller bumps eventually suffer rounding cancellation. Macaulay duration is not reported for this dated convention.</p><div data-risk-convergence class="table-scroll" tabindex="0" aria-label="Numerical duration and convexity convergence"></div></details>
+</div></div></section>

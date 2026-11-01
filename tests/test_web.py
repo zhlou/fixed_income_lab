@@ -182,14 +182,14 @@ def test_currency_is_not_mistaken_for_inline_math():
     assert 'math inline' in markdown.render('Time $T$ is in years.')
 
 
-def test_six_lesson_sequence_and_optional_implementation():
+def test_nine_lesson_sequence_and_optional_implementation():
     import re
     home = client.get('/').text
-    assert '6 available lessons' in home
-    assert home.count('class="lesson-card"') == 6
+    assert '9 available lessons' in home
+    assert home.count('class="lesson-card"') == 9
     for slug in ('bond-basics', 'present-value', 'bond-pricing-lab', 'yield-to-maturity', 'settlement-and-accrued-interest', 'treasury-bill-yields'):
         page = client.get('/lessons/' + slug).text
-        assert page.count('class="lesson-link ') == 6
+        assert page.count('class="lesson-link ') == 9
         assert 'href="/lessons/cash-flows-and-pricing"' not in page
     second = client.get('/lessons/present-value').text
     assert 'Present value &amp; bond pricing' in second

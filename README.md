@@ -1,6 +1,7 @@
 # Fixed-Income Lab
 
-A local, interactive learning website for fixed-income mathematics. Each
+A local, interactive learning website for fixed-income mathematics, growing
+toward a reproducible workbench for bond strategies and historical returns. Each
 lesson combines a working experiment, an explanation, and optional Python
 examples. The Python backend uses the existing tested `filab.pricing` package.
 
@@ -45,12 +46,20 @@ The development command above watches only application source files.
 | `/lessons/yield-to-maturity` | Price-to-YTM solving and coupon/current-yield comparisons |
 | `/lessons/settlement-and-accrued-interest` | Dated pricing, accrued interest, clean/dirty YTM, and pull-to-par |
 | `/lessons/treasury-bill-yields` | Bank discount and coupon-equivalent yield conventions |
+| `/lessons/macaulay-duration` | Present-value weights and average payment time |
+| `/lessons/modified-duration-dv01` | Percentage sensitivity, dollar duration, and DV01 |
+| `/lessons/convexity` | Exact repricing, curvature, and approximation error |
+| `/tools/bond-risk` | Reusable two-bond risk comparison with JSON export/import |
 
-The six-lesson sequence is **Bond Basics → Present Value and Bond Pricing
+The six foundations lessons are **Bond Basics → Present Value and Bond Pricing
 → Bond Pricing Lab → Yield to Maturity → Settlement and Accrued Interest
 → Treasury Bill Yields**. Lesson 2 includes optional Python examples in a collapsed
 “Under the hood” section. Implementation is supplementary, not a separate
 required lesson. The former implementation page redirects to that section.
+M1 adds three lessons: **Cash-flow timing & duration → Modified duration & DV01
+→ Convexity & approximation error**. Each has prediction prompts, a derivation,
+a worked example, reflection questions, and a transfer exercise with a collapsed
+answer. The shared Risk Explorer is also available outside the lesson sequence.
 
 Use the course sidebar and previous/next links to move between lessons.
 Discrete controls use visible option cards so every choice is shown without
@@ -93,10 +102,42 @@ settlement is after payment. Bill yields use the selected 365/366 basis and
 the coupon-equivalent quadratic beyond half a year. Input ranges are bounded
 for the website; original pricing interfaces remain available.
 
+## Bond Risk Explorer (M1)
+
+Open `/tools/bond-risk` to compare two hypothetical bonds at the same face value,
+yield, and payment frequency. Change coupon/maturity independently. The explorer
+shows Macaulay and modified duration, dollar duration, DV01, convexity, payment
+weights, and exact versus approximate shocks of ±25, ±50, ±100, and ±200 bp.
+Errors are signed estimates minus exact changes, in dollars and percentage points.
+These are immediate repricings, not holding-period returns.
+
+Regular mode uses analytical derivatives, checked numerically. Dated mode keeps
+the existing settlement pricer, normalizes by dirty price, and uses a ±0.5 bp
+central bump; the table also shows ±1 and ±0.25 bp. No textbook Macaulay conversion
+is asserted for dated pricing. Dollar duration means −dP/dy per unit decimal yield;
+DV01 is that positive magnitude times 0.0001. Negative yields are supported within
+the bounded controls. Dates and model exclusions are displayed beside the inputs.
+
+`POST /api/risk` accepts `mode` (`regular` or `dated`), `face_value`, decimal `ytm`,
+`frequency`, `coupon_rate`, `maturity_years`, `comparison_coupon_rate`,
+`comparison_maturity_years`, `issue_date`, `settlement_date`, `maturity_date`,
+`comparison_maturity_date`, and integer `shock_bp`. Defaults reproduce the lessons.
+Each of the two returned `bonds` contains `risk`, `cashflows`, `convergence`,
+`points`, `scenarios`, and the highlighted `selected` shock.
+
+**Export comparison** downloads JSON with `schema_version: 1`,
+`kind: "filab-bond-risk"`, `conventions: "nominal-yield-risk-v1"`, and complete
+`inputs`. **Import comparison** validates the complete snapshot through
+`POST /api/risk-study` before restoring inputs and recalculating. Incompatible
+files leave the comparison unchanged. This saves assumptions, not frozen outputs
+or historical research runs. Inputs are local; there is no cloud account or feed.
+
 ## Project layout
 
 ```text
 src/filab/pricing/          Reusable pricing calculations
+src/filab/risk/             Yield derivatives and comparison scenarios
+src/filab/web/curriculum.py Published lessons and milestone registry
 src/filab/web/app.py        Lesson routes and numerical API
 src/filab/web/content/      Website lesson Markdown
 src/filab/web/templates/    Shared page templates
@@ -107,8 +148,13 @@ notebooks/                 Preserved original learning experiments
 ```
 
 The website Markdown is the source for website lessons. Original notes and
-Notebook 01 remain available as reference artifacts. The [12-week project
-plan](fixed_income_lab_plan.md) defines future lesson modules and labs.
+Notebook 01 remain available as reference artifacts. The [project
+plan](fixed_income_lab_plan.md) evaluates the existing implementation and defines
+milestones for learning, educational lessons, and a historical research workbench.
+M1 duration and convexity is implemented. The next milestone is return accounting,
+followed by historical data, discount curves, and a small two-strategy research release.
+Historical research, saved studies, and data feeds are planned, not available yet.
+The website roadmap now shows milestone availability without week-based promises.
 Application resources resolve relative to the package, not the working
 directory. After moving a checkout, recreate its virtual environment or
 reinstall the editable package if its scripts still reference the old path.
@@ -129,7 +175,9 @@ zero-coupon formulas, zero and negative yields, payment frequencies, and
 invalid prices. Dated pricing, accrued interest, and bill quotation checks use published
 Treasury examples. See [Phase 1 validation](notes/phase_1_validation.md) for
 sources, tolerances, and model limits. Phase 1 software is complete; the
-next implementation milestone is duration and convexity.
+next implementation milestone is return accounting (M2). M1 software is also
+complete; learner reflection remains separate. See [M1 validation](notes/m1_validation.md)
+and the intentionally unanswered [learning journal](notes/m1_learning_journal.md).
 
 ## Original Python and notebook workflow
 

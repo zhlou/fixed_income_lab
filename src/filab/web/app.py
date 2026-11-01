@@ -13,48 +13,29 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from markdown_it import MarkdownIt
 from mdit_py_plugins.dollarmath import dollarmath_plugin
-from pydantic import BaseModel, ConfigDict, Field
+from mdit_py_plugins.container import container_plugin
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from filab.pricing import fixed_coupon_cashflows, price_coupon_bond, price_zero_coupon, yield_to_maturity
 from filab.pricing import coupon_schedule, settled_bond_valuation, settled_yield_to_maturity, treasury_bill
 from filab.pricing.settlement import SettlementError
 
+from filab.risk.explorer import compare_bonds
+from .curriculum import LESSONS, ROADMAP
+
 HERE = Path(__file__).resolve().parent
-LESSONS = [
-    dict(slug="bond-basics", title="Bond basics", headline="Meet the cash flows.",
-         description="A bond is a promise about money and time. Change the terms and see exactly what gets paid.",
-         tag="The building blocks", duration="15 min", file="basics.md"),
-    dict(slug="present-value", title="Present value & bond pricing", headline="Bring the future back.",
-         description="Discount future payments, understand annual rate conventions, and add them up to price a bond.",
-         tag="The time value of money", duration="25 min", file="present-value.md"),
-    dict(slug="bond-pricing-lab", title="Bond pricing lab", headline="Change one thing.",
-         description="Hold the assumptions still. Move yield, maturity, or coupon—and learn from what changes.",
-         tag="Experiment & explain", duration="30 min", file="lab.md"),
-    dict(slug="yield-to-maturity", title="Yield to maturity", headline="What yield does this price imply?",
-         description="Work backward from a bond price, then compare coupon rate, current yield, and yield to maturity.",
-         tag="Price to yield", duration="20 min", file="yield-to-maturity.md"),
-    dict(slug="settlement-and-accrued-interest", title="Settlement & accrued interest", headline="What do you actually pay?",
-         description="Move between coupon dates, separate clean and dirty prices, and follow a bond toward maturity.",
-         tag="Dates and dollars", duration="30 min", file="settlement.md"),
-    dict(slug="treasury-bill-yields", title="Treasury bill yields", headline="One bill. Different quoted yields.",
-         description="Translate a bank discount quote into price, holding-period return, and coupon-equivalent yield.",
-         tag="Read the convention", duration="20 min", file="bills.md"),
-]
-ROADMAP = [
-    ("01", "Bond mathematics", "Weeks 1–2", "Available"),
-    ("02", "Duration & convexity", "Weeks 3–4", "Coming later"),
-    ("03", "Treasury yield history", "Week 5", "Coming later"),
-    ("04", "Spot & forward curves", "Weeks 6–7", "Coming later"),
-    ("05", "Holding-period returns", "Week 8", "Coming later"),
-    ("06", "Yield-curve risk", "Week 9", "Coming later"),
-    ("07", "Inflation & TIPS", "Week 10", "Coming later"),
-    ("08", "Monetary policy", "Week 11", "Coming later"),
-    ("09", "Strategy laboratory", "Week 12", "Coming later"),
-]
 
 markdown = MarkdownIt("commonmark", {"html": False}).enable("table").use(
     dollarmath_plugin, allow_space=False, allow_digits=False,
 )
+
+def reveal_answer(renderer, tokens, idx, options, env):
+    if tokens[idx].nesting == 1:
+        return '<details class="exercise-answer"><summary>Reveal the explanation</summary>\n'
+    return '</details>\n'
+
+
+markdown.use(container_plugin, 'answer', render=reveal_answer)
 default_fence = markdown.renderer.rules["fence"]
 
 
@@ -335,3 +316,65 @@ def experiments(data: ExperimentInputs):
                 reference_x=data.ytm, reference_y=100, insight=insight,
                 timeline=timeline, timeline_label=f"{maturity:g}-year bond · {coupon * 100:g}% coupon · $100 principal",
                 identical=identical)
+
+
+class RiskInputs(Inputs):
+    mode: Literal['regular', 'dated'] = 'regular'
+    face_value: float = Field(default=100, ge=100, le=1e7)
+    ytm: float = Field(default=.05, ge=-.02, le=.20)
+    frequency: Literal[1, 2, 4, 12] = 2
+    coupon_rate: float = Field(default=.04, ge=0, le=.20)
+    maturity_years: float = Field(default=2, ge=1, le=30)
+    comparison_coupon_rate: float = Field(default=.04, ge=0, le=.20)
+    comparison_maturity_years: float = Field(default=10, ge=1, le=30)
+    issue_date: date = date(2025, 11, 15)
+    settlement_date: date = date(2026, 8, 15)
+    maturity_date: date = date(2028, 11, 15)
+    comparison_maturity_date: date = date(2036, 11, 15)
+    shock_bp: int = Field(default=100, ge=-200, le=200)
+
+
+class RiskStudy(Inputs):
+    # Required literals prevent silently accepting future or incompatible files.
+    schema_version: Literal[1]
+    kind: Literal['filab-bond-risk']
+    conventions: Literal['nominal-yield-risk-v1']
+    inputs: RiskInputs
+
+    @model_validator(mode='before')
+    @classmethod
+    def complete_snapshot(cls, value):
+        if isinstance(value, dict):
+            if type(value.get('schema_version')) is not int:
+                raise ValueError('The comparison version must be an integer.')
+            fields = value.get('inputs')
+            if not isinstance(fields, dict) or set(fields) != set(RiskInputs.model_fields):
+                raise ValueError('A saved comparison must include every input and its conventions.')
+        return value
+
+
+def calculate_risk(data):
+    try:
+        return compare_bonds(**data.model_dump())
+    except SettlementError as exc:
+        input_error(exc.field, str(exc))
+    except (ValueError, OverflowError, ZeroDivisionError) as exc:
+        input_error('ytm', str(exc))
+
+
+@app.post('/api/risk')
+def risk(data: RiskInputs):
+    return calculate_risk(data)
+
+
+@app.post('/api/risk-study')
+def risk_study(study: RiskStudy):
+    result = calculate_risk(study.inputs)
+    return dict(study=study.model_dump(mode='json'), result=result)
+
+
+@app.get('/tools/bond-risk')
+def risk_tool(request: Request):
+    return templates.TemplateResponse(request=request, name='risk.html', context={
+        'lessons': LESSONS, 'active': 'bond-risk', 'page_title': 'Bond Risk Explorer',
+    })

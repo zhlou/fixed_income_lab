@@ -1,14 +1,19 @@
 # Fixed-Income Lab — Status and Progress
 
-**Updated:** October 31, 2026 (America/Chicago)
+**Updated:** November 1, 2026 (America/Chicago)
 
 ## Current status
 
-**Phase 1 implementation and independent reference validation are complete
-for the regular-coupon educational model.** The local website has six
-interactive lessons. Phase 2, duration and convexity, is the next milestone;
-Phases 2–9 have not been implemented. The plan now also includes a
-credit and corporate bond extension (Phases 10–13); it has not been implemented.
+**Foundations implementation and independent reference validation are complete
+for the regular-coupon educational model** (original Phase 1, now M0).
+The local website has **nine interactive lessons**. **M1 risk calculations,
+lessons, and the Bond Risk Explorer are implemented and validated. M2 return
+accounting is next.** No M2–M7 calculation or research module is implemented.
+
+The revised plan prioritizes the user's intended daily use: **researching bond
+strategies and historical returns**. It brings return accounting forward, targets
+a small two-strategy historical research release at M5, and places TIPS, macro,
+credit, and advanced models after the nominal Treasury research core.
 
 Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
@@ -25,6 +30,9 @@ questions or demonstrated the learning checkpoints.
 | 4. Yield to Maturity | `/lessons/yield-to-maturity` | Solve yield from price; compare coupon rate, current yield, and YTM |
 | 5. Settlement & Accrued Interest | `/lessons/settlement-and-accrued-interest` | Actual settlement dates, clean/dirty prices, dated YTM solving, and pull-to-par |
 | 6. Treasury Bill Yields | `/lessons/treasury-bill-yields` | Discount quotations, investment yields, and the half-year convention change |
+| 7. Cash-flow timing & duration | `/lessons/macaulay-duration` | Present-value weights, zero/coupon comparisons, Macaulay duration |
+| 8. Modified duration & DV01 | `/lessons/modified-duration-dv01` | Yield sensitivity, face scaling, dated numerical checks |
+| 9. Convexity & approximation error | `/lessons/convexity` | Exact vs first/second-order repricing and signed shock errors |
 
 Each lesson has an overview card, sidebar entry, and previous/next navigation.
 Python examples are optional and collapsed. Original notes and Notebook 01
@@ -63,7 +71,7 @@ request and response schemas.
 
 ## Validation and model limits
 
-The latest full test run passed **221 tests**. Coverage includes pricing
+The final M1 test run on November 1, 2026 passed **313 tests**. Coverage includes pricing
 identities, yield round trips, dated settlement, coupon boundaries, leap
 years, bill conventions, API validation, and lesson navigation.
 
@@ -72,10 +80,17 @@ bond prices, accrued interest, and short/long bill quotations. QuantLib is
 not required. Details, source links, and tolerances are recorded in
 [Phase 1 validation](notes/phase_1_validation.md).
 
-Desktop/mobile browser checks covered the six lessons, visible choices,
+Previously recorded desktop/mobile browser checks covered the six lessons, visible choices,
 calculations, disabled states, resets, keyboard navigation, and layout.
 The payment-option reorder was checked in rendered HTML; the latest bill
 explanation, formulas, and half-year marker were also checked in the browser.
+
+The earlier planning audit used source/tests only. The subsequent M1 implementation
+was verified in a browser at desktop and 390-pixel mobile widths: calculations,
+face scaling, dated mode, invalid dates, export/import, reset, keyboard radio and
+chart controls, mobile navigation, and rendered formulas. No browser console errors
+were observed. Mobile pages stayed within viewport width. Temporary verification
+servers are stopped after checks; normal use still requires starting the server.
 
 Dated bonds use Actual/Actual coupon-period accrual and simple discounting
 over the first fractional period, followed by compound full periods.
@@ -96,9 +111,9 @@ source .venv/bin/activate
 python -m uvicorn filab.web.app:app --host 127.0.0.1 --port 8000
 ```
 
-Open [the local website](http://127.0.0.1:8000). At the time of this summary,
-one server is listening on port 8000. Stop it with Ctrl+C when finished;
-restart it after Python code changes.
+Open [the local website](http://127.0.0.1:8000). Reuse an existing server if
+available; otherwise start one with the command above. Stop it with Ctrl+C
+when finished; restart it after Python code changes.
 
 An earlier high-CPU issue came from bare `--reload` recursively polling the
 project, including approximately 5,947 Python files in `.venv`. The watcher
@@ -115,30 +130,58 @@ Run the numerical and web tests with:
 python -m pytest -q
 ```
 
+## M1 delivered
+
+- Independent `filab.risk` functions for regular-period analytical Macaulay/modified
+  duration and convexity; dollar duration and positive-magnitude DV01.
+- Numerical dated dirty-price sensitivity using the existing settlement convention,
+  with explicit exclusion of a textbook Macaulay conversion between coupons.
+- `/tools/bond-risk`, `/api/risk`, and `/api/risk-study`: two-bond comparisons,
+  exact shocks, approximation errors, PV weights, bump diagnostics, and versioned
+  complete-input export/import. Invalid or stale inputs cannot be exported.
+- Three separate lessons with prediction prompts, worked examples, derivations,
+  collapsed transfer answers, and reflection questions.
+- Shared control templates and a curriculum registry; milestone-based website
+  roadmap replaces the 12-week promise.
+- [Validation record](notes/m1_validation.md) and an unanswered
+  [learner journal](notes/m1_learning_journal.md). Software completion is recorded;
+  the learner's reflection and transfer exercises remain pending.
+
 ## Next milestone
 
-Build **Phase 2: Duration, Convexity, and Interest-Rate Risk**:
+Build **M2: Returns and cash accounting**. Start with one bond and deterministic
+yield paths. Record purchases, coupons, redemption, sales, cash, and costs once;
+reconcile a coupon-date example independently before simulating historical returns.
+Keep dirty-price accounting and clean/accrual explanations consistent. M3 data
+work can follow M1 independently, but historical backtests require the M2 ledger.
 
-1. Implement Macaulay duration, modified duration, dollar duration, and DV01.
-2. Add analytical and finite-difference duration and convexity checks.
-3. Compare exact repricing with first- and second-order approximations for
-   positive and negative 25, 50, 100, and 200 basis-point shocks.
-4. Add separate financial lessons and a Bond Risk Explorer, retaining the
-   visible controls and clear conventions established in Phase 1.
-5. Validate approximation errors before marking Phase 2 complete.
+## Revised roadmap and planning audit
 
-Subsequent phases cover historical Treasury ingestion, curve construction,
-holding-period returns, nonparallel curve risk, TIPS, monetary policy, and
-an integrated strategy laboratory. The planned 5–6 week extension adds
-credit fundamentals and ratings, noncallable corporate bond pricing and
-Z-spreads, default/survival/recovery models, and spread risk and credit returns.
-It follows the Treasury core by default; ratings and basic spread pricing
-can begin after Phase 4, while credit return work depends on Phases 5–6.
-Callable bonds, OAS, and advanced credit models remain optional research.
-The current pricing code still implements only the Phase 1 model; this
-curriculum expansion adds no corporate pricing support or website lessons.
-Hosting, accounts, brokerage integration,
-and real-time trading remain deferred.
+| Milestone | Deliverable | Status |
+|---|---|---|
+| M0 Foundations | Existing six lessons and pricing | Software/reference checks complete; learner checkpoint unverified |
+| M1 Interest-rate risk | Duration, convexity, risk explorer | Software validated; learner checkpoint pending |
+| M2 Return accounting | Deterministic cash/position ledger | Next |
+| M3 Historical observations | Versioned data and curve history viewer | Planned |
+| M4 Discount curves | Curve valuation and validated historical adapter | Planned |
+| M5 Strategy research | Two synthetic Treasury strategies, saved runs, exports | Planned; first historical research release |
+| M6 Robustness | Horizon analysis, curve scenarios, key-rate risk | Planned |
+| M7 Daily use | Research desk, reproducibility, backup/recovery | Planned |
+
+The roadmap has distinct learning, educational-site, and workbench acceptance
+criteria. M1 comparison-input files are implemented; saved historical studies,
+feeds, return ledgers, and research modules remain future work. The 108–170 hour
+budget in the plan was the provisional pre-M1 estimate, not recorded time spent.
+Re-estimate remaining work after M2.
+
+The [original plan](notes/fixed_income_lab_plan_original_2026-11-01.md) is preserved
+with its detailed credit curriculum and advanced research topics. These remain
+extensions. Hosting, accounts, broker execution, and real-time quotes remain deferred.
+
+The planning audit passed the original 221 tests. M1 adds 92 cases, including
+closed-form risk identities, CME price-bump arithmetic, convergence, dated
+boundaries, API parity, complete configuration validation, and lesson integration.
+See the M1 validation record for sources, tolerances, and remaining limitations.
 
 The [project plan](fixed_income_lab_plan.md) contains the full curriculum;
 the [README](README.md) contains setup and interface details.

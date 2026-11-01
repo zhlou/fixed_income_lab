@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="lesson-heading"><div class="eyebrow">M1 / REUSABLE EXPERIMENT</div><h1>Bond Risk Explorer</h1><p>Compare two fixed-cash-flow bonds. Measure sensitivity, test approximations, and save your assumptions.</p></div>
+<section class="card prediction"><strong>Start with a prediction.</strong><p>Which bond will move more for the same yield shock, and why? These hypothetical scenarios change yield instantly; they are not holding-period returns.</p><p><a href="/lessons/macaulay-duration">Cash-flow timing</a> · <a href="/lessons/modified-duration-dv01">Duration & DV01</a> · <a href="/lessons/convexity">Convexity & error</a></p></section>
+{% include 'risk_controls.html' %}
+{% endblock %}

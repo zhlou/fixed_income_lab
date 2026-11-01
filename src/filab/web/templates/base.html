@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/static/site.css">
   <script defer src="/static/vendor/katex/katex.min.js"></script>
   <script defer src="/static/app.js"></script>
+  <script defer src="/static/risk.js"></script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to lesson</a>
@@ -17,20 +18,21 @@
   <div class="sidebar-caption">YOUR LEARNING DESK</div>
   <a href="/" class="overview-link {{ 'active' if active == 'home' else '' }}" {% if active == 'home' %}aria-current="page"{% endif %}><span>◫</span> Overview <span class="link-arrow">↗</span></a>
   <div class="sidebar-rule"></div>
-  <div class="sidebar-caption">01 / BOND MATHEMATICS</div>
+  <div class="sidebar-caption">LEARN / FOUNDATIONS & RISK</div>
   <nav aria-label="Lessons">
   {% for item in lessons %}
     <a href="/lessons/{{ item.slug }}" class="lesson-link {{ 'active' if active == item.slug else '' }}" {% if active == item.slug %}aria-current="page"{% endif %}><span class="nav-number">{{ '%02d'|format(loop.index) }}</span><span>{{ item.title }}</span>{% if active == item.slug %}<span class="active-dot"></span>{% endif %}</a>
   {% endfor %}
   </nav>
+  <a class="overview-link {{ 'active' if active == 'bond-risk' else '' }}" href="/tools/bond-risk" {% if active == 'bond-risk' %}aria-current="page"{% endif %}>Bond Risk Explorer ↗</a>
   <div class="sidebar-caption coming-caption">UP NEXT</div>
-  <div class="up-next"><span>02</span> Duration & convexity <small>WEEKS 3–4</small></div>
-  <div class="up-next"><span>03</span> Treasury yield history <small>WEEK 5</small></div>
+  <div class="up-next"><span>M2</span> Returns & cash accounting <small>NEXT MILESTONE</small></div>
+  <div class="up-next"><span>M3</span> Historical observations <small>PLANNED</small></div>
   <a class="roadmap-link" href="/#curriculum">View the full curriculum <span>→</span></a>
   <div class="sidebar-bottom"><span class="status-dot"></span> LOCAL WORKSPACE <div>Learn by changing the inputs.</div></div>
 </aside>
 <div class="page-shell">
-  <header class="topbar"><button id="nav-toggle" class="nav-toggle" aria-controls="course-nav" aria-expanded="false" aria-label="Toggle course navigation">☰</button><div class="breadcrumb">Fixed-Income Lab <span>/</span> {{ 'Overview' if active == 'home' else 'Bond mathematics' }}</div><span class="engine"><span class="status-dot"></span> Python-powered</span></header>
+  <header class="topbar"><button id="nav-toggle" class="nav-toggle" aria-controls="course-nav" aria-expanded="false" aria-label="Toggle course navigation">☰</button><div class="breadcrumb">Fixed-Income Lab <span>/</span> {{ 'Overview' if active == 'home' else 'Experiments' if active == 'bond-risk' else 'Learn' }}</div><span class="engine"><span class="status-dot"></span> Python-powered</span></header>
   <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
   <footer class="site-footer"><span>FIXED-INCOME LAB</span><span>Understand the assumptions. Test the intuition.</span></footer>
 </div>

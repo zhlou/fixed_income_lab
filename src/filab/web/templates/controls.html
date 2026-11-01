@@ -1,0 +1,11 @@
+{% macro control(name, label, value, min, max, step, unit='', hint='', input_name='') %}
+<div class="control" data-control="{{ name }}"><label for="{{ name }}">{{ label }} <span class="unit">{{ unit }}</span></label><div class="number-wrap"><input id="{{ name }}" name="{{ input_name or name }}" type="number" inputmode="decimal" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" aria-describedby="{{ name }}-error{% if hint %} {{ name }}-hint{% endif %}"></div><input class="range" type="range" min="{{ min }}" max="{{ max }}" step="{{ step }}" value="{{ value }}" aria-label="{{ label }} slider" data-pair="{{ name }}">{% if hint %}<small id="{{ name }}-hint">{{ hint }}</small>{% endif %}<small class="field-error" id="{{ name }}-error" data-error-for="{{ input_name or name }}"></small></div>
+{% endmacro %}
+{% macro date_control(name, label, value) %}
+<div class="control"><label for="{{ name }}">{{ label }}</label><div class="number-wrap"><input id="{{ name }}" name="{{ name }}" type="date" value="{{ value }}" required aria-describedby="{{ name }}-error"></div><small class="field-error" id="{{ name }}-error" data-error-for="{{ name }}"></small></div>
+{% endmacro %}
+{% macro choices(id, name, label, options, hint='', selected='') %}
+<fieldset class="choice-group" id="{{ id }}"><legend>{{ label }}</legend><div class="choice-options">
+{% for value, title, detail in options %}<label class="choice-option"><input type="radio" name="{{ name }}" value="{{ value }}" id="{{ id }}-{{ value }}" {% if value == selected or (not selected and loop.first) %}checked{% endif %} aria-describedby="{{ id }}-error{% if hint %} {{ id }}-hint{% endif %}"><span><strong>{{ title }}</strong>{% if detail %}<small>{{ detail }}</small>{% endif %}</span></label>{% endfor %}
+</div>{% if hint %}<small class="choice-hint" id="{{ id }}-hint">{{ hint }}</small>{% endif %}<small class="field-error" id="{{ id }}-error" data-error-for="{{ name }}"></small></fieldset>
+{% endmacro %}
