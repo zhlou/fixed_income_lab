@@ -1,7 +1,7 @@
 # Fixed-Income Lab
 ## A Learning-Driven Quantitative Research Project
 
-**Duration:** 12 weeks for the core curriculum, followed by open-ended research  
+**Duration:** 12 weeks for the Treasury core, followed by a planned 5–6 week credit and corporate bond extension and open-ended research\
 **Effort:** Approximately 5–8 hours per week  
 **Primary language:** Python  
 **Primary objective:** Learn fixed-income theory through mathematical derivation, interactive experiments, and historical data analysis, with optional Python implementation examples.
@@ -10,7 +10,7 @@
 
 ## 1. Project Vision
 
-Build a personal interactive learning website and quantitative research environment for understanding the U.S. Treasury market, interest-rate dynamics, inflation, and bond investment strategies.
+Build a personal interactive learning website and quantitative research environment for understanding the U.S. Treasury market, interest-rate dynamics, inflation, and bond investment strategies, then extending those foundations to credit risk and corporate bond valuation.
 
 The project will gradually evolve from a simple bond-pricing library into a research laboratory capable of answering questions such as:
 
@@ -24,6 +24,8 @@ The project will gradually evolve from a simple bond-pricing library into a rese
 - What is the difference between nominal yields, real yields, and inflation expectations?
 - How does the Federal Reserve influence different parts of the yield curve?
 - Can historical market behavior help evaluate different bond investment strategies?
+- How do credit ratings, default risk, recovery, and liquidity affect corporate bonds?
+- How do we price a corporate bond and separate interest-rate risk from credit spread risk?
 
 ### Guiding Principles
 
@@ -623,7 +625,193 @@ Avoid look-ahead bias. Distinguish simulated prices from actual security-level o
 
 ---
 
-# Part VI — Advanced Research Directions
+# Part VI — Credit Risk and Corporate Bonds
+**Planned extension: approximately 5–6 weeks after the Treasury core**
+
+This is a planned learning track, not an implemented website feature. Basic
+credit analysis and noncallable corporate bond valuation are intermediate
+material; structural credit models and embedded options remain advanced.
+The 12-week Treasury core and its completion criteria remain intact.
+
+### Prerequisites and sequencing
+
+Start after Phase 4 for ratings and basic spread pricing, using Phase 2 risk
+measures. Complete Phases 5–6 before credit return and portfolio experiments.
+The default schedule places the full track after Phase 9. It adds four modules
+with separate lesson pages, overview cards, sidebar entries, and previous/next
+navigation. Each lesson includes intuition, defined symbols, a derivation or
+conceptual mechanism, a reproducible example, an interactive experiment,
+misconceptions, and reflection questions; Python examples remain optional.
+
+## Phase 10: Credit Fundamentals and Credit Ratings
+**Approximately 1 week**
+
+### Learning objectives
+Understand what a bondholder is promised, what can prevent payment, and what
+a credit rating does and does not tell an investor.
+
+### Concepts to study
+- Business risk, leverage, interest coverage, cash flow, and refinancing risk.
+- Issuer versus issue ratings; agency-specific rating scales and outlooks.
+- Investment grade versus high yield, including agency-specific boundaries.
+- Upgrades, downgrades, watch lists, fallen angels, and rising stars.
+- Seniority, secured versus unsecured debt, guarantees, and covenants.
+- Default, recovery, and loss given default.
+- Ratings as credit opinions rather than guarantees, prices, or precise
+  default probabilities; limitations and delays in rating changes.
+
+### Implementation and experiments
+- Build a rating-scale comparison with source dates and agency definitions.
+- Use a hypothetical capital structure to show payment priority and recovery
+  under explicitly stated asset-value and waterfall assumptions.
+- Compare hypothetical issuers with different leverage and interest coverage;
+  do not assign an agency rating mechanically from a single financial ratio.
+- Follow a synthetic downgrade scenario and distinguish a credit event from
+  the separate market response in yields and prices.
+
+### Validation and deliverable
+Check rating definitions against the agencies' own documentation and verify
+that the simplified waterfall conserves available assets and respects claims.
+**Website Module 10: Credit Fundamentals and Ratings.**
+
+### Learning checkpoint
+Explain why two bonds from the same issuer can have different ratings and
+why a highly rated bond can still lose market value.
+
+## Phase 11: Pricing Noncallable Corporate Bonds
+**Approximately 1–2 weeks**
+
+### Learning objectives
+Price a plain fixed-rate, noncallable corporate bond using explicit benchmark
+and spread conventions, and understand what the quoted spread measures.
+
+### Concepts to study
+- Promised cash flows versus payments actually received.
+- Treasury benchmark spreads, maturity matching, and benchmark choice.
+- Yield spread versus Z-spread; why a single-benchmark yield difference is
+  generally different from a spread applied across the spot curve.
+- Discounting promised cash flows with a benchmark curve plus a specified
+  spread convention; solving a Z-spread from a dirty price.
+- Credit compensation, liquidity, and other spread components; the full
+  observed spread is not an expected default loss.
+- Clean/dirty prices, accrued interest, day counts, and settlement conventions.
+
+### Implementation
+- Reuse Phase 4 discount curves and the existing cash-flow pricing layer.
+- Add constant-spread pricing and a price-to-Z-spread solver, initially using
+  a continuously compounded spread applied to benchmark discount factors.
+- State benchmark curve, rate units, coupon frequency, face-value units,
+  settlement, and accrual conventions alongside every example.
+- Begin with synthetic regular schedules. Do not silently apply the current
+  Treasury accrual and fractional-period conventions to market corporate
+  bonds; add and validate any required corporate conventions explicitly.
+
+### Experiments
+1. Price the same promised payments at different credit spreads.
+2. Compare Treasury-rate increases with spread widening, both separately
+   and together, holding all other scenario inputs fixed.
+3. Compare a benchmark yield spread with a Z-spread on a sloped curve.
+4. Solve a spread from price and reproduce the original dirty price.
+
+### Validation and deliverable
+Test zero-spread equivalence to benchmark-curve pricing, price/spread round
+trips, and falling prices as spreads increase for positive promised payments.
+Validate an independent published noncallable example with matching
+conventions, recording source and numerical tolerance before claiming
+market-convention support.
+**Website Module 11: Corporate Bond Pricing Lab.**
+
+### Learning checkpoint
+Explain why a corporate bond's YTM is a promised-cash-flow yield rather than
+a guaranteed realized return, and why its spread is not just default risk.
+
+## Phase 12: Default, Survival, and Recovery
+**Approximately 1 week**
+
+### Learning objectives
+Understand how default changes payments and how a simplified credit model
+connects survival probabilities, recovery assumptions, and price.
+
+### Concepts to study
+- Conditional default probabilities, survival probabilities, and hazard rates.
+- Historical (real-world) versus pricing-implied (risk-neutral) probabilities.
+- Recovery of par versus other recovery conventions and payment timing.
+- Expected loss versus compensation for bearing credit risk.
+- Limits of inferring default probabilities from a spread or rating.
+
+### Implementation and experiments
+- Implement a simplified constant-hazard model with risk-neutral survival,
+  a benchmark discount curve, and recovery of par at explicitly specified
+  default payment times on a discrete grid.
+- Calculate survival-weighted promised payments and recovery payments
+  separately; do not also apply a full credit spread to these expected
+  payments and count default compensation twice.
+- Vary hazard and recovery separately; compare zero-default and zero-recovery
+  boundaries and inspect sensitivity to the recovery payment grid.
+- Contrast the model price with Phase 11 spread pricing and explain why a
+  fitted hazard is model-dependent rather than an observed forecast.
+
+### Validation and deliverable
+Check survival/default probability consistency, convergence as the grid is
+refined, zero-hazard equivalence to benchmark pricing, and independent
+numerical examples with documented recovery assumptions and tolerances.
+**Website Module 12: Default and Recovery Explorer.**
+
+### Learning checkpoint
+Explain why a historical default rate cannot simply replace a risk-neutral
+hazard rate in a market-pricing model.
+
+## Phase 13: Credit Spread Risk and Corporate Bond Returns
+**Approximately 1–2 weeks**
+
+### Learning objectives
+Separate interest-rate exposure, spread exposure, default losses, and income
+when evaluating corporate bond investments.
+
+### Concepts to study
+- Spread duration, spread DV01, and spread convexity under stated conventions.
+- Benchmark-rate shocks versus spread shocks and their joint effect.
+- Rating migration, default events, liquidity, and issuer concentration.
+- Investment-grade versus high-yield behavior without treating a rating group
+  as a homogeneous investment or a spread as a return forecast.
+- Coupon income, reinvestment, price movement, and recovery in total returns.
+
+### Implementation and experiments
+- Add finite-difference spread sensitivities and exact joint repricing.
+- Extend the holding-period simulator with synthetic spread paths, rating
+  transitions, and explicit default/recovery events. Stop contractual coupons
+  and principal payments after default and avoid double-counting recovery.
+- Compare equal-duration Treasury and corporate positions under isolated
+  rate shocks, spread widening, and combined scenarios.
+- Compare holding to maturity with selling after a downgrade; holding to
+  maturity does not remove default risk.
+- Use labeled synthetic scenarios first. Historical extensions must preserve
+  point-in-time ratings, defaulted and delisted securities, acquisition
+  metadata, and missing observations; avoid survivorship and look-ahead bias.
+
+### Validation and deliverable
+Compare sensitivity estimates with exact repricing, reconcile cash balances
+and total returns, and check no-default and default-event boundary cases.
+Any empirical rating transition or default study must state its source,
+sample period, cohort definition, and treatment of withdrawn ratings.
+**Website Module 13: Credit Risk and Return Laboratory.**
+
+### Learning checkpoint
+Explain how falling Treasury yields can coincide with a corporate bond loss,
+and distinguish an immediate price shock from a holding-period return.
+
+### Credit-track completion criteria
+
+Be able to interpret ratings and capital-structure priority; price a regular
+noncallable corporate bond under explicit curve/spread conventions; explain
+a survival/recovery model and its probability measure; calculate spread
+sensitivity; and reconcile a credit holding-period return. Record independent
+financial benchmarks in a dedicated credit validation note when implemented.
+Software completion and learner reflection checkpoints are separate.
+
+---
+
+# Part VII — Advanced Research Directions
 
 ## A. Stochastic Interest-Rate Models
 **Difficulty: Advanced**
@@ -653,12 +841,18 @@ Learn duration targeting, key-rate constraints, liability matching, immunization
 
 Research question: How to construct a portfolio if short rates may fall but long rates may stay elevated?
 
-## E. Credit Risk and Corporate Bonds
-**Difficulty: Advanced**
+## E. Advanced Credit Models and Callable Corporate Bonds
+**Difficulty: Advanced; optional after the credit track**
 
-Explore credit spreads, default probabilities, recoveries, credit spread duration, high yield versus investment grade, liquidity premiums, and structural versus reduced-form credit models.
-
-This is optional; Treasuries provide enough material for the core curriculum.
+Extend Phase 12 to structural models and richer reduced-form models, including
+calibration limitations and historical versus risk-neutral dynamics. Study
+call provisions, yield to call and yield to worst, interest-rate trees,
+effective duration, and option-adjusted spreads (OAS). Explain the issuer's
+exercise incentive and why a callable bond cannot be valued reliably by
+ignoring the embedded option. Compare Z-spread with model-dependent OAS and
+validate callable prices against independent references before adding them
+to the corporate bond lab. CDS and other credit derivatives remain outside
+the planned introductory track.
 
 ---
 
@@ -729,13 +923,22 @@ These shares are guidelines, not strict quotas.
 - [ ] TIPS and real-yield analysis
 - [ ] Integrated historical research website module
 
+## Planned credit extension (after the Treasury core)
+
+- [ ] Credit fundamentals, ratings, seniority, and covenants
+- [ ] Regular noncallable corporate bond curve/spread pricing and Z-spread solving
+- [ ] Default, survival, and recovery modeling
+- [ ] Spread sensitivities, rating migration, and credit holding-period returns
+- [ ] Independent credit pricing validation and interactive lessons
+
 ## Explicitly defer
 
 - [ ] Production hosting and deployment
 - [ ] User accounts and cloud synchronization
 - [ ] Broker account integration
 - [ ] Real-time trading data
-- [ ] Individual corporate bond pricing
+- [ ] Live individual corporate bond quotes and comprehensive security-specific conventions
+- [ ] Callable corporate bond pricing and OAS (optional advanced research)
 - [ ] Derivatives pricing
 - [ ] Comprehensive ETF holdings replication
 - [ ] Forecasting actual bond-market returns
