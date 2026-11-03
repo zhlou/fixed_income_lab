@@ -7,20 +7,32 @@ examples. The Python backend uses the existing tested `filab.pricing` package.
 
 ## Start the website
 
+Use Python 3.12 locally to match the Docker runtime. On macOS with Homebrew,
+install it with `brew install python@3.12`; see the
+[Homebrew formula](https://formulae.brew.sh/formula/python@3.12).
+
 From the project root (currently `/Users/zhlou/Work/fixed_income_lab`):
 
 ```bash
-python3 -m venv .venv  # Only when creating a new environment.
+python3.12 -m venv .venv  # Only when creating a new environment.
 source .venv/bin/activate
+python --version  # Should report Python 3.12.x.
 python -m pip install -e '.[web,dev]'
 python -m uvicorn filab.web.app:app --host 127.0.0.1 --port 8000
 ```
 
-Open **http://127.0.0.1:8000**. Python 3.9 or newer is required. If port
-8000 is in use, choose another with `--port`. Stop the server with Ctrl+C.
+Open **http://127.0.0.1:8000**. The local environment and Docker image use Python
+3.12; package metadata still permits Python 3.9 or newer. If port 8000 is in use,
+choose another with `--port`. Stop the server with Ctrl+C.
 JupyterLab and Node.js are not required to run the website. The `web` extra
 alone is sufficient for website use; `dev` adds tests and the original
 notebook tools.
+
+For an existing environment created with another Python version, deactivate it,
+move `.venv` outside the checkout as a backup, and recreate it with the commands
+above. Running `venv` over the old directory does not provide a clean dependency
+reinstall. Reopen an active notebook kernel after the switch so it uses the new
+interpreter.
 
 The server stays running while you use the local website and should be
 idle between requests. Stop it with Ctrl+C when finished. Restart it after

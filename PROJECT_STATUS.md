@@ -20,6 +20,29 @@ questions or demonstrated the learning checkpoints.
 
 ## Completed work
 
+### Local Python 3.12 environment — November 3, 2026
+
+Installed Homebrew Python **3.12.16** and recreated the project's `.venv` with it
+to match Docker's Python 3.12 runtime. Reinstalled the editable package with both
+`web` and `dev` extras, including notebook tools. The previous Python 3.9.6
+environment and its dependency inventory are backed up outside the checkout at
+`/private/tmp/filab-python39-backup.1LMfoS/`; this is a temporary local recovery
+copy, not a durable project artifact.
+
+Updated README setup instructions and repository guidance to use
+`python3.12 -m venv .venv` explicitly. Activating `.venv` now selects Python
+3.12.16. Package metadata retains its existing Python 3.9+ compatibility floor;
+this change standardizes the working runtime.
+
+All **313 tests passed** under Python 3.12.16, and `python -m pip check` found no
+broken requirements. NumPy, SciPy, Matplotlib, JupyterLab, ipykernel, and ipywidgets
+imported successfully; the worked bond example reproduced $981.19. A temporary
+Uvicorn server passed 19 page/asset checks (including all nine lessons) and eight
+API checks, including the known price and invalid-input rejection, then was
+stopped. The test run emitted the same upstream Starlette/httpx deprecation
+warning as the container verification. Financial calculations, lesson content,
+and original notebook artifacts are unchanged.
+
 ### Docker runtime — November 3, 2026
 
 Added a Python 3.12 slim image that installs the packaged application with its
@@ -185,10 +208,11 @@ discount-curve valuation have not yet been added.
 
 ## Running the project
 
-From the project root, using the existing environment:
+From the project root, using the existing Python 3.12 environment:
 
 ```bash
 source .venv/bin/activate
+python --version  # Expect Python 3.12.x.
 python -m uvicorn filab.web.app:app --host 127.0.0.1 --port 8000
 ```
 

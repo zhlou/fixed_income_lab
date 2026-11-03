@@ -37,11 +37,13 @@ Use visible radio option cards instead of dropdowns. Order frequencies Annual â†
 
 ## Development Commands and Runtime
 
-Python 3.9+ is required:
+Use Python 3.12 for the local environment to match the Docker runtime. Package
+metadata continues to permit Python 3.9+.
 
 ```bash
-python3 -m venv .venv
+python3.12 -m venv .venv
 source .venv/bin/activate
+python --version  # Expect Python 3.12.x.
 python -m pip install -e '.[web,dev]'
 python -m uvicorn filab.web.app:app --host 127.0.0.1 --port 8000
 python -m pytest -q
