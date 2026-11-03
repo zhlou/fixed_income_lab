@@ -11,6 +11,8 @@ Prerequisite: [cash-flow timing and Macaulay duration](/lessons/macaulay-duratio
 Predict first: doubling face value should double dollar exposure, but should it
 change percentage sensitivity?
 
+**Goal:** Estimate a small price change from a yield change, first as a percentage and then in dollars. “Local” sensitivity means sensitivity near the starting yield; it can change when the yield changes.
+
 ## Which rate moves?
 
 Here, **“yield move” means a change in YTM**, with the coupon rate and all
@@ -36,14 +38,18 @@ settlement, payment dates, and compounding convention stay fixed.
 
 ## Derive the sensitivity
 
+Think of zooming in on the price-versus-yield curve until a small piece looks straight. Its **slope** is price change divided by yield change. A **derivative**, written $dP/dy$, is the limiting slope as the yield step becomes very small. You can use the resulting duration and DV01 rules without doing calculus yourself.
+
 Keep the previous lesson's notation: price $P$, annual nominal decimal yield $y$,
-frequency $m$, payment $CF_k$ at $k/m$ years, and $q=1+y/m$.
+frequency $m$, $N$ remaining payment periods, payment $CF_k$ at $k/m$ years, and the growth factor $q=1+y/m$.
 Differentiate price with respect to **annual decimal yield**, keeping payments
 and settlement fixed:
 
 $$
 \frac{dP}{dy}=-\sum_{k=1}^{N}\frac{k}{m}CF_kq^{-k-1}.
 $$
+
+To see where the factors come from, each price term is $CF_kq^{-k}$. Differentiating the power brings down $-k$, reduces the power by one, and multiplies by $1/m$ because $q=1+y/m$. Thus a more distant payment has a larger timing factor $k/m$ in its sensitivity.
 
 Divide by price and reverse the sign to get a positive sensitivity for these
 positive-cash-flow bonds:
@@ -53,7 +59,9 @@ D_{\mathrm{mod}}=-\frac{1}{P}\frac{dP}{dy}
 =\frac{D_{\mathrm{Mac}}}{1+y/m}.
 $$
 
-For a small yield change $\Delta y$, the tangent-line estimate is
+The division by price expresses the slope relative to the size of the investment. Compared with the Macaulay weighted-time sum, every term has one extra factor $1/q$; that is why the conversion divides by $1+y/m$. Although modified duration is conventionally quoted in years, it describes sensitivity, not a waiting time. A modified duration of 5 means roughly a 5% price fall for a one-percentage-point yield rise.
+
+The symbol $\Delta$ means “change”: $\Delta y$ is new yield minus initial yield, and $\Delta P$ is new price minus initial price. For a small yield change, the **tangent line** is the straight line with the curve's starting slope. Its estimate is
 
 $$
 \Delta P\approx-PD_{\mathrm{mod}}\Delta y,
@@ -71,6 +79,8 @@ $$
 A +1 bp move therefore has an approximate price change of **minus DV01**.
 A −1 bp move has an approximate gain of DV01. These are approximations;
 exact upward and downward moves differ because price is curved.
+
+Use decimal changes in these formulas: +50 bp is +0.005, not 0.5 or 50. **DV01** means “dollar value of one basis point.” It uses the selected face amount: it is not automatically per $100 face or per bond.
 
 ## Worked example: turn the two-year bond into dollar risk
 
@@ -93,6 +103,8 @@ Exact repricing gives **−$1.84**, or **−1.871310%**. The small difference is
 full precision is used before displaying cents. No time has passed, so these
 numbers are price changes, not a year's return.
 
+For example, the percentage calculation is $-1.893956(0.01)=-0.01893956$, which is **−1.893956%** after multiplying by 100. Multiplying this decimal price change by the initial price gives the dollar estimate.
+
 ## Test the prediction
 
 1. Double face value. Modified duration should stay fixed; dollar duration and
@@ -105,7 +117,7 @@ numbers are price changes, not a year's return.
    negative. Macaulay duration still equals maturity.
 
 Equal face values do not mean equal market values or equal DV01. This tool
-compares individual-bond YTM shocks; it does not yet measure key-rate curve risk.
+compares individual-bond YTM shocks. **Key-rate risk** measures sensitivity to changes near particular maturities on a yield curve; it comes later. A curve can steepen or flatten when rates at different maturities move by different amounts, even if one overall duration figure is unchanged.
 
 ## Check with numerical repricing
 
@@ -116,9 +128,11 @@ $$
 D_h=\frac{P(y-h)-P(y+h)}{2hP(y)}.
 $$
 
+Here $P(y-h)$ and $P(y+h)$ are prices at yields just below and above the starting yield. They are $2h$ apart. Dividing their price difference by that gap estimates the slope's positive magnitude; dividing by $P(y)$ gives percentage sensitivity. For a one-basis-point bump, $h=0.0001$.
+
 The numerical-check table tries ±1, ±0.5, and ±0.25 bp. For regular periods,
 compare them to the analytical answer. Smaller bumps reduce truncation error
-until subtraction loses useful digits; “smaller” is not always “better.”
+until subtracting nearly equal computer-stored prices loses useful digits; “smaller” is not always “better.” This loss of precision is called **cancellation**. “Analytical” means calculated directly from the derivative formula; “numerical” means estimated from repriced values.
 
 For **Dated settlement**, this calculation uses dirty prices from our existing
 pricer: Actual/Actual coupon-period accrual, simple first fractional period,

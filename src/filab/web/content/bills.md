@@ -1,5 +1,7 @@
 ## A yield needs a denominator and a clock
 
+**Goal:** Explain how different quoted rates can describe the same bill. Prerequisite: [price and yield](/lessons/yield-to-maturity); recall that the rate convention is part of the calculation. All examples are hypothetical and exclude fees and taxes.
+
 A Treasury bill pays no periodic coupons. You pay $P$ and receive face value
 $F$ at maturity. The dollar gain is $F-P$, and holding-period return is:
 
@@ -7,7 +9,7 @@ $$
 H=\frac{F-P}{P}.
 $$
 
-This is the return over the bill's remaining days, not an annual rate.
+Here $H$ is the **holding-period return** if you buy at $P$, receive $F$ at maturity, and have no other cash flows. It divides the gain by the money invested. This is the return over the bill's remaining days, not an annual rate. **Annualization** expresses a return on a one-year comparison scale; it does not promise that you can repeat the investment at the same rate.
 Different annualization rules can describe exactly the same purchase and
 redemption. A higher quoted number alone does not mean a better investment.
 
@@ -19,6 +21,8 @@ $$
 P=F\left(1-d\frac{r}{360}\right),
 \qquad d=\frac{F-P}{F}\frac{360}{r}.
 $$
+
+To derive the price formula, start with the quoted discount: $F-P=Fd(r/360)$. Subtract this discount from face value. Here $r$ counts days, not an interest rate, and $d$ is a decimal: enter 5% in the control and use 0.05 in the formula.
 
 The discount rate uses **face value**, not money invested, and a **360-day
 year**. It is not the coupon rate, compound nominal YTM, or holding-period
@@ -39,7 +43,7 @@ this calculator makes the basis an explicit input.
 ### Within one six-month period
 
 Treasury's convention uses simple interest within a partial interest period.
-Let $t=r/Y$ be the holding time in years and $i$ the annual quoted yield.
+Let $Y$ be the chosen 365- or 366-day year basis, $t=r/Y$ the holding time in years, and $i$ the annual quoted decimal yield. The ratio $F/P=1+H$ is the growth of one dollar invested.
 For $t\leq 1/2$, the growth factor is:
 
 $$
@@ -80,7 +84,7 @@ discount quote.
 
 ### Why the chart bends at half a year
 
-**The yield stays continuous, but the formula's slope changes.** Before the
+**At a positive discount quote, the yield stays continuous, but the formula's slope changes.** “Continuous” means no jump in the quoted yield; a slope change means it rises at a different pace. At a zero discount quote, both yield curves are flat at zero. Before the
 boundary, the quote uses simple annualization. After it, the quote includes
 the semiannual compounding adjustment. For a positive gain, compounding lets
 a lower annual quoted rate represent the same total gain than simple
@@ -118,7 +122,7 @@ If an actual purchase price is rounded, recomputing yield from that rounded
 price can give a slightly different result.
 
 This lesson implements the formulas in
-[Treasury Appendix B, section V](https://www.treasurydirect.gov/files/laws-and-regulations/auction-regulations-uoc/31-cfr-part-356.pdf).
+[Treasury Appendix B, section VI](https://www.treasurydirect.gov/files/laws-and-regulations/auction-regulations-uoc/31-cfr-part-356.pdf).
 Treasury also provides a short
 [pricing example](https://www.treasurydirect.gov/marketable-securities/understanding-pricing/).
 Prices and yields are illustrative; they are not current market data.
@@ -134,7 +138,15 @@ print(f"Price: ${bill['price']:.2f}")
 print(f"Investment yield: {bill['investment_rate']:.4%}")
 ```
 
-## Phase 1 checkpoint
+## Transfer exercise
+
+Set the bank discount quote to 4%, days to 90, and year basis to 365. Predict price, the 90-day return, and investment yield before checking the table. Then change only the year basis to 366: which result should remain fixed?
+
+::: answer
+Price is $100 × (1 − 0.04 × 90 / 360) = **$99.00**. The gain is **$1.00**, so the 90-day return is $1 / $99 ≈ **1.0101%**. Simple investment yield is that return × 365 / 90 ≈ **4.0965%**. A 366-day basis gives **4.1077%**; the price and actual 90-day return do not change. The 4% discount quote uses a different denominator and clock.
+:::
+
+## Foundations checkpoint (M0)
 
 Before moving to duration and convexity, explain these in your own words:
 
@@ -145,9 +157,8 @@ Before moving to duration and convexity, explain these in your own words:
 5. Why can bonds with the same maturity and YTM have different sensitivity?
 
 For the last question, revisit the coupon and payment-timing experiments:
-earlier cash receipts change the weights of distant payments. Phase 2 will
-turn that intuition into duration and convexity. Completing the software
+earlier cash receipts change how much of today's price comes from distant payments. The next three lessons (M1) turn that intuition into duration and convexity. Completing the software
 makes these experiments available; completing the learning checkpoint means
 you can explain their results.
 
-**Next module:** Duration, convexity, DV01, and exact versus approximate repricing.
+**Next:** [Cash-flow timing and Macaulay duration](/lessons/macaulay-duration).

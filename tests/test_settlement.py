@@ -1,6 +1,6 @@
 """Dated identities, boundaries, and independent published Treasury examples.
 
-Reference: 31 CFR 356 Appendix B, I.D, II.A/D and V.D.
+Reference: 31 CFR 356 Appendix B, I.D, II.A/D and VI.D.
 https://www.treasurydirect.gov/files/laws-and-regulations/auction-regulations-uoc/31-cfr-part-356.pdf
 Published prices use six decimals; comparisons allow half of the final unit.
 """
@@ -123,7 +123,7 @@ def test_treasurydirect_published_bill_price():
 
 
 def test_treasury_published_short_and_long_bill_examples():
-    # Appendix B V.D: June 1–21, 1990; June 7, 1990–June 6, 1991.
+    # Appendix B VI.D: June 1–21, 1990; June 7, 1990–June 6, 1991.
     short = treasury_bill(discount_rate=.0793, days_to_maturity=20)
     assert short['price'] == pytest.approx(99.559444, abs=0.5e-6, rel=0)
     # The printed calculation rounds intermediate ratios. Match the final

@@ -1,6 +1,6 @@
 # Fixed-Income Lab — Status and Progress
 
-**Updated:** November 2, 2026 (America/Chicago)
+**Updated:** November 3, 2026 (America/Chicago)
 
 ## Current status
 
@@ -19,6 +19,25 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### Lesson clarity review — November 3, 2026
+
+Reviewed and revised all nine canonical website lessons, and reviewed the optional
+Python supplement plus the original notes and notebook. Added explicit learning
+goals, definitions before formulas, guided experiments, and worked steps for YTM,
+settlement, payment weights, and risk approximations. Foundation exercises now
+use the existing keyboard-accessible answer reveals. Reordered the effective
+annual rate discussion before the final checkpoint, clarified units and negative
+yield boundaries, corrected the Treasury bill appendix reference, and replaced
+outdated phase wording with M0/M1 navigation.
+
+All **313 tests passed**. Independent arithmetic checks reproduced lesson prices,
+yield solutions, dated settlement, bill quotations, and duration/convexity examples.
+Browser checks on all nine lessons at **1440×900 and 390×900** covered formulas,
+page/reading-panel width, keyboard answer reveals, optional code, live results,
+and YTM input/reset. No formula-rendering or browser console errors were observed.
+The existing local server was reused. Original learning artifacts remain preserved;
+learner reflection is still pending. See [the review record](notes/lesson_content_review.md).
 
 ### Lessons and experiments
 

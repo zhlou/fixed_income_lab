@@ -6,6 +6,8 @@ value arrives on average, weighting each payment by its contribution to today's
 price. It is a center of present value, not a literal date on which you recover
 all your investment.
 
+**Goal:** Calculate that average and explain why it can be shorter than maturity. A **weight** is a share of a total: if 20% of a hypothetical bond's present value arrives in year one and 80% in year three, its weighted time is $0.20(1)+0.80(3)=2.6$ years. We use the same idea for every payment in a schedule.
+
 Prerequisite: [present value and bond pricing](/lessons/present-value).
 Before changing a control, predict which has the longer weighted payment time:
 a ten-year zero-coupon bond or a ten-year bond with coupons.
@@ -14,13 +16,17 @@ a ten-year zero-coupon bond or a ten-year bond with coupons.
 
 We begin just after a coupon payment. Face value is $F$, annual coupon rate is
 $c$, annual nominal yield is $y$, and there are $m$ equal payments per year.
-Time $t_k=k/m$ is in years, $N=mT$ is the number of payments, and $CF_k$ includes
+Remaining maturity $T$ and payment time $t_k=k/m$ are in years. The index $k$ counts payment periods, $N=mT$ is the number of payments, and $CF_k$ includes
 principal in the final payment. Coupon and compounding frequencies match.
 No accrued interest, default, embedded options, or changing cash flows are modeled.
+
+Here **default** means failure to make promised payments. An **embedded option** is a contract feature that can change payments, such as an issuer's right to repay early. Our hypothetical bonds have fixed positive receipts. Use **Regular periods** for this derivation; the shared explorer's other risk measures are introduced in the next two lessons. For now, focus on **Bond A's payment weights** and the Macaulay column.
 
 $$
 q=1+y/m,\qquad PV_k=CF_kq^{-k},\qquad P=\sum_{k=1}^{N}PV_k.
 $$
+
+$q$ is the per-period growth factor, so $q^{-k}=1/q^k$ discounts payment $k$. $P$ is the sum of all payment present values, and $\sum$ means “add over the payments.”
 
 Divide each present value by total price to get a weight:
 
@@ -35,8 +41,7 @@ D_{\mathrm{Mac}}=\sum_{k=1}^{N}t_kw_k.
 $$
 
 This is an identity under these conventions. The weights use **discounted value**,
-not face value or undiscounted payment totals. Earlier cash has more present value
-per dollar. Multiplying every payment by the same factor leaves the weights unchanged.
+not face value or undiscounted payment totals. At a positive yield, earlier cash has more present value per dollar; at zero yield a dollar has the same present value at every date, and at negative yields that comparison reverses. The weighted-average definition still holds when the discount base is positive. Multiplying every payment by the same factor leaves the weights unchanged.
 
 ## Reproduce a two-year example
 
@@ -54,6 +59,8 @@ The unrounded values give a price of **$98.12** and Macaulay duration of
 **1.941305 years**. Calculate each contribution as time × present value / price;
 the weight table in the experiment shows the contributions at higher precision.
 Use unrounded values when summing: cent displays can differ from the rounded total.
+
+For example, the final payment's weight is approximately **0.941785**, or **94.1785%** of price. Its time contribution is $2w_4\approx1.883569$ years. The three smaller coupons together contribute about **0.057736** years. Adding gives **1.941305 years**. This explains why duration is close to two years: most of the value is still in the final payment. Weights add to one; time contributions add to duration.
 
 For the default ten-year Bond B, price is **$92.21** and Macaulay duration is
 **8.255587 years**. Both have the same coupon and yield. The later principal
@@ -80,7 +87,7 @@ yield while holding time fixed.
 Macaulay duration is not yet the percentage response to a yield shock. The next
 lesson derives that conversion. It also distinguishes a dimensionless percentage
 change from dollar exposure. A long weighted payment time does not measure credit,
-liquidity, inflation, or all possible yield-curve changes.
+liquidity, inflation, or all possible yield-curve changes. **Credit risk** concerns payments not arriving as promised; **liquidity risk** concerns the ability to sell promptly at an acceptable price. Neither is captured by an average payment time.
 
 If you choose **Dated settlement**, the experiment preserves our simple first
 fractional-period discounting convention. It shows actual payment dates and PV

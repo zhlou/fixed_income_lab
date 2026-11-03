@@ -6,6 +6,8 @@ Prerequisite: [Lesson 1 glossary](/lessons/bond-basics).
 
 All examples are hypothetical. We value fixed, promised cash flows using a single supplied annual nominal yield y, compounded m times per year. We are not estimating market interest rates in this lesson.
 
+An **annual nominal rate** is quoted as the rate per compounding period multiplied by the number of periods in a year. An **effective annual rate** includes a full year's compound growth. “Nominal” here describes a rate quotation; it has a different role from “nominal Treasury,” which means a security without inflation adjustment.
+
 Assume valuation immediately after a coupon payment, equal periods until future payments, no accrued interest, and no fees or taxes. For the coupon examples, coupon and compounding frequencies match. Rates in formulas are decimals.
 
 ## 2. Derive present value by reversing compounding
@@ -20,7 +22,7 @@ $$
 P(1+r)^2 \quad\text{after two periods}.
 $$
 
-After k periods, the future value is P(1+r)^k. To find the amount today equivalent to a future payment CF_k, solve:
+Here $k$ counts periods and $CF_k$ means the cash flow paid at the end of period $k$. After k periods, the future value is P(1+r)^k. To find the amount today equivalent to a future payment CF_k, solve:
 
 $$
 P(1+r)^k=CF_k
@@ -44,7 +46,7 @@ where t is time in years. For y = 5% and m = 2, each half-year rate is 2.5%. A p
 
 ## 3. Price a zero-coupon bond
 
-A zero-coupon bond makes just one payment: face value F at maturity. With N periods remaining:
+A zero-coupon bond makes just one payment: face value F at maturity. Let $T$ be remaining years and $N=mT$ the number of compounding periods. Then:
 
 $$
 \boxed{P=\frac{F}{(1+y/m)^N}}.
@@ -64,7 +66,7 @@ This is a generic zero-coupon pricing example. Actual Treasury bill discount-yie
 
 ## 4. Price a coupon bond by adding present values
 
-Each coupon is a separate future payment. Because dollars received today can be added, add the present values of all the payments:
+Each coupon is a separate future payment. Because dollars received today can be added, add the present values of all the payments. The symbol $\sum_{k=1}^{N}$ means “add one term for every payment, from period 1 through period $N$”:
 
 $$
 \boxed{P=\sum_{k=1}^{N}\frac{CF_k}{(1+y/m)^k}}.
@@ -91,10 +93,10 @@ $$
 
 | Period k | Years from valuation | Cash flow | Discount factor 1/(1.025)^k | Present value |
 |---|---:|---:|---:|---:|
-| 1 | 0.5 | $20 | 0.975610 | $19.512195 |
-| 2 | 1.0 | $20 | 0.951814 | $19.036288 |
-| 3 | 1.5 | $20 | 0.928599 | $18.571988 |
-| 4 | 2.0 | $1,020 | 0.905951 | $924.069658 |
+| 1 | 0.5 | $20 | 0.975610 | $19.51 |
+| 2 | 1.0 | $20 | 0.951814 | $19.04 |
+| 3 | 1.5 | $20 | 0.928599 | $18.57 |
+| 4 | 2.0 | $1,020 | 0.905951 | $924.07 |
 
 $$
 P=\frac{20}{1.025}
@@ -148,6 +150,8 @@ Higher yield makes each discount factor smaller, so the same positive payments h
 
 ## 6. Where the yield curve fits
 
+A **yield curve** relates interest rates to maturities at one point in time. A **spot rate** applies to a single future payment at a particular maturity; a **discount curve** expresses the same valuation information as today's value of one dollar paid at each future date. These are previews of later lessons, not inputs you need to estimate here.
+
 The more general expression is:
 
 $$
@@ -158,29 +162,11 @@ where D(t_k) is the discount factor for payment date t_k. In this lesson, our si
 
 A market discount curve can supply a different discount factor at each payment date. A bond's YTM is the single rate that reproduces its price; it does not imply the market's spot curve is flat. We will construct curves later. For now, every exercise supplies the yield and its compounding convention.
 
-## 7. Try it yourself
-
-1. Price a $1,000 zero-coupon bond with one year remaining at 4% nominal yield compounded semiannually.
-2. Price a $1,000 bond with a 6% coupon, one year remaining, semiannual payments, and 4% nominal yield compounded semiannually. List the cash flows before discounting them.
-3. What would the bond in question 2 cost at a 6% nominal yield compounded semiannually?
-4. Why is the final cash flow larger than the earlier coupons?
-
-### Answers — attempt the questions first
-
-1. $1,000/(1.02)^2 = **$961.17**.
-2. Cash flows: $30 in six months and $1,030 in one year. Price = $30/1.02 + $1,030/(1.02)^2 = **$1,019.42**.
-3. **$1,000.00**, since coupon rate and yield match under these conventions.
-4. It includes both the last coupon and principal repayment.
-
-**Checkpoint:** You should be able to turn a bond description into cash flows, convert an annual nominal yield into a period rate, and discount each payment using the correct period count.
-
-**Next:** Use the [Bond Pricing Lab](/lessons/bond-pricing-lab) to test how coupon, maturity, and yield change price, then [solve yield to maturity from a price](/lessons/yield-to-maturity). The optional “Under the hood” section below shows the implementation.
-
-
-## Effective annual rate: a comparison, not an automatic payment
+## 7. Effective annual rate: a comparison, not an automatic payment
 
 A 4% nominal rate with two compounding periods has a 2% half-year rate.
-The effective annual rate is:
+To get the effective annual rate $R$, compound one dollar for all $m$ periods,
+then subtract the starting dollar:
 
 $$
 R=\left(1+\frac{y}{m}\right)^m-1=1.02^2-1=4.04\%.
@@ -191,7 +177,8 @@ Holding both as non-interest-bearing cash produces $40. Reinvesting the
 first $20 at 2% for six months adds $0.40. The extra money comes from
 reinvestment; the bond still pays only $40 in coupons.
 
-The inverse conversion is:
+To reverse the calculation, take the $m$th root of $1+R$ to recover the
+per-period growth factor, subtract one, and multiply the period rate by $m$:
 
 $$
 y=m\left[(1+R)^{1/m}-1\right].
@@ -206,3 +193,36 @@ $$
 Here $T$ is in years, including fractional years. The annualized rate is
 an equivalent rate: it does not guarantee an opportunity to repeat a
 short investment at the same return for the rest of a year.
+
+## 8. Predict and check in the experiment
+
+Start with the worked example, then change only YTM from 5% to 4%. Predict which cash flows and present values will change. The payments stay at $20, $20, $20, and $1,020; their present values now sum to $1,000.00. At zero yield the discount factors are all one and price equals the $1,080 total receipts.
+
+In the separate **What does “4% a year” mean?** experiment, select Annual nominal rate, 4%, and Semiannual. Compare $40.00 held as cash with $40.40 after reinvestment. Predict what Annual compounding will show: the nominal and effective annual rates coincide, and there is no within-year reinvestment income.
+
+## 9. Common mistakes
+
+- **Using 5% for every half-year:** divide a 5% annual nominal yield by two first.
+- **Discounting the final coupon twice:** include it in the coupon sum or in the final combined payment, never both.
+- **Assuming all discount factors are below one:** that holds for positive yields. At zero yield they equal one; a negative yield with $1+y/m>0$ makes future positive payments worth more than their undiscounted amounts in this model.
+- **Treating compounding as an extra bond payment:** interest on coupons requires a separate reinvestment action.
+
+## 10. Try it yourself
+
+1. Price a $1,000 zero-coupon bond with one year remaining at 4% nominal yield compounded semiannually.
+2. Price a $1,000 bond with a 6% coupon, one year remaining, semiannual payments, and 4% nominal yield compounded semiannually. List the cash flows before discounting them.
+3. What would the bond in question 2 cost at a 6% nominal yield compounded semiannually?
+4. Why is the final cash flow larger than the earlier coupons?
+
+::: answer
+**Answers — attempt the questions first**
+
+1. $1,000/(1.02)^2 = **$961.17**.
+2. Cash flows: $30 in six months and $1,030 in one year. Price = $30/1.02 + $1,030/(1.02)^2 = **$1,019.42**.
+3. **$1,000.00**, since coupon rate and yield match under these conventions.
+4. It includes both the last coupon and principal repayment.
+:::
+
+**Checkpoint:** You should be able to turn a bond description into cash flows, convert an annual nominal yield into a period rate, and discount each payment using the correct period count.
+
+**Next:** Use the [Bond Pricing Lab](/lessons/bond-pricing-lab) to test how coupon, maturity, and yield change price, then [solve yield to maturity from a price](/lessons/yield-to-maturity). The optional “Under the hood” section below shows the implementation.

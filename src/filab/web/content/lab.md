@@ -1,5 +1,11 @@
 ## One bond, one changing variable
 
+**Goal:** Explain a price change by identifying which payments or discount rates changed. Prerequisite: [present value and bond pricing](/lessons/present-value).
+
+We now use **$100 face**, one tenth of the first two lessons' $1,000 example. A price of $92.21 per $100 face means $922.10 for $1,000 face if scaling that rounded quote. The calculator keeps unrounded values internally.
+
+Each comparison is valued just after a coupon date, with no accrued interest, taxes, or fees. Before moving a control, predict the result and name what stays fixed.
+
 The dashed curve is always the same original bond: **10 years remaining,
 4% annual coupon, $100 face value, semiannual payments**. The solid curve
 is your selected bond. Every tab plots **price versus YTM**, using the same
@@ -9,6 +15,16 @@ The **Compare at YTM** control moves the markers to a particular yield and
 sets the starting yield for the table. It does not change either price curve.
 These are hypothetical pricing scenarios, not a Treasury yield curve or
 predictions of future rates.
+
+## The calculation behind each curve
+
+Let $P(y)$ mean “the price calculated at annual nominal decimal YTM $y$.” With $N$ half-year periods remaining and annual decimal coupon rate $c$, each coupon is $C=100c/2$. The previous lesson's formula becomes:
+
+$$
+P(y)=\sum_{k=1}^{N}\frac{C}{(1+y/2)^k}+\frac{100}{(1+y/2)^N}.
+$$
+
+Each point on a curve repeats this calculation at a different yield. The horizontal axis is a rate, not a date; moving along it does not age the bond.
 
 ## 1. Maturity: move the principal repayment date
 
@@ -43,6 +59,8 @@ because it promises less total cash. This comparison changes payment
 amounts as well as timing, so a dollar-price difference alone does not
 measure relative interest-rate sensitivity.
 
+A **basis point (bp)** is 0.01 percentage point: 100 bp is a move from 5% to 6%, or 0.01 in decimal yield.
+
 Use the **percentage change column** to compare sensitivity to the same
 100-basis-point shock. Starting at a 5% YTM, the zero-coupon bond loses
 about 9.27%, versus 7.68% for the coupon bond. Receiving some cash earlier
@@ -64,10 +82,20 @@ $$
 \frac{\Delta P}{P}=\frac{P(y+0.01)}{P(y)}-1.
 $$
 
+Here $\Delta P$ means new price minus initial price, so a loss is negative. For the original ten-year 4% coupon bond, the unrounded prices at 5% and 6% YTM display as **$92.21** and **$85.12**. Their difference displays as **−$7.08**, and dividing the unrounded difference by the unrounded starting price gives **−7.68%**. Subtracting the two already-rounded prices would instead give −$7.09.
+
 Each percentage uses that bond’s own initial price. No time passes,
 maturity stays fixed, and no coupons arrive between the two valuations.
 A holding-period return must also account for elapsed time, received
 coupons, reinvestment, and sale value.
+
+## Transfer exercise
+
+Use the Maturity tab with two years remaining and Compare at YTM at 4%. Predict the selected bond's price and its change after the table's +100 bp shock.
+
+::: answer
+The starting price is **$100.00** because coupon and YTM match. At 5% YTM it is **$98.12**. The immediate change is **−$1.88**, or **−1.88%**, using unrounded values. Its remaining payments are still $2, $2, $2, and $102.
+:::
 
 ## Try explaining the relationships
 

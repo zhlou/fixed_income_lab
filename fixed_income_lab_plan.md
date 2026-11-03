@@ -69,6 +69,15 @@ in [the M1 journal](notes/m1_learning_journal.md). M2–M7 remain planned.
 
 ### Three separate measures of success
 
+**Teaching review, November 3, 2026:** All nine published lessons have been
+reviewed for prerequisite order, terminology, notation, reproducible examples,
+experiment guidance, and reflection. The revisions keep the existing M0/M1
+sequence and calculation conventions. Definitions now precede the more advanced
+formulas; foundational exercises include revealed explanations, and YTM and dated
+settlement have fuller worked examples. See [the review record](notes/lesson_content_review.md).
+This is an educational-content improvement, not completion of learner checkpoints
+or delivery of M2.
+
 | Goal | Evidence |
 |---|---|
 | Learn during the process | Predict a result, reproduce a calculation, explain a surprise, and solve a new case without copying the example |

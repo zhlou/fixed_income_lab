@@ -9,16 +9,22 @@ than the loss from an equal yield rise.
 Prerequisite: [modified duration and DV01](/lessons/modified-duration-dv01).
 Predict the asymmetry before highlighting +200 bp and −200 bp in the explorer.
 
+**Goal:** Improve a duration estimate and measure the error that remains. In the shared experiment, focus on **Bond A · exact versus approximate** and the shock grid. “Exact” here means fully repriced within our model, not a prediction of a market trade.
+
+A **first-order** estimate uses only the starting slope, so it is proportional to the yield change. A **second-order** estimate also uses how that slope changes, adding a term proportional to the square of the yield change. This is why convexity matters more as a shock grows.
+
 ## Derive the second-order term
 
 With fixed payments $CF_k$, annual nominal decimal yield $y$, frequency $m$,
-price $P$, and $q=1+y/m$, differentiate the first derivative once more:
+price $P$, $N$ remaining payment periods, and growth factor $q=1+y/m$, differentiate the first derivative once more. The **second derivative** $d^2P/dy^2$ measures how the slope changes as yield changes:
 
 $$
 \frac{d^2P}{dy^2}=\sum_{k=1}^{N}\frac{k(k+1)}{m^2}CF_kq^{-k-2}.
 $$
 
-Define convexity $\mathcal C$ as normalized second derivative:
+The previous derivative had the factor $-(k/m)q^{-k-1}$. Differentiating again brings down $-(k+1)/m$: the two minus signs cancel, leaving the positive $k(k+1)/m^2$ factor.
+
+Define convexity $\mathcal C$ as the second derivative divided by initial price. This makes it independent of the position's dollar size. As before, $w_k=CF_kq^{-k}/P$ is payment $k$'s present-value weight:
 
 $$
 \mathcal C=\frac{1}{P}\frac{d^2P}{dy^2}
@@ -33,10 +39,12 @@ $$
 \frac12\mathcal C(\Delta y)^2.
 $$
 
+Here $\Delta y$ is the annual decimal yield change, $D_{\mathrm{mod}}$ is modified duration, and $\Delta P/P$ is the price change divided by initial price. The **Taylor approximation** is this local slope-plus-curvature expansion. The one-half arises because, to this order, the slope changes steadily across the yield step: its average change is half its endpoint change. Multiply the entire expression by $P$ to get dollars.
+
 For these fixed positive cash flows and positive discount bases, convexity is
 positive. The correction is positive for both yield directions: it reduces an
 estimated loss and increases an estimated gain. Callable bonds can behave
-differently because their expected payments can change; they are not modeled here.
+differently: a **call** gives the issuer the right to repay early under specified terms, so expected payments can change as yields change. They are not modeled here.
 
 ## Reproduce the ten-year example
 
@@ -59,6 +67,13 @@ All values use full-precision initial price and derivatives; displayed cents are
 rounded. This is a hypothetical instantaneous repricing, not a forecast or a
 holding-period return.
 
+For the +200 bp row, $\Delta y=0.02$. The curvature contribution is
+$\tfrac12(77.111675)(0.02)^2=0.015422335$, or **+1.542234 percentage points**.
+Adding it to the duration estimate of −16.108462% gives approximately
+−14.566229%. The remaining error is about **+0.101048 percentage point**
+of initial price, not 0.101048% of the exact loss. A positive signed error
+means the estimate predicts a higher ending price than exact repricing does.
+
 ## Inspect the error, not just the estimate
 
 1. Start with ±25 bp, then move through ±50, ±100, and ±200 bp. Inspect errors
@@ -69,13 +84,15 @@ holding-period return.
 4. Double face value. Dollar errors double; normalized sensitivities and percentage
    errors do not. For the same face, A and B can still have different market values.
 
-A central numerical check is
+For a numerical check, let $h$ be a small decimal yield bump and compare prices at $y-h$, $y$, and $y+h$:
 
 $$
 \mathcal C_h=\frac{P(y-h)+P(y+h)-2P(y)}{h^2P(y)}.
 $$
 
-Second derivatives are especially vulnerable to cancellation at tiny bumps. The
+For a straight line, the average of the two outer prices would equal the middle price, making the numerator zero. On this convex curve, their average is higher. Dividing by $h^2$ measures curvature; dividing by price removes dollar size.
+
+Second derivatives are especially vulnerable to cancellation at tiny bumps: subtracting nearly equal stored prices can erase significant digits. The
 convergence table is a diagnostic; it is not proof that any chosen bump works
 for all instruments. Dated mode uses the unchanged settlement pricer and dirty
 price normalization, without inventing a textbook Macaulay value.
@@ -86,7 +103,7 @@ price normalization, without inventing a textbook Macaulay value.
 - For a regular zero-coupon bond with maturity $T=N/m$,
   $\mathcal C=T(T+1/m)/(1+y/m)^2$; it is not simply duration squared.
 - Adding convexity does not make an estimate exact. Higher-order terms remain,
-  especially for large shocks, long maturities, or yields near the pricing boundary.
+  especially for large shocks, long maturities, or yields near the pricing boundary $1+y/m=0$. Our formulas require a positive discount base.
 - A Taylor estimate is not guaranteed to be an economically plausible price;
   exact repricing remains the reference.
 - A high convexity figure is not a complete investment recommendation. Credit,
