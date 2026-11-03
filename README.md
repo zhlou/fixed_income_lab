@@ -36,6 +36,77 @@ Avoid bare `--reload` from the project root: the polling reloader can scan
 thousands of Python files in `.venv` repeatedly and consume CPU while idle.
 The development command above watches only application source files.
 
+## Run with Docker
+
+The image uses Python 3.12, installs the package with its `web` dependencies,
+and includes lesson Markdown, templates, JavaScript, CSS, and local KaTeX fonts.
+It runs as an unprivileged user, listens on container port 8000 without reload,
+and checks the homepage for container health. Python, Node.js, and a virtual
+environment are not required on the Docker client machine. Internet access is
+needed to download the base image and dependencies during the build; the website
+works offline afterward. Dependency versions follow `pyproject.toml` and are not
+locked, so a fresh build can pick up newer compatible releases.
+
+From the checkout root, build and run using the **currently selected Docker
+context**:
+
+```bash
+docker context show
+docker context inspect --format '{{.Endpoints.docker.Host}}'
+docker build --tag fixed-income-lab:local .
+docker run --detach --name fixed-income-lab \
+  --publish 127.0.0.1:8000:8000 \
+  fixed-income-lab:local
+```
+
+The final `.` sends the local build context to the engine. `.dockerignore`
+limits the upload to installation inputs, excluding the virtual environment,
+Git history, notebooks, tests, caches, and local configuration. Source is copied
+into the image and installed normally; no runtime bind mounts or volumes are
+needed. With a remote engine, bind-mount paths refer to the **engine's filesystem**,
+not this checkout on the client; see
+[Docker's bind-mount documentation](https://docs.docker.com/engine/storage/bind-mounts/).
+Rebuild the image and recreate the container after source changes. The engine
+chooses its own native image architecture; there is no hard-coded macOS/ARM or
+Linux/x86 platform.
+
+The published `127.0.0.1:8000` belongs to the **Docker engine host**, as described in
+[Docker's port-publishing documentation](https://docs.docker.com/engine/network/port-publishing/).
+For the currently configured `deepl` context at `ssh://deepl.lan`, open an SSH
+tunnel from the client in a separate terminal:
+
+```bash
+ssh -N -o ExitOnForwardFailure=yes \
+  -L 127.0.0.1:18000:127.0.0.1:8000 deepl.lan
+```
+
+Open [the container website](http://127.0.0.1:18000) or
+[its API documentation](http://127.0.0.1:18000/docs) on the client. Replace
+`deepl.lan` with the engine's SSH destination if the context changes. Port 18000
+on the client avoids conflicting with a local server on port 8000; change that
+first port if needed. Stop the tunnel with Ctrl+C. With a local Docker engine,
+the same container command is reachable directly at
+[http://127.0.0.1:8000](http://127.0.0.1:8000) without a tunnel.
+
+Inspect health and logs, then stop and remove the container when finished:
+
+```bash
+docker ps --filter name=fixed-income-lab
+docker logs fixed-income-lab
+docker stop fixed-income-lab
+docker rm fixed-income-lab
+```
+
+Run the build and start commands again to use updated source. If port 8000 on
+the engine is occupied, change the middle port in `--publish` (for example,
+`127.0.0.1:8001:8000`) and the tunnel destination port to match. Keep the
+container's final port at 8000. Images and containers live on the selected
+engine; no registry push or local Docker daemon is required.
+
+The current Docker client builds successfully with the legacy builder and emits
+a deprecation warning because Buildx is not installed. This Dockerfile also works
+with BuildKit; it does not require builder-specific features.
+
 ## Lessons
 
 | Page | What to explore |
@@ -141,6 +212,8 @@ or historical research runs. Inputs are local; there is no cloud account or feed
 ## Project layout
 
 ```text
+Dockerfile                 Self-contained Python web runtime on port 8000
+.dockerignore              Minimal build context for local or remote engines
 src/filab/pricing/          Reusable pricing calculations
 src/filab/risk/             Yield derivatives and comparison scenarios
 src/filab/web/curriculum.py Published lessons and milestone registry

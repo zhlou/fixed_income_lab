@@ -1,0 +1,16 @@
+# Send only application installation inputs to the Docker engine.
+**
+!Dockerfile
+!.dockerignore
+!pyproject.toml
+!README.md
+!src/
+!src/**
+
+# Exclude generated files even when they are inside src/.
+**/__pycache__/
+**/*.py[cod]
+**/*.egg-info/
+**/.DS_Store
+**/.env
+**/.env.*

@@ -20,6 +20,45 @@ questions or demonstrated the learning checkpoints.
 
 ## Completed work
 
+### Docker runtime — November 3, 2026
+
+Added a Python 3.12 slim image that installs the packaged application with its
+`web` extra, includes all lesson and formula assets, runs as an unprivileged
+user, and serves on container port 8000 without reload. A homepage health check
+reports container readiness. `.dockerignore` limits uploads to installation
+inputs and excludes local environments, Git history, tests, notebooks, and caches.
+
+The image needs no runtime bind mounts or volumes. Build/run commands preserve
+the selected Docker context; the README explains remote-host port publishing,
+SSH tunneling, rebuilding, health/log inspection, and cleanup. This adds a runtime
+option for the existing M0/M1 website; curriculum and financial conventions are
+unchanged.
+
+Validation on the selected `deepl` engine (`ssh://deepl.lan`, Linux/amd64):
+
+- `docker build --tag fixed-income-lab:local .` succeeded, uploading a 1.715 MB
+  context from the macOS/arm64 client. No source bind mounts or volumes were used.
+- All **313 tests passed locally** and **313 passed inside the container** against
+  the installed package as the unprivileged user. Tests were copied with
+  `docker cp`; only the disposable verification container received `pytest` and
+  `httpx`. The runtime image excludes test and notebook dependencies.
+- HTTP checks passed for 19 pages/assets (all nine lessons, overview, standalone
+  tool, API docs/schema, and bundled scripts/styles/fonts) plus eight API checks,
+  including a known price and invalid-input rejection. Resources resolved from
+  the installed package. Docker reported the container healthy.
+- A fresh container with `--network none` served 17 lesson/tool/asset URLs and
+  seven numerical APIs successfully and became healthy. A client HTTP request
+  through an SSH tunnel to the remote published port returned 200.
+- Temporary containers and the tunnel were stopped after verification. The
+  `fixed-income-lab:local` image remains available on the remote engine.
+
+The client currently falls back to the legacy Docker builder and emits its
+deprecation notice because Buildx is absent. The container test run also emitted
+one upstream Starlette/httpx test-client deprecation warning; all checks passed.
+Dependencies remain unlocked under the existing `pyproject.toml` policy. No UI
+or financial calculation changes were made, so no new visual or reference-price
+benchmark review was required.
+
 ### Lesson clarity review — November 3, 2026
 
 Reviewed and revised all nine canonical website lessons, and reviewed the optional
@@ -156,6 +195,12 @@ python -m uvicorn filab.web.app:app --host 127.0.0.1 --port 8000
 Open [the local website](http://127.0.0.1:8000). Reuse an existing server if
 available; otherwise start one with the command above. Stop it with Ctrl+C
 when finished; restart it after Python code changes.
+
+Alternatively, build `fixed-income-lab:local` with the root `Dockerfile` and run
+it on the selected Docker engine. With the current remote `deepl` context, the
+published port is on `deepl.lan`; an SSH tunnel makes it available to the client.
+See [Run with Docker](README.md#run-with-docker) for complete commands, port
+choices, and container lifecycle instructions.
 
 An earlier high-CPU issue came from bare `--reload` recursively polling the
 project, including approximately 5,947 Python files in `.venv`. The watcher
