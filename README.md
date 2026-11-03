@@ -52,9 +52,10 @@ The development command above watches only application source files.
 
 The image uses Python 3.12, installs the package with its `web` dependencies,
 and includes lesson Markdown, templates, JavaScript, CSS, and local KaTeX fonts.
-It runs as an unprivileged user, listens on container port 8000 without reload,
-and checks the homepage for container health. Python, Node.js, and a virtual
-environment are not required on the Docker client machine. Internet access is
+It runs as an unprivileged user and listens on container port 8000 without reload.
+The image does not configure a periodic health check; configure probes through
+the hosting platform if needed. Python, Node.js, and a virtual environment are
+not required on the Docker client machine. Internet access is
 needed to download the base image and dependencies during the build; the website
 works offline afterward. Dependency versions follow `pyproject.toml` and are not
 locked, so a fresh build can pick up newer compatible releases.
@@ -100,7 +101,7 @@ first port if needed. Stop the tunnel with Ctrl+C. With a local Docker engine,
 the same container command is reachable directly at
 [http://127.0.0.1:8000](http://127.0.0.1:8000) without a tunnel.
 
-Inspect health and logs, then stop and remove the container when finished:
+Inspect container status and logs, then stop and remove it when finished:
 
 ```bash
 docker ps --filter name=fixed-income-lab

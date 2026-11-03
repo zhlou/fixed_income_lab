@@ -20,6 +20,20 @@ questions or demonstrated the learning checkpoints.
 
 ## Completed work
 
+### Docker health check removed — November 3, 2026
+
+Removed the built-in periodic homepage health check and updated the Docker run
+documentation. The image no longer schedules localhost requests; hosting-platform
+probes can be configured separately if needed. Rebuilt `fixed-income-lab:local`
+on `deepl` and confirmed that its health-check configuration is absent.
+
+A temporary container passed homepage, lesson, risk-tool, local formula-asset,
+and valuation API checks, then was removed. Recreated the existing `naughty_newton`
+container with its original port 8000 mapping and verified that it runs without
+a health check. The website remains available at `http://deepl.lan:8000`.
+Validation was limited to the changed Docker configuration and startup behavior;
+the financial and application code did not change.
+
 ### Local Python 3.12 environment — November 3, 2026
 
 Installed Homebrew Python **3.12.16** and recreated the project's `.venv` with it
@@ -47,17 +61,19 @@ and original notebook artifacts are unchanged.
 
 Added a Python 3.12 slim image that installs the packaged application with its
 `web` extra, includes all lesson and formula assets, runs as an unprivileged
-user, and serves on container port 8000 without reload. A homepage health check
-reports container readiness. `.dockerignore` limits uploads to installation
+user, and serves on container port 8000 without reload. The initial homepage
+health check was subsequently removed; the image no longer polls the website.
+`.dockerignore` limits uploads to installation
 inputs and excludes local environments, Git history, tests, notebooks, and caches.
 
 The image needs no runtime bind mounts or volumes. Build/run commands preserve
 the selected Docker context; the README explains remote-host port publishing,
-SSH tunneling, rebuilding, health/log inspection, and cleanup. This adds a runtime
+SSH tunneling, rebuilding, status/log inspection, and cleanup. This adds a runtime
 option for the existing M0/M1 website; curriculum and financial conventions are
 unchanged.
 
-Validation on the selected `deepl` engine (`ssh://deepl.lan`, Linux/amd64):
+Initial validation on the selected `deepl` engine (`ssh://deepl.lan`, Linux/amd64),
+before removal of the health check:
 
 - `docker build --tag fixed-income-lab:local .` succeeded, uploading a 1.715 MB
   context from the macOS/arm64 client. No source bind mounts or volumes were used.
