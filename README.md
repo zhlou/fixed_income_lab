@@ -61,7 +61,13 @@ M1 adds three lessons: **Cash-flow timing & duration → Modified duration & DV0
 a worked example, reflection questions, and a transfer exercise with a collapsed
 answer. The shared Risk Explorer is also available outside the lesson sequence.
 
-Use the course sidebar and previous/next links to move between lessons.
+On desktop windows at least 1200 pixels wide, lessons place the experiment on the
+left and the explanation on the right. Each side scrolls independently, so the
+chart stays in place while you read. The experiment receives most of the width;
+open **Course** in the header for navigation. Narrower windows stack the sections
+with links between them. The top bar provides Overview, Previous, Next, and the
+current lesson number; previous/next links also sit at the end of the explanation.
+On desktop, only the two content panels scroll, keeping the header in view.
 Discrete controls use visible option cards so every choice is shown without
 opening a dropdown. Use Tab and arrow keys to select an option by keyboard.
 Change a control to recalculate in Python. Exact values accompany the

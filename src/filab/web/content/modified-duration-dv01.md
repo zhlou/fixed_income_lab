@@ -2,13 +2,37 @@
 
 Faraway payments usually lose more present value when the discount rate rises.
 Modified duration translates that intuition into a local percentage sensitivity.
-DV01 translates it into dollars for a **one basis point** move. One basis point
+DV01 translates it into dollars for a **one basis point** move in the bond's
+yield to maturity (YTM). One basis point
 is 0.01 percentage point, or 0.0001 in decimal yield. A move from 5% to 6% is
 100 bp, not 1 bp.
 
 Prerequisite: [cash-flow timing and Macaulay duration](/lessons/macaulay-duration).
 Predict first: doubling face value should double dollar exposure, but should it
 change percentage sensitivity?
+
+## Which rate moves?
+
+Here, **“yield move” means a change in YTM**, with the coupon rate and all
+promised payments held fixed. Recall the distinction:
+
+| Rate | What it means for this fixed-coupon bond | During a yield shock |
+|---|---|---|
+| Coupon rate | Annual coupon dollars divided by face value; set in the bond's terms | Stays fixed |
+| Yield to maturity (YTM) | The single discount rate that makes the present value of remaining promised payments equal the bond's full price | Changes; we recalculate price |
+
+For example, a **4% coupon** on **$100 face** pays **$4 a year**, split into
+two **$2 payments** if semiannual. If YTM rises from **5.00% to 5.01%**,
+that is a **+1 bp yield move**. The coupons remain $2 each and principal at
+maturity remains $100. Discounting those same payments at the higher YTM
+gives a lower price; DV01 estimates the dollar decrease.
+
+The experiment asks: “What price would these same payments have if the market
+required a different YTM right now?” When observing a market price instead,
+we can work backward to its implied YTM, as in the
+[YTM lesson](/lessons/yield-to-maturity). Here YTM is an annual nominal rate
+compounded at the selected payment frequency. No time passes during the shock;
+settlement, payment dates, and compounding convention stay fixed.
 
 ## Derive the sensitivity
 
@@ -118,6 +142,7 @@ would need to calculate either of those.
 ## Reflection checkpoint
 
 - Why is DV01 positive here even though price falls when yield rises?
+- If a 4% coupon bond's YTM rises from 5% to 6%, which payments change, and why does its price change?
 - What exactly stays fixed when taking the price derivative?
 - Why could equal-duration portfolios still respond differently to a changing curve?
 

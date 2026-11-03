@@ -11,7 +11,7 @@
   <script defer src="/static/app.js"></script>
   <script defer src="/static/risk.js"></script>
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 <a class="skip-link" href="#main">Skip to lesson</a>
 <aside class="sidebar" id="course-nav">
   <a class="brand" href="/" aria-label="Fixed-Income Lab home"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M5 28V9M5 28h27M10 22l7-11 6 7 8-13"/></svg><span>FIXED-INCOME<span class="brand-sub">L A B O R A T O R Y</span></span></a>
@@ -31,8 +31,20 @@
   <a class="roadmap-link" href="/#curriculum">View the full curriculum <span>→</span></a>
   <div class="sidebar-bottom"><span class="status-dot"></span> LOCAL WORKSPACE <div>Learn by changing the inputs.</div></div>
 </aside>
+<button class="nav-backdrop" tabindex="-1" aria-label="Close course navigation" hidden></button>
 <div class="page-shell">
-  <header class="topbar"><button id="nav-toggle" class="nav-toggle" aria-controls="course-nav" aria-expanded="false" aria-label="Toggle course navigation">☰</button><div class="breadcrumb">Fixed-Income Lab <span>/</span> {{ 'Overview' if active == 'home' else 'Experiments' if active == 'bond-risk' else 'Learn' }}</div><span class="engine"><span class="status-dot"></span> Python-powered</span></header>
+  <header class="topbar">
+    <button id="nav-toggle" class="nav-toggle" aria-controls="course-nav" aria-expanded="false" aria-label="Toggle course navigation">☰ <span>Course</span></button>
+    <div class="breadcrumb">Fixed-Income Lab <span>/</span> {{ 'Overview' if active == 'home' else 'Experiments' if active == 'bond-risk' else 'Learn' }}</div>
+    {% if lesson is defined %}
+    <nav class="topbar-navigation" aria-label="Lesson navigation">
+      <a href="/" class="topbar-overview">Overview</a>
+      {% if previous %}<a href="/lessons/{{ previous.slug }}" aria-label="Previous lesson: {{ previous.title }}" title="{{ previous.title }}">← <span>Previous</span></a>{% else %}<span class="nav-unavailable" aria-disabled="true">← <span>Previous</span></span>{% endif %}
+      <span class="lesson-position" aria-label="Lesson {{ lesson_number }} of {{ lessons|length }}">{{ '%02d'|format(lesson_number) }} / {{ '%02d'|format(lessons|length) }}</span>
+      {% if next %}<a href="/lessons/{{ next.slug }}" aria-label="Next lesson: {{ next.title }}" title="{{ next.title }}"><span>Next</span> →</a>{% else %}<a href="/#curriculum" aria-label="Continue to the curriculum"><span>Curriculum</span> →</a>{% endif %}
+    </nav>
+    {% else %}<span class="engine"><span class="status-dot"></span> Python-powered</span>{% endif %}
+  </header>
   <main id="main" tabindex="-1">{% block content %}{% endblock %}</main>
   <footer class="site-footer"><span>FIXED-INCOME LAB</span><span>Understand the assumptions. Test the intuition.</span></footer>
 </div>

@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 {% from 'controls.html' import control, date_control, choices %}
+{% block body_class %}lesson-page{% endblock %}
 {% block content %}
 <div class="lesson-heading"><div class="eyebrow"><span class="eyebrow-line"></span> LESSON {{ '%02d'|format(lesson_number) }} <span class="eyebrow-divider">/</span> {{ lesson.tag|upper }}</div><h1>{{ lesson.headline }}</h1><p>{{ lesson.description }}</p></div>
+<div class="learning-layout">
+<section class="experiment-pane" aria-labelledby="experiment-title">
+<div class="pane-heading"><h2 id="experiment-title">Experiment</h2><a href="#lesson-reading">Read the explanation ↗</a></div>
+<div class="experiment-scroll" id="lesson-experiment" tabindex="0" role="region" aria-label="Interactive experiment">
 {% if lesson.milestone == 'M1' %}
-<section class="card prediction"><div class="card-overline">PREDICT BEFORE YOU MOVE THE CONTROLS</div><p>{{ lesson.prediction }}</p><p class="tiny-note">Prerequisite: <a href="/lessons/{{ lesson.prerequisite }}">review the previous concept</a>. Write a prediction, then look for evidence in the tables.</p><a href="#lesson-reading">Read the explanation first ↓</a> · <a href="/tools/bond-risk">Open the standalone Risk Explorer ↗</a></section>
 {% include 'risk_controls.html' %}
 {% elif active == 'bond-pricing-lab' %}
 <section class="lab-section" data-experiment>
@@ -95,9 +99,20 @@
 {% if active == 'present-value' %}
 <section class="rate-section card" data-rates><div class="section-heading"><div><div class="eyebrow">A RATE IS ALSO A CONVENTION</div><h2>What does “4% a year” mean?</h2></div></div><p>A bond pays coupons on fixed dates. Reinvestment is a separate action. Compare the same annual coupon stream with and without reinvesting it.</p><form class="rate-controls" novalidate>{{ choices('convention', 'convention', 'The rate I know', [('nominal', 'Annual nominal rate', ''), ('effective', 'Effective annual rate', '')], '') }}{{ control('rate', 'Known annual rate', 4, 0, 20, 0.25, '%') }}{{ choices('rate-frequency', 'frequency', 'Compounding / coupon frequency', [('1', 'Annual', '1'), ('2', 'Semiannual', '2'), ('4', 'Quarterly', '4'), ('12', 'Monthly', '12')], '', selected='2') }}</form><p class="error" role="alert" data-error></p><div class="rate-result" aria-live="polite"><div><span>ANNUAL NOMINAL RATE</span><strong data-rate="nominal_rate">—</strong></div><span class="rate-arrow" aria-hidden="true">⇄</span><div><span>EFFECTIVE ANNUAL RATE</span><strong data-rate="effective_rate">—</strong></div></div><div class="reinvestment"><div><span class="reinvestment-label">Hold coupons as cash</span><strong data-rate="held_interest">—</strong><small>One year of interest / $1,000 face</small></div><div><span class="reinvestment-label">Reinvest every coupon</span><strong data-rate="reinvested_interest">—</strong><small>One year of interest, including interest on interest</small></div><div class="reinvestment-extra"><span>FROM REINVESTMENT</span><strong data-rate="extra_interest">—</strong></div></div><p class="tiny-note">Assumes purchase at par, unchanged value or redemption at par after one year, and reinvestment at the same periodic rate. The bond itself does not compound your coupons.</p></section>
 {% endif %}
-<section class="reading-section" id="lesson-reading"><div class="section-heading"><div><div class="eyebrow">CONNECT THE DOTS</div><h2>The explanation behind the experiment</h2></div></div><article class="prose">{{ body|safe }}</article></section>
+</div>
+</section>
+<section class="reading-pane" aria-labelledby="reading-title">
+<div class="pane-heading"><h2 id="reading-title">Learn the concept</h2><a href="#lesson-experiment">Try the experiment ↗</a></div>
+<div class="reading-scroll" id="lesson-reading" tabindex="0" role="region" aria-label="Lesson explanation">
+{% if lesson.milestone == 'M1' %}
+<section class="card prediction"><div class="card-overline">PREDICT BEFORE YOU MOVE THE CONTROLS</div><p>{{ lesson.prediction }}</p><p class="tiny-note">Prerequisite: <a href="/lessons/{{ lesson.prerequisite }}">review the previous concept</a>. Write a prediction, then look for evidence in the tables.</p><a href="/tools/bond-risk">Open the standalone Risk Explorer ↗</a></section>
+{% endif %}
+<article class="prose">{{ body|safe }}</article>
 {% if implementation %}
 <details class="card under-hood" id="under-the-hood"><summary>Under the hood <span>Optional Python examples</span></summary><div class="prose">{{ implementation|safe }}</div></details>
 {% endif %}
 <nav class="lesson-pagination" aria-label="Previous and next lesson">{% if previous %}<a href="/lessons/{{ previous.slug }}"><small>← PREVIOUS LESSON</small><span>{{ previous.title }}</span></a>{% else %}<a href="/"><small>← YOUR LEARNING DESK</small><span>Course overview</span></a>{% endif %}{% if next %}<a href="/lessons/{{ next.slug }}" class="next-lesson"><small>NEXT LESSON →</small><span>{{ next.title }}</span></a>{% else %}<a href="/#curriculum" class="next-lesson"><small>WHAT COMES NEXT →</small><span>The full curriculum</span></a>{% endif %}</nav>
+</div>
+</section>
+</div>
 {% endblock %}

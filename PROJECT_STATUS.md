@@ -1,6 +1,6 @@
 # Fixed-Income Lab — Status and Progress
 
-**Updated:** November 1, 2026 (America/Chicago)
+**Updated:** November 2, 2026 (America/Chicago)
 
 ## Current status
 
@@ -57,6 +57,13 @@ request and response schemas.
 
 ### Interface decisions and recent improvements
 
+- Place experiments and explanations side by side at desktop widths of 1200px
+  and above, with independent scrolling and most of the width for the experiment.
+  Lesson navigation opens from the Course button; narrower screens stack the
+  sections with direct links between them. Risk charts precede detailed measures.
+- Keep the desktop page within the viewport and contain positioned formula
+  accessibility content inside its panel, preventing blank outer-page scrolling.
+  Add Overview, Previous, Next, and the lesson position to the top bar.
 - Give distinct financial concepts their own lessons; YTM is a separate page.
 - Show discrete choices as visible radio option cards, rather than dropdowns.
 - Order payment frequencies **Annual → Semiannual → Quarterly**, followed
@@ -64,6 +71,8 @@ request and response schemas.
 - Display purchase-price inputs to two decimal places, with one-cent steps;
   round typed prices when committed. Preserve calculation precision elsewhere.
 - Label assumptions and distinguish immediate repricing from holding-period return.
+- Define a DV01 lesson yield move as a change in YTM with fixed coupons and
+  principal; contrast coupon rate with YTM before deriving sensitivity.
 - Explain why the Treasury bill yield formula changes at half a year:
   six months is one period in the semiannual coupon-bond benchmark.
   Lesson 6 includes the two growth formulas, a numerical comparison,
@@ -91,6 +100,20 @@ face scaling, dated mode, invalid dates, export/import, reset, keyboard radio an
 chart controls, mobile navigation, and rendered formulas. No browser console errors
 were observed. Mobile pages stayed within viewport width. Temporary verification
 servers are stopped after checks; normal use still requires starting the server.
+
+The November 2 lesson layout update passed all **313 tests** and browser checks
+on all nine lessons at 1440, 1200, 1024, and 390-pixel widths. Checks covered
+independent reading scroll, graph width, formulas, course navigation and Escape,
+keyboard radio selection, recalculation/reset, section links, optional Python,
+and the overview/standalone tool. No horizontal page overflow or browser console
+errors were observed. The existing local server was reused.
+
+Follow-up browser checks covered all nine lessons at 1440×900, 1200×600,
+390×844, and 320×640: desktop document height matches the viewport, wheel and
+section-link navigation cannot scroll the outer page, both panels still reach
+their final content, and mobile retains normal page scrolling. Header links,
+first/last lesson destinations, keyboard activation, and expanded Python examples
+were checked. The existing desktop/mobile interaction checks and 313 tests passed.
 
 Dated bonds use Actual/Actual coupon-period accrual and simple discounting
 over the first fractional period, followed by compound full periods.

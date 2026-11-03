@@ -24,3 +24,81 @@
 @media(max-width:680px){.risk-toolbar{padding:15px}.risk-file-actions{width:100%}.risk-file-actions .button{flex:1;text-align:center}.tool-entry{align-items:start;flex-direction:column}.risk-details{padding:16px 14px}.prediction{padding:17px}.risk-explorer .chart-tooltip{white-space:pre-wrap}.risk-explorer .chart svg{min-height:150px}}
 
 .exercise-answer{padding:12px 16px;border:1px solid var(--line);border-radius:5px;margin:18px 0;background:#f1f5eb}.exercise-answer summary{cursor:pointer;font-weight:600}.exercise-answer p{margin:12px 0 0}.risk-file-actions .button{border:1px solid #cbd8c2;border-radius:4px;background:#f4f7ef;color:#31533b;font-family:inherit}
+
+/* Lesson desk: reserve the full window for the experiment and its explanation. */
+.nav-backdrop{position:fixed;inset:0;border:0;background:#102b2345;z-index:9;cursor:default}
+.nav-backdrop[hidden]{display:none}
+.sidebar{overflow-y:auto;scrollbar-width:thin}
+.nav-toggle span{font-size:11px;margin-left:5px}
+.lesson-page .sidebar{display:none;top:64px;box-shadow:6px 0 30px #0d251d30}
+.lesson-page.nav-open .sidebar{display:flex}
+.lesson-page .page-shell{margin-left:0}
+.lesson-page .topbar{height:64px;justify-content:flex-start;gap:22px;position:relative;z-index:11}
+.lesson-page .topbar .engine{margin-left:auto}
+.lesson-page .nav-toggle{display:block;background:white;border:1px solid var(--line);border-radius:4px;color:#31553b;padding:6px 10px;white-space:nowrap}
+.topbar-navigation{display:flex;align-items:center;gap:10px;margin-left:auto;font-size:11px;white-space:nowrap}
+.topbar-navigation>a{padding:7px 10px;border:1px solid var(--line);border-radius:4px;background:white;color:#365b42}
+.topbar-navigation>a:hover{background:#edf3e2;border-color:#8ba17d}
+.topbar-navigation .topbar-overview{margin-right:8px}
+.lesson-position{padding:0 5px;font:10px ui-monospace,monospace;color:#6b7b6b}
+.nav-unavailable{padding:7px 10px;color:#94a090}
+.learning-layout,.experiment-pane,.reading-pane{min-width:0}
+.pane-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px 13px}
+.pane-heading h2{font:600 13px/1.5 -apple-system,BlinkMacSystemFont,sans-serif;letter-spacing:0;margin:0}
+.pane-heading a{font-size:10px;color:#53704e;text-decoration:underline;text-underline-offset:3px}
+/* Keep positioned formula/accessibility content inside its scrolling panel. */
+.experiment-scroll,.reading-scroll{position:relative;min-width:0;scrollbar-width:thin;scrollbar-color:#b8c6b2 transparent;scroll-margin-top:20px}
+.reading-scroll{background:white;border:1px solid var(--line);border-radius:7px;padding:24px}
+.reading-scroll .prose>:first-child{margin-top:0}
+.reading-scroll .under-hood{padding:14px;margin-top:24px}
+.reading-scroll .under-hood>summary>span{display:block;margin:4px 0 0}
+.reading-scroll .lesson-pagination{gap:16px;margin-top:28px}
+.reading-scroll .lesson-pagination span{font-size:17px}
+.reading-scroll .prediction{padding:16px;background:#f4f7ed;font-size:12px}
+.reading-pane{margin-top:28px}
+@media(min-width:1200px){
+  body.lesson-page{height:100dvh;overflow:hidden;overscroll-behavior:none}
+  .lesson-page .page-shell{height:100%;display:flex;flex-direction:column;overflow:clip}
+  .lesson-page .topbar{flex-shrink:0}
+  .lesson-page main{max-width:1920px;width:100%;flex:1;min-height:0;padding:22px 30px 24px;display:flex;flex-direction:column;overflow:clip}
+  .lesson-page .lesson-heading{margin-bottom:20px;flex-shrink:0}
+  .lesson-page .lesson-heading h1{font-size:34px;margin:8px 0}
+  .lesson-page .lesson-heading>p{max-width:1100px;font-size:12px;line-height:1.7}
+  .learning-layout{display:grid;grid-template-columns:minmax(0,1fr) clamp(350px,30vw,460px);gap:24px;flex:1;min-height:0}
+  .experiment-pane,.reading-pane{display:flex;flex-direction:column;min-height:0}
+  .reading-pane{margin-top:0}
+  .pane-heading{flex-shrink:0}
+  .experiment-scroll,.reading-scroll{flex:1;min-height:0;overflow:auto;overscroll-behavior-y:contain;scrollbar-gutter:stable}
+  .experiment-scroll{padding:1px 8px 12px 2px}
+  .lesson-page .workspace{grid-template-columns:200px minmax(0,1fr);gap:16px}
+  .lesson-page .controls{padding:18px 15px}
+  .lesson-page .controls h2{font-size:20px}
+  .lesson-page .choice-options{grid-template-columns:1fr}
+  .lesson-page .risk-form .choice-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lesson-page #risk-mode .choice-options,.lesson-page #risk-frequency .choice-options{grid-template-columns:1fr}
+  .lesson-page .risk-toolbar{padding:12px 16px;gap:8px}
+  .lesson-page .risk-toolbar [role="status"]:empty{display:none}
+  .lesson-page .metrics{gap:8px}
+  .lesson-page .metric{padding:14px 11px}
+  .lesson-page .metric>strong{font-size:25px}
+  .lesson-page .chart-card{padding-left:19px;padding-right:19px}
+  .lesson-page .chart-card>.insight{margin-left:-19px;margin-right:-19px;padding-left:19px;padding-right:19px}
+  .lesson-page .chart text{font-size:12px}
+  .lesson-page .chart .axis-label{font-size:11px}
+  .lesson-page .site-footer{display:none}
+}
+@media(min-width:1600px){.lesson-page .workspace{grid-template-columns:220px minmax(0,1fr)}}
+@media(max-width:1199px){.reading-pane{max-width:900px}.lesson-page main{max-width:1200px}}
+@media(max-width:680px){
+  .lesson-page .topbar{height:62px;gap:12px}
+  .lesson-page .sidebar{top:62px}
+  .nav-toggle span{display:none}
+  .reading-scroll{padding:20px 17px}
+  .pane-heading a{font-size:9px}
+  .lesson-page .topbar .breadcrumb{display:none}
+  .topbar-navigation{gap:6px;font-size:10px}
+  .topbar-navigation>a,.nav-unavailable{padding:7px}
+  .topbar-navigation .topbar-overview{margin-right:0}
+  .lesson-position{font-size:9px;padding:0}
+}
+@media(max-width:380px){.topbar-navigation .lesson-position{display:none}.topbar-navigation{gap:4px}}

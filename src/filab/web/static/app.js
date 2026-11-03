@@ -272,5 +272,13 @@ const experimentRoot=$('[data-experiment]');if(experimentRoot){let mode='maturit
   $('.reset',form).addEventListener('click',()=>setMode(mode,true));
 }
 const homeChart=$('[data-home-chart]');if(homeChart)fetch('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'maturity'})}).then(response=>{if(!response.ok)throw Error();return response.json();}).then(data=>drawLines($('#home-chart'),data,true)).catch(()=>$('#home-chart').replaceChildren(element('p','Start the Python server to load the experiment.','loading')));
-const navToggle=$('#nav-toggle');if(navToggle){navToggle.addEventListener('click',()=>{const open=document.body.classList.toggle('nav-open');navToggle.setAttribute('aria-expanded',String(open));});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.body.classList.contains('nav-open')){document.body.classList.remove('nav-open');navToggle.setAttribute('aria-expanded','false');navToggle.focus();}});$$('a',$('#course-nav')).forEach(link=>link.addEventListener('click',()=>{document.body.classList.remove('nav-open');navToggle.setAttribute('aria-expanded','false');}));}
+const navToggle=$('#nav-toggle');if(navToggle){
+  const backdrop=$('.nav-backdrop');
+  function setNavigation(open,restoreFocus=false){document.body.classList.toggle('nav-open',open);navToggle.setAttribute('aria-expanded',String(open));backdrop.hidden=!open;if(restoreFocus)navToggle.focus();}
+  navToggle.addEventListener('click',()=>{const open=!document.body.classList.contains('nav-open');setNavigation(open);if(open)($('#course-nav [aria-current="page"]')||$('#course-nav a')).focus();});
+  backdrop.addEventListener('click',()=>setNavigation(false,true));
+  document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.body.classList.contains('nav-open'))setNavigation(false,true);});
+  $$('a',$('#course-nav')).forEach(link=>link.addEventListener('click',()=>setNavigation(false)));
+  window.addEventListener('resize',()=>{if(!document.body.classList.contains('lesson-page')&&window.innerWidth>680)setNavigation(false);});
+}
 if(window.katex)$$('.math').forEach(node=>{try{window.katex.render(node.textContent,node,{displayMode:node.classList.contains('block'),throwOnError:false,strict:'ignore'});}catch(error){console.warn('Formula could not be rendered',error);}});
