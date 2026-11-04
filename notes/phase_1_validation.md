@@ -73,3 +73,12 @@ places in percent. Additional arithmetic and browser checks are recorded in
 The pricing interfaces and conventions above remain unchanged. Duration,
 convexity, numerical dated sensitivities, and yield-shock approximation checks
 are documented separately in [M1 validation](m1_validation.md).
+
+## M2 follow-on
+
+The dated pricing conventions and original reference checks above are preserved.
+The return ledger adds dirty-price cash accounting, explicit coupon eligibility,
+cash growth, costs, and mark/liquidation treatment. Its independent two-period
+example, nine published OTS/OCC horizon-return checks, tolerances, and model limits
+are recorded in [M2 validation](m2_validation.md). This does not extend the pricing
+model to stubs, holidays, ex-coupon rules, or market settlement lags.

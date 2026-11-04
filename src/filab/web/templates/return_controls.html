@@ -1,0 +1,57 @@
+{% from 'controls.html' import control, date_control, choices %}
+<section class="return-calculator" data-returns data-view="results" data-initial-example="coupon">
+<div class="return-workspace-header">
+<div class="card return-toolbar">
+<div class="return-presets" role="group" aria-label="Examples; choosing one replaces the current inputs"><div class="return-preset-buttons"><button type="button" class="button" data-return-example="coupon">Across a coupon</button><button type="button" class="button" data-return-example="maturity">Hold to maturity</button><button type="button" class="button" data-return-example="shock">Sell after a yield rise</button><button type="button" class="button" data-return-example="two-period" title="Two annual coupon periods; the other examples use semiannual coupons">Two-period check</button></div></div>
+<p class="tiny-note return-state" data-return-state role="status">Calculating your inputs…</p>
+<details class="return-tool-menu return-saved"><summary>Save / load</summary><div class="risk-file-actions"><button class="button" type="button" data-return-export disabled>Export inputs</button><label class="button risk-file-label">Import inputs<input type="file" accept="application/json,.json" data-return-import aria-label="Import return scenario JSON"></label><button class="button" type="button" data-ledger-export disabled>Export ledger</button></div><p class="tiny-note" role="status" data-return-file-status></p><p class="error" role="alert" data-return-file-error></p></details>
+<p class="error" role="alert" data-error></p>
+</div>
+<div class="return-view-switch" role="group" aria-label="Experiment view"><button type="button" data-return-view="inputs" aria-controls="return-inputs" aria-pressed="false">Edit inputs</button><button type="button" data-return-view="results" aria-controls="return-results" aria-pressed="true">Results & chart</button></div>
+</div>
+<div class="workspace return-workspace"><form class="controls card return-form" id="return-inputs" aria-label="Return calculator inputs" novalidate>
+<div class="return-input-scroll" tabindex="0" role="region" aria-label="Bond and return assumptions">
+<details class="return-input-group" name="return-settings" data-return-group="horizon" open><summary><strong>Horizon & yield</strong><small data-return-group-summary="horizon">Dates and the yield path</small></summary><div class="return-input-fields">
+{{ date_control('return-start', 'Purchase settlement', '2026-11-14', 'start_date') }}
+{{ date_control('return-end', 'Investment horizon', '2026-11-16', 'end_date') }}
+{{ control('return-start-yield', 'Purchase nominal YTM', 5, -2, 30, 0.25, '%', input_name='start_yield') }}
+{{ choices('return-yield-path', 'yield_path', 'Yield after purchase', [('fixed', 'Keep YTM fixed', 'Time passes; payments stay fixed'), ('shock', 'One dated change', 'Then hold the new YTM fixed')]) }}
+<div data-return-shock hidden>{{ date_control('return-shock', 'Yield-change date', '2026-11-16', 'shock_date') }}
+{{ control('return-end-yield', 'New annual nominal YTM', 6, -2, 30, 0.25, '%', 'Applies before that day’s sale or valuation; coupons are unchanged.', 'end_yield') }}</div>
+</div></details>
+<details class="return-input-group" name="return-settings" data-return-group="bond"><summary><strong>Bond A</strong><small data-return-group-summary="bond">Face amount, coupon, maturity</small></summary><div class="return-input-fields">
+{{ control('return-face', 'Face amount', 100, 100, 1000000, 100, '$', input_name='face_value') }}
+{{ control('return-coupon', 'Annual coupon', 4, 0, 20, 0.25, '%', input_name='coupon_rate') }}
+{{ date_control('return-maturity', 'Maturity', '2028-11-15', 'maturity_date') }}
+{{ date_control('return-issue', 'Issue / accrual start', '2025-11-15', 'issue_date') }}
+{{ choices('return-frequency', 'frequency', 'Coupon & YTM frequency', [('1', 'Annual', '1 per year'), ('2', 'Semiannual', '2 per year'), ('4', 'Quarterly', '4 per year'), ('12', 'Monthly', '12 per year')], selected='2') }}
+</div></details>
+<details class="return-input-group" name="return-settings" data-return-group="purchase"><summary><strong>Purchase pricing</strong><small data-return-group-summary="purchase">YTM assumption or clean quote</small></summary><div class="return-input-fields">
+{{ choices('return-purchase', 'purchase_method', 'Purchase from', [('yield', 'YTM assumption', 'Model-derived purchase price'), ('clean', 'Clean quote', 'User assumption per $100 face')]) }}
+{{ control('return-price', 'Clean purchase quote', '98.12', 0.01, 1000, 0.01, '$', 'Per $100 face, plus accrued interest at settlement.', 'price') }}
+</div></details>
+<details class="return-input-group" name="return-settings" data-return-group="cash"><summary><strong>Cash & trading costs</strong><small data-return-group-summary="cash">Cash rate, fees, and the exit rule</small></summary><div class="return-input-fields">
+{{ choices('return-cash', 'cash_policy', 'Cash receipts', [('zero', 'Hold at 0%', 'Coupons stay in the portfolio'), ('interest', 'Earn explicit interest', 'Cash account; no new bonds')]) }}
+{{ control('return-cash-rate', 'Annual effective cash rate', 4, -2, 30, 0.25, '%', 'Actual/365 Fixed compounding. Also shown in the cash comparison.', 'cash_rate') }}
+{{ control('return-cost', 'One-way trading cost', 0, 0, 100, 1, 'bp', 'Basis points of face on each purchase and sale. No redemption or marking fee.', 'cost_bp') }}
+{{ choices('return-end-treatment', 'end_treatment', 'At the horizon', [('mark', 'Keep & value', 'Remaining bonds stay invested'), ('liquidate', 'Sell remaining bonds', 'After payments; charge sale cost')], selected='liquidate') }}
+</div></details>
+<details class="return-input-group" name="return-settings" data-return-group="comparison"><summary><strong>Second bond</strong><small data-return-group-summary="comparison">Optional portfolio comparison</small></summary><div class="return-input-fields">
+{{ choices('return-comparison', 'include_comparison', 'Portfolio', [('no', 'Bond A only', ''), ('yes', 'Add Bond B', 'Aggregate both positions')]) }}
+<div class="return-bond" data-return-comparison hidden><h3>Bond B</h3>
+{{ control('return-b-face', 'Face amount', 100, 100, 1000000, 100, '$', input_name='comparison_face_value') }}
+{{ control('return-b-coupon', 'Annual coupon', 4, 0, 20, 0.25, '%', input_name='comparison_coupon_rate') }}
+{{ date_control('return-b-maturity', 'Maturity', '2036-11-15', 'comparison_maturity_date') }}
+{{ control('return-b-price', 'Clean purchase quote', '90.00', 0.01, 1000, 0.01, '$', 'Per $100 face; uses the same settlement and frequency.', 'comparison_price') }}</div>
+</div></details>
+<details class="return-input-group return-conventions" name="return-settings"><summary><strong>Model assumptions</strong><small>Settlement, day counts, and limits</small></summary><div class="convention">Hypothetical prices and yield paths, not forecasts or market observations. Dollar amounts use the selected face amount. Purchases and sales settle on their entered date, after any coupon. Regular maturity-anchored dates; Actual/Actual coupon accrual, simple first fractional discount period. No stubs, holidays, ex-coupon rules, settlement lags, taxes, or external flows.</div></details>
+</div><div class="return-form-actions"><button type="button" class="reset">↺ Reset</button><button type="button" class="button" data-return-show-results>View chart →</button></div>
+</form><div class="results return-results" id="return-results" tabindex="0" role="region" aria-label="Return chart and accounting results">
+<div class="metrics" aria-live="polite" aria-atomic="true"><div class="metric primary-metric"><span>Net holding-period return</span><strong data-return-metric="total_return">—</strong><small>Entire period · not annualized</small></div><div class="metric"><span>Beginning wealth</span><strong data-return-metric="beginning_wealth">—</strong><small>Dirty purchases + entry costs</small></div><div class="metric"><span>Ending wealth</span><strong data-return-metric="ending_wealth">—</strong><small>Remaining bond value + cash</small></div></div>
+<div class="card chart-card"><div class="card-overline">BOND VALUE + CASH = WEALTH</div><h2>Payments move value into cash.</h2><div class="chart" data-return-chart></div><p class="insight" data-return-insight></p></div>
+<div class="card table-card"><div class="card-overline">RECONCILE EVERY DOLLAR OF PROFIT</div><div class="table-scroll" data-return-components tabindex="0" aria-label="Return reconciliation"></div><p class="tiny-note" data-return-check></p></div>
+<div class="card table-card"><div class="card-overline">CHANGE ONLY THE CASH ASSUMPTION</div><div class="table-scroll" data-return-cash-table tabindex="0" aria-label="Zero interest versus explicit cash rate"></div><p class="tiny-note">Same positions, prices, dates, fees, and beginning capital. This cash account grows all receipts, including sale proceeds and redemption if they occur before the horizon. The rate is a user assumption and is independent of bond YTM.</p></div>
+<details class="card risk-details" open><summary>Position and price details</summary><div class="table-scroll" data-return-positions tabindex="0" aria-label="Position purchase and terminal values"></div><p class="tiny-note" data-return-yields></p></details>
+<details class="card risk-details" open><summary>Cash and position event ledger</summary><p class="tiny-note">Each date: grow existing cash → credit coupons → redeem principal → sell and charge fees → value remaining holdings. Opening purchases follow that date’s payments, so they receive no coupon on the purchase date. Valuation rows move no cash. Prices in the ledger are dirty dollars per $100 face; balances use position dollars.</p><div class="table-scroll" data-return-ledger tabindex="0" aria-label="Cash and face conservation ledger"></div></details>
+<details class="card risk-details"><summary>All plotted valuations</summary><p class="tiny-note">Post-event snapshots on model dates, including payment dates and the preceding day. Lines join sampled hypothetical values; they are not historical observations.</p><div class="table-scroll" data-return-path tabindex="0" aria-label="Plotted bond value cash and wealth"></div></details>
+</div></div></section>

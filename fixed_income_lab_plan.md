@@ -1,12 +1,12 @@
 # Fixed-Income Lab — Learning, Education, and Research Workbench
 
-**Revised:** November 1, 2026 (America/Chicago)
+**Revised:** November 3, 2026 (America/Chicago)
 
 **Primary daily use:** Research bond strategies and historical returns.
 
-**Current release:** Nine lessons, regular-bond pricing, bill quotations, and M1 risk tools.
+**Current release:** Thirteen lessons, regular-bond pricing, bill quotations, M1 risk tools, and M2 return accounting.
 
-**Next release:** M2 holding-period returns and cash accounting.
+**Next release:** M3 historical observations and provenance.
 
 ## 1. Direction and assessment
 
@@ -65,7 +65,25 @@ bump diagnostics, and complete versioned comparison-input export/import. The
 standalone tool is `/tools/bond-risk`. The website now has nine lessons and
 milestone-based roadmap labels. All 313 tests pass; the validation record is
 [notes/m1_validation.md](notes/m1_validation.md). Learner reflection remains pending
-in [the M1 journal](notes/m1_learning_journal.md). M2–M7 remain planned.
+in [the M1 journal](notes/m1_learning_journal.md). This records M1's release;
+see the M2 update below for the current implementation.
+
+### M2 delivery update — November 3, 2026
+
+M2 software adds a deterministic dirty-price cash/position ledger, fixed or
+step-YTM scenarios, explicit cash growth and trading costs, mark/liquidation,
+early sales in the domain/API, and aggregation of positions. Four distinct
+lessons and `/tools/bond-return` connect prices and payments to wealth. Complete
+scenario-input export/import and full ledger export support reproduction.
+Cash defaults to zero interest; optional annual effective cash growth uses
+Actual/365 Fixed, separately from the existing dated bond convention.
+
+An independent two-period hand ledger and nine published OTS/OCC horizon-return
+scenarios validate the accounting. The full suite now has 424 passing cases. See
+[M2 validation](notes/m2_validation.md); learner evidence remains pending in
+[the M2 journal](notes/m2_learning_journal.md). M3–M7 are still planned. M2 adds
+neither market data nor historical strategies; curved-term-structure roll-down
+remains in M4.
 
 ### Three separate measures of success
 
@@ -164,7 +182,7 @@ learning pace and data issues may extend it. Useful releases arrive along the wa
 |---|---|---|---|---|
 | M0 Foundations | Existing | Cash flows, prices, yields, accrual | Six lessons and calculators | Software complete; learner checkpoint unverified |
 | M1 Interest-rate risk | M0 | Sensitivity and approximation error | Delivered; learner checkpoint pending | Original estimate: 12–18 h |
-| M2 Returns and cash accounting | M0; M1 for risk comparisons | Reconcile a holding-period return | Event ledger and return calculator | 12–20 h |
+| M2 Returns and cash accounting | M0; M1 for risk comparisons | Reconcile a holding-period return | Delivered; learner checkpoint pending | Original estimate: 12–20 h |
 | M3 Historical observations | M0; independent of M2 | Understand dataset meaning | Historical curve viewer and versioned data | 16–24 h |
 | M4 Discount curves | M1, M3 | Par, spot, forward, and YTM distinctions | Curve valuation and historical adapter | 16–24 h |
 | M5 First strategy study | M1–M4 | Explain historical strategy returns | Two-strategy backtest, saved runs, exports | 24–40 h |
@@ -201,6 +219,16 @@ shocks weaken a duration-only approximation.
 
 **Lessons:** price change versus return; coupons/accrual; reinvestment and cash;
 pull-to-par. Complete curved-term-structure roll-down in M4.
+
+**Teaching interface:** each lesson now limits its controls and examples to its
+own question. Lesson 10 varies exit yield and costs; 11 varies dates around a
+coupon and coupon size; 12 varies cash rate, coupon, and cash/reporting horizon;
+13 varies coupon, purchase yield, and holding horizon, with an exit yield only
+for an early sale. Each has a focused chart and numerical table. Keep the full
+calculator at `/tools/bond-return`; transfer current lesson inputs there for
+portfolio, quotation, date, or saved-file experiments. Financial calculations
+remain shared. Fixed assumptions must be visible rather than disguised as
+editable or unexplained hidden settings.
 
 Build an event ledger for purchases, coupons, redemption, sales, cash, and
 valuation. Start with one bond and deterministic yield paths, then aggregate
@@ -372,14 +400,14 @@ calculations. API rates are decimals; controls use percentages. Display cents,
 commit purchase prices in one-cent increments, and keep intermediate precision.
 Preserve option cards, semiannual defaults, units, and accessibility.
 
-`pricing/`, `risk/`, and `web/` now exist. Add the remaining modules when needed,
+`pricing/`, `risk/`, `analytics/`, and `web/` now exist. Add the remaining modules when needed,
 not empty architecture in advance.
 
 | Layer | Responsibility | Milestone |
 |---|---|---|
 | `pricing/` | Existing schedules and quotation/pricing functions | Existing |
 | `risk/` | Yield duration/convexity implemented; curve sensitivity later | M1 delivered; M6 planned |
-| `analytics/` | Event ledger, returns, metrics | M2 |
+| `analytics/` | Event ledger and holding-period returns; strategy metrics later | M2 delivered; M5 metrics planned |
 | `data/` | Source adapters, normalization, snapshot metadata | M3 |
 | `curves/` | Discount factors, interpolation, bootstrap, historical adapter | M4 |
 | `research/` | Fixed strategies, run orchestration, reproducibility | M5 |
@@ -446,17 +474,22 @@ optimization until a concrete research need justifies the scope.
 
 1. Complete the M1 learner journal: predict, inspect payment weights, reconcile a
    shock row, and export/reload a comparison. Software does not answer these prompts.
-2. Build M2's deterministic ledger and reconcile a coupon-date example before
-   historical return simulation.
-3. Add the M2 lessons and reusable return calculator with clear cash treatment,
-   transaction costs, settlement assumptions, and same-date event ordering.
-4. Start M3 with an official source, pinned fixture, and provenance panel; assess
+2. Complete the M2 learner journal: independently reconcile the coupon-date and
+   two-period examples, explain an early-sale return, and export/reload inputs.
+3. Start M3 with an official source, pinned fixture, and provenance panel; assess
    M4's data feasibility before promising a historical backtest date.
-5. Re-estimate remaining work after M2. Keep saved comparison inputs distinct
+4. Keep saved comparison inputs distinct
    from future immutable historical research runs.
 
-M1 implementation does not add market data, holding-period returns, historical
-strategy results, or saved research studies.
+M2 implementation adds holding-period returns. Market data, historical strategy
+results, and saved research studies remain future work.
+
+**Post-M2 estimate review:** The original remaining M3–M7 component budgets sum
+to **84–132 focused hours**. M2 has resolved the core event-ordering and cash
+accounting design, but there is no measured source-ingestion or historical-curve
+adapter work yet to justify narrowing those budgets. Retain them provisionally,
+then re-estimate M4/M5 after M3's pinned official-data feasibility check. These
+are planning allowances, not recorded time spent or delivery promises.
 
 ## 10. Sources and migration
 

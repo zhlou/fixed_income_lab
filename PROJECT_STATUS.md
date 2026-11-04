@@ -6,9 +6,10 @@
 
 **Foundations implementation and independent reference validation are complete
 for the regular-coupon educational model** (original Phase 1, now M0).
-The local website has **nine interactive lessons**. **M1 risk calculations,
-lessons, and the Bond Risk Explorer are implemented and validated. M2 return
-accounting is next.** No M2–M7 calculation or research module is implemented.
+The local website has **thirteen interactive lessons**. **M1 risk and M2 return
+accounting are implemented and validated**, including the Risk Explorer and
+Bond Return Calculator. **M3 historical observations is next.** No M3–M7 data,
+curve, or historical strategy research module is implemented.
 
 The revised plan prioritizes the user's intended daily use: **researching bond
 strategies and historical returns**. It brings return accounting forward, targets
@@ -19,6 +20,88 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### Focused M2 lesson experiments — November 3, 2026
+
+Lessons 10–13 now expose only the controls and examples relevant to their
+financial question. Lesson 10 compares price change with return while varying
+exit YTM and costs; lesson 11 follows coupon/accrual through a nearby date
+window; lesson 12 isolates additional wealth from cash growth; lesson 13 compares
+discount/premium convergence and early sale. Fixed assumptions are stated in
+the input panel. Lesson guides use the visible controls and examples.
+
+The full calculator remains at `/tools/bond-return`, including the four general
+cases, arbitrary supported dates, quotes, a second position, costs, and files.
+Each lesson can transfer its current validated inputs to that page. Shared
+Python accounting/pricing and shared browser workspace navigation are retained.
+Lesson APIs reject unrelated controls/scenarios. In lesson 13, price curves stop
+before redemption; terminal cash and zero remaining face appear separately.
+
+All **424 tests passed**, including 26 new focused-lesson cases. Desktop/short-
+window/mobile browser checks covered only-relevant controls and presets,
+complete charts, independent scrolling, date errors, conditional early-sale YTM,
+keyboard interaction, resets, stale-response protection, and exact transfer to
+the full calculator. Full-tool quote rounding, two positions, export/import,
+and original numerical API parity also passed. No JavaScript/formula errors,
+external asset requests, or unexpected console errors were observed. See
+[M2 validation](notes/m2_validation.md). Learner reflection remains pending.
+
+### M2 controls and chart layout — November 3, 2026
+
+Reworked the M2 lesson workspace after use revealed that the long input form and
+plot moved together. At desktop widths, inputs and results now have separate
+scroll areas within the experiment; scrolling to a lower control leaves the
+chart in place. Input sections expand individually and summarize their settings.
+Reset and a one-click **View chart** action remain at the input column's foot.
+All four example buttons remain visible in the compact toolbar; only save/load
+actions expand. On smaller screens the examples and view switch stay together
+while scrolling the experiment. Short desktop windows
+retain the complete plot, axes, and curve labels.
+
+Below 1200 pixels, an **Edit inputs / Results & chart** switch replaces the long
+controls-before-results stack. It preserves all input values and makes returning
+to the chart one tap. Errors reveal the relevant collapsed section. The shared
+layout applies to lessons 10–13 and the standalone return calculator.
+
+All **398 tests passed**. Chrome checks covered 1600/1440/1200×900,
+1200/1600×600, 1024/768×900, 390×844, and 320×640. Checks confirmed an unchanged
+plot position while scrolling/changing a lower input, independent result scrolling,
+complete chart visibility, responsive switching, keyboard disclosures/radios,
+quote rounding, comparison positions, import/export, reset, errors, and all four
+M2 opening examples. No JavaScript or unexpected console errors were observed;
+expected 422 responses came from invalid-input checks. Financial calculations
+and curriculum content are unchanged. See [M2 validation](notes/m2_validation.md).
+
+### M2 returns and cash accounting — November 3, 2026
+
+Added `filab.analytics` with a deterministic dirty-price cash/position ledger:
+opening purchases, every eligible coupon, final redemption once, early/horizon
+sales, explicit cash growth, and closing valuations. Beginning wealth includes
+entry costs; ending wealth includes credited cash. One-way costs are basis points
+of face on purchases and sales. Settlement is after payment on coupon dates;
+the existing regular dated pricing conventions remain in force.
+
+Four separate lessons and `/tools/bond-return` explain price versus return,
+coupons/accrual, cash reinvestment, and pull-to-par. The calculator supports
+one/two-position aggregation, fixed or one-change hypothetical yield paths,
+clean purchase quotes committed to cents, mark/liquidation, cash-policy comparison,
+complete scenario-input export/import, and full-precision ledger export. The
+domain/API additionally supports explicit step paths and early sales. Cash defaults
+to 0%; optional annual effective interest uses Actual/365 Fixed separately from
+the bond's Actual/Actual coupon-period accrual.
+
+All **398 tests passed** on Python 3.12.16, including the independent annual
+two-period ledger and nine OTS/OCC published return scenarios. Checks cover
+cash/face conservation, payment eligibility and order, fees once, redemption once,
+early-sale cash growth, report-grid independence, aggregation, financial boundaries,
+API parity, saved inputs, and lesson navigation. The existing upstream
+Starlette/httpx deprecation warning remains. See [M2 validation](notes/m2_validation.md)
+for references, tolerances, browser checks, and limits.
+
+M2 is a deterministic hypothetical experiment, without market history or strategy
+backtests. Curved-term-structure roll-down remains in M4. Learner reflection is
+pending in [the M2 journal](notes/m2_learning_journal.md). The existing remote
+Docker deployment must be rebuilt/recreated to serve this source release.
 
 ### Docker health check removed — November 3, 2026
 
@@ -130,6 +213,10 @@ learner reflection is still pending. See [the review record](notes/lesson_conten
 | 7. Cash-flow timing & duration | `/lessons/macaulay-duration` | Present-value weights, zero/coupon comparisons, Macaulay duration |
 | 8. Modified duration & DV01 | `/lessons/modified-duration-dv01` | Yield sensitivity, face scaling, dated numerical checks |
 | 9. Convexity & approximation error | `/lessons/convexity` | Exact vs first/second-order repricing and signed shock errors |
+| 10. Price change & total return | `/lessons/holding-period-returns` | Early sale, costs, mark/liquidation, and aggregate wealth |
+| 11. Coupons, accrual & return | `/lessons/coupons-and-return` | Dirty-price accounting across a coupon date |
+| 12. Reinvestment & cash | `/lessons/reinvestment-and-cash` | Zero-interest/explicit cash and the two-period ledger |
+| 13. Pull-to-par & the horizon | `/lessons/pull-to-par` | Discount/premium convergence, redemption, and early exit |
 
 Each lesson has an overview card, sidebar entry, and previous/next navigation.
 Python examples are optional and collapsed. Original notes and Notebook 01
@@ -145,12 +232,19 @@ remain preserved; website Markdown is the source for lesson content.
 - Treasury bill actual/360 discount pricing and 365/366 investment-year bases.
 - Simple short-bill annualization and the longer-bill coupon-equivalent quadratic.
 - Fixed-YTM clean/dirty price paths showing coupon resets and approach to maturity.
+- Closed-portfolio return accounting with coupons, redemption, sales, cash, and fees.
+- Explicit effective cash growth, step-YTM scenarios, and aggregation of positions.
 
-Calculations live in `src/filab/pricing/`. FastAPI endpoints are
+Pricing calculations live in `src/filab/pricing/`. FastAPI pricing endpoints are
 `/api/valuation`, `/api/rates`, `/api/experiments`, `/api/yield`,
 `/api/settlement`, and `/api/bills`; each accepts POST requests. API rates
 are decimals, while browser controls display percentages. See `/docs` for
 request and response schemas.
+
+Return accounting lives in `src/filab/analytics/`; `/api/returns`,
+`/api/return-ledger`, and `/api/return-study` expose the calculator, explicit
+portfolio ledger, and complete input-snapshot validation. Risk functions remain
+in `src/filab/risk/`. The [README](README.md) documents these interfaces.
 
 ### Interface decisions and recent improvements
 
@@ -177,7 +271,8 @@ request and response schemas.
 
 ## Validation and model limits
 
-The final M1 test run on November 1, 2026 passed **313 tests**. Coverage includes pricing
+The latest M2 test run on November 3, 2026 passed **424 tests**. Coverage includes focused lesson boundaries, returns,
+cash/position accounting, published horizon scenarios, and the existing pricing
 identities, yield round trips, dated settlement, coupon boundaries, leap
 years, bill conventions, API validation, and lesson navigation.
 
@@ -276,11 +371,11 @@ python -m pytest -q
 
 ## Next milestone
 
-Build **M2: Returns and cash accounting**. Start with one bond and deterministic
-yield paths. Record purchases, coupons, redemption, sales, cash, and costs once;
-reconcile a coupon-date example independently before simulating historical returns.
-Keep dirty-price accounting and clean/accrual explanations consistent. M3 data
-work can follow M1 independently, but historical backtests require the M2 ledger.
+Build **M3: Historical observations** from an official source, with a pinned
+fixture, raw observations, acquisition metadata, missing-value policy, and rate
+types. Verify historical discount-curve feasibility before committing to M4/M5
+delivery dates. Complete the learner's M1 and M2 reflection independently of
+that implementation; no software run answers the learning journals.
 
 ## Revised roadmap and planning audit
 
@@ -288,18 +383,19 @@ work can follow M1 independently, but historical backtests require the M2 ledger
 |---|---|---|
 | M0 Foundations | Existing six lessons and pricing | Software/reference checks complete; learner checkpoint unverified |
 | M1 Interest-rate risk | Duration, convexity, risk explorer | Software validated; learner checkpoint pending |
-| M2 Return accounting | Deterministic cash/position ledger | Next |
-| M3 Historical observations | Versioned data and curve history viewer | Planned |
+| M2 Return accounting | Deterministic cash/position ledger and return calculator | Software validated; learner checkpoint pending |
+| M3 Historical observations | Versioned data and curve history viewer | Next |
 | M4 Discount curves | Curve valuation and validated historical adapter | Planned |
 | M5 Strategy research | Two synthetic Treasury strategies, saved runs, exports | Planned; first historical research release |
 | M6 Robustness | Horizon analysis, curve scenarios, key-rate risk | Planned |
 | M7 Daily use | Research desk, reproducibility, backup/recovery | Planned |
 
 The roadmap has distinct learning, educational-site, and workbench acceptance
-criteria. M1 comparison-input files are implemented; saved historical studies,
-feeds, return ledgers, and research modules remain future work. The 108–170 hour
+criteria. M1 comparison inputs and M2 return ledgers/input snapshots are implemented;
+saved historical studies, feeds, and research modules remain future work. The 108–170 hour
 budget in the plan was the provisional pre-M1 estimate, not recorded time spent.
-Re-estimate remaining work after M2.
+The post-M2 review retains the remaining component budgets, totaling 84–132
+focused hours, provisionally until M3 establishes source/curve feasibility.
 
 The [original plan](notes/fixed_income_lab_plan_original_2026-11-01.md) is preserved
 with its detailed credit curriculum and advanced research topics. These remain

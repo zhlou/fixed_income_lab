@@ -1,8 +1,8 @@
 {% macro control(name, label, value, min, max, step, unit='', hint='', input_name='') %}
 <div class="control" data-control="{{ name }}"><label for="{{ name }}">{{ label }} <span class="unit">{{ unit }}</span></label><div class="number-wrap"><input id="{{ name }}" name="{{ input_name or name }}" type="number" inputmode="decimal" value="{{ value }}" min="{{ min }}" max="{{ max }}" step="{{ step }}" aria-describedby="{{ name }}-error{% if hint %} {{ name }}-hint{% endif %}"></div><input class="range" type="range" min="{{ min }}" max="{{ max }}" step="{{ step }}" value="{{ value }}" aria-label="{{ label }} slider" data-pair="{{ name }}">{% if hint %}<small id="{{ name }}-hint">{{ hint }}</small>{% endif %}<small class="field-error" id="{{ name }}-error" data-error-for="{{ input_name or name }}"></small></div>
 {% endmacro %}
-{% macro date_control(name, label, value) %}
-<div class="control"><label for="{{ name }}">{{ label }}</label><div class="number-wrap"><input id="{{ name }}" name="{{ name }}" type="date" value="{{ value }}" required aria-describedby="{{ name }}-error"></div><small class="field-error" id="{{ name }}-error" data-error-for="{{ name }}"></small></div>
+{% macro date_control(name, label, value, input_name='', min='', max='') %}
+<div class="control"><label for="{{ name }}">{{ label }}</label><div class="number-wrap"><input id="{{ name }}" name="{{ input_name or name }}" type="date" value="{{ value }}" {% if min %}min="{{ min }}"{% endif %} {% if max %}max="{{ max }}"{% endif %} required aria-describedby="{{ name }}-error"></div><small class="field-error" id="{{ name }}-error" data-error-for="{{ input_name or name }}"></small></div>
 {% endmacro %}
 {% macro choices(id, name, label, options, hint='', selected='') %}
 <fieldset class="choice-group" id="{{ id }}"><legend>{{ label }}</legend><div class="choice-options">

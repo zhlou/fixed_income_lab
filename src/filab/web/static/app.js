@@ -37,7 +37,8 @@ function drawLines(container, model, compact=false){
   const svg=svgElement('svg',{viewBox:`0 0 ${W} ${H}`,role:'img','aria-label':`${model.title}. ${model.x_label}. ${model.y_label}. Use left and right arrow keys to inspect values.`,tabindex:'0'});
   svg.append(svgElement('title',{},model.title));svg.append(svgElement('desc',{},'Line chart with numerical values available in the accompanying tables.'));
   for(const value of axis.ticks){const py=y(value);svg.append(svgElement('line',{x1:L,x2:W-R,y1:py,y2:py,stroke:'#e8ede2'}));svg.append(svgElement('text',{x:L-9,y:py+3,'text-anchor':'end','data-axis-tick':'y'},model.percent_y?percent(value,axis.step<0.01?2:0):value.toLocaleString('en-US',{maximumFractionDigits:2})));}
-  for(let i=0;i<=5;i++){const value=xmin+(xmax-xmin)*i/5;svg.append(svgElement('text',{x:x(value),y:H-B+21,'text-anchor':'middle'},model.percent_x===false?value.toFixed(model.x_unit==='days'?0:1):percent(value,1)));}
+  const xTicks=model.x_ticks||Array.from({length:6},(_,i)=>xmin+(xmax-xmin)*i/5);
+  for(const value of xTicks){svg.append(svgElement('text',{x:x(value),y:H-B+21,'text-anchor':'middle'},model.percent_x===false?value.toFixed(model.x_unit==='days'?0:1):percent(value,1)));}
   svg.append(svgElement('text',{x:L,y:14,class:'axis-label'},model.y_label));svg.append(svgElement('text',{x:L+pw/2,y:H-11,'text-anchor':'middle',class:'axis-label'},model.x_label));
   if(model.reference_y>=ymin&&model.reference_y<=ymax)svg.append(svgElement('line',{x1:L,x2:W-R,y1:y(model.reference_y),y2:y(model.reference_y),stroke:'#a2ae96','stroke-dasharray':'4 4'}));
   if(model.reference_x>=xmin&&model.reference_x<=xmax)svg.append(svgElement('line',{x1:x(model.reference_x),x2:x(model.reference_x),y1:T,y2:H-B,stroke:'#b3bfaa','stroke-dasharray':'3 5'}));

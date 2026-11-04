@@ -33,14 +33,36 @@ LESSONS.extend([
          tag="M1 · Test the approximation", duration="30 min", file="convexity.md", milestone="M1",
          prerequisite="modified-duration-dv01", prediction="For equal upward and downward yield shocks, will the price loss and gain have the same size?"),
 ])
+LESSONS.extend([
+    dict(slug="holding-period-returns", title="Price change & total return", headline="What did the investment earn?",
+         description="Follow a bond through time and reconcile ending wealth with prices, payments, cash, and costs.",
+         tag="M2 · Holding-period returns", duration="25 min", file="holding-period-returns.md", milestone="M2",
+         prerequisite="yield-to-maturity",
+         prediction="If a bond pays a coupon while its price falls, must the investor have lost money?"),
+    dict(slug="coupons-and-return", title="Coupons, accrual & return", headline="A coupon moves the money.",
+         description="Cross a payment date without mistaking the dirty-price drop for a loss or counting a coupon twice.",
+         tag="M2 · Cash-flow accounting", duration="25 min", file="coupons-and-return.md", milestone="M2",
+         prerequisite="holding-period-returns",
+         prediction="Buy just before a coupon date. Is the next coupon entirely new profit?"),
+    dict(slug="reinvestment-and-cash", title="Reinvestment & cash", headline="What happens to the coupons?",
+         description="Give every cash receipt a home. Compare zero-interest cash with an explicit reinvestment assumption.",
+         tag="M2 · Cash policy", duration="30 min", file="reinvestment-and-cash.md", milestone="M2",
+         prerequisite="coupons-and-return",
+         prediction="For a two-year coupon bond, does holding every coupon at zero interest reproduce the purchase YTM?"),
+    dict(slug="pull-to-par", title="Pull-to-par & the horizon", headline="Follow the bond to the finish.",
+         description="Separate price convergence, coupon income, and an early sale after a yield change.",
+         tag="M2 · Time and terminal wealth", duration="25 min", file="pull-to-par.md", milestone="M2",
+         prerequisite="reinvestment-and-cash",
+         prediction="A discount bond will redeem at face value. Does that guarantee a positive return if you sell early?"),
+])
 for lesson in LESSONS:
     lesson.setdefault('milestone', 'M0')
 
 MILESTONES = [
     ('M0', 'Bond foundations', 'Available'),
     ('M1', 'Duration & convexity', 'Available'),
-    ('M2', 'Returns & cash accounting', 'Next'),
-    ('M3', 'Historical observations', 'Planned'),
+    ('M2', 'Returns & cash accounting', 'Available'),
+    ('M3', 'Historical observations', 'Next'),
     ('M4', 'Discount curves', 'Planned'),
     ('M5', 'First strategy study', 'Planned'),
     ('M6', 'Robustness & curve risk', 'Planned'),

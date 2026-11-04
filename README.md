@@ -3,7 +3,8 @@
 A local, interactive learning website for fixed-income mathematics, growing
 toward a reproducible workbench for bond strategies and historical returns. Each
 lesson combines a working experiment, an explanation, and optional Python
-examples. The Python backend uses the existing tested `filab.pricing` package.
+examples. The Python backend uses tested `filab.pricing`, `filab.risk`, and
+`filab.analytics` calculations.
 
 ## Start the website
 
@@ -134,6 +135,11 @@ with BuildKit; it does not require builder-specific features.
 | `/lessons/modified-duration-dv01` | Percentage sensitivity, dollar duration, and DV01 |
 | `/lessons/convexity` | Exact repricing, curvature, and approximation error |
 | `/tools/bond-risk` | Reusable two-bond risk comparison with JSON export/import |
+| `/lessons/holding-period-returns` | Price change, profit, and closed-portfolio return |
+| `/lessons/coupons-and-return` | Dirty-price accounting across a coupon date |
+| `/lessons/reinvestment-and-cash` | Explicit cash growth and the two-period ledger |
+| `/lessons/pull-to-par` | Price convergence, redemption, and early-sale outcomes |
+| `/tools/bond-return` | One/two-position return calculator with input and ledger exports |
 
 The six foundations lessons are **Bond Basics → Present Value and Bond Pricing
 → Bond Pricing Lab → Yield to Maturity → Settlement and Accrued Interest
@@ -144,6 +150,10 @@ M1 adds three lessons: **Cash-flow timing & duration → Modified duration & DV0
 → Convexity & approximation error**. Each has prediction prompts, a derivation,
 a worked example, reflection questions, and a transfer exercise with a collapsed
 answer. The shared Risk Explorer is also available outside the lesson sequence.
+M2 adds **Price change & total return → Coupons, accrual & return → Reinvestment
+& cash → Pull-to-par & the horizon**, bringing the total to thirteen lessons.
+Their focused experiments share the same return ledger, which processes every
+payment before measuring wealth. The complete calculator has its own tool page.
 
 On desktop windows at least 1200 pixels wide, lessons place the experiment on the
 left and the explanation on the right. Each side scrolls independently, so the
@@ -222,6 +232,102 @@ Each of the two returned `bonds` contains `risk`, `cashflows`, `convergence`,
 files leave the comparison unchanged. This saves assumptions, not frozen outputs
 or historical research runs. Inputs are local; there is no cloud account or feed.
 
+## Bond Return Calculator (M2)
+
+Open `/tools/bond-return`. Start with **Across a coupon**, **Hold to maturity**,
+**Sell after a yield rise**, or the annual-coupon **Two-period check**. Buy from
+a YTM assumption or a clean quote per $100 face, with quotes committed to cents.
+Accrued interest is added before scaling to the position's face amount. Add
+Bond B to aggregate two positions with the same purchase/horizon dates and cash
+policy. Each position keeps its own coupon, maturity, face amount, and implied
+purchase yield when using quotes.
+
+M2 lessons use focused controls and related examples, with the remaining
+assumptions stated explicitly:
+
+| Lesson | Adjustable controls | Chart emphasis |
+|---|---|---|
+| 10. Price change & total return | Exit YTM, trading cost, mark/sell | Dirty price change versus investment return |
+| 11. Coupons, accrual & return | Nearby purchase/valuation dates, coupon rate | Coupon-date transfer from bond value to cash |
+| 12. Reinvestment & cash | Cash rate, coupon rate, reporting horizon | Extra wealth relative to cash at 0% |
+| 13. Pull-to-par & the horizon | Coupon, purchase YTM, horizon; exit YTM for an early sale | Clean/dirty price convergence before sale or redemption |
+
+At desktop widths of 1200 pixels or more, the input column and results scroll
+independently. **View chart** remains beneath the controls. Short desktop windows
+fit the complete plot and curve labels. The dedicated full calculator retains
+all controls, grouped into expandable sections, plus four general examples and
+input/ledger export and import.
+
+On narrower screens, **Edit inputs / Results & chart** switches between the
+controls and results while preserving the scenario. The input footer offers the
+same one-tap return to the chart. Each lesson's relevant example buttons stay
+visible above its workspace; the full tool shows all four general examples.
+On smaller screens, the examples and view switch stay together while scrolling.
+**Full calculator** carries the lesson's current validated inputs into
+`/tools/bond-return` through a versioned scenario URL fragment, validated by
+`POST /api/return-study` before restoration. Pending or invalid inputs disable
+this transfer. The full tool's **Save / load** expands separately.
+
+Choose fixed YTM or one dated change, then either keep/mark surviving bonds or
+sell them at the horizon. The hypothetical step change applies on its date and
+stays fixed afterward. All intervening coupons and redemptions are processed
+even when the plot samples fewer dates. The chart and tables connect remaining
+dirty bond value, credited cash, and total wealth.
+
+The return is **ending wealth / beginning wealth − 1 over the entire period**,
+without annualization. Opening capital includes dirty purchase amounts and
+entry costs. Coupons are already in cash, so they are not added again to wealth.
+One-way costs are basis points of face on each purchase/sale; a mark or principal
+redemption has no trading fee. Same-date order is cash growth → coupons →
+redemption → sales/costs → valuation. Opening-date purchases occur after payment
+and receive no coupon on that date. There are no external flows, withdrawals,
+taxes, leverage, or further bond purchases.
+
+Cash is held at 0% by default. An optional annual **effective** cash rate uses
+Actual/365 Fixed compounding and is independent of nominal bond YTM. It grows
+all receipts, including sale/redemption proceeds if received before the horizon.
+The comparison table changes only this cash assumption. The existing dated bond
+pricing conventions and exclusions still apply. These are hypothetical scenarios,
+not market observations, forecasts, or curved-term-structure roll-down estimates.
+
+`POST /api/returns` accepts `start_date`, `end_date`, `issue_date`,
+`maturity_date`, `face_value`, `coupon_rate`, `frequency`, `purchase_method`
+(`yield` or `clean`), `price` (clean per $100 face), `start_yield`, `yield_path`
+(`fixed` or `shock`), `shock_date`, `end_yield`, `cash_policy` (`zero` or `interest`),
+`cash_rate`, `cost_bp`, and `end_treatment` (`mark` or `liquidate`). Optional
+`include_comparison: true` adds `comparison_face_value`, `comparison_coupon_rate`,
+`comparison_maturity_date`, and `comparison_price`. Rates are decimal fractions;
+`cost_bp` is a number of basis points. Defaults match the coupon-date lesson.
+The response includes `result` (ledger, valuation path, positions, wealth,
+return, components, and residuals), `cash_comparison`, solved purchase yields,
+complete `inputs`, and a convention version. `/docs` describes every field.
+
+`POST /api/lesson-returns/{slug}` accepts an `example` identifier and a `controls`
+object for the four M2 lesson slugs. It accepts only the controls in the table
+above, then constructs fixed assumptions in Python and calls the shared ledger.
+For example, lesson 10 accepts `{"example":"yield-rise","controls":{"end_yield":0.07,"cost_bp":10}}`.
+Lesson dates are constrained to its teaching window; unrelated controls and
+examples are rejected. The response contains complete transferable `inputs`,
+the shared `result`, and lesson-specific metrics, curves, and numerical rows.
+Rates remain decimal fractions. Existing full-calculator APIs and their bounds
+are preserved.
+
+`POST /api/return-ledger` exposes the domain workflow: common `start_date` and
+`end_date`, `cash_rate`, `cost_bp`, `end_treatment`, optional `valuation_dates`,
+and a `holdings` list. Each holding supplies a unique `label`, `face_value`,
+`coupon_rate`, `issue_date`, `maturity_date`, `frequency`, dated `yields`
+(`date`, `ytm`), and optional `sale_date`. Paths must begin at purchase and have
+unique increasing dates within the horizon; no future backfill is allowed.
+
+**Export inputs** saves complete assumptions under `schema_version: 1`,
+`kind: "filab-bond-return"`, and `conventions: "dated-return-ledger-v1"`.
+**Import inputs** validates the entire scenario through `POST /api/return-study`
+before restoring it. **Export ledger** additionally saves full-precision results
+and hypothetical price provenance. Invalid or stale inputs disable exports.
+These files reproduce deterministic experiments; they are not immutable historical
+research runs. The [M2 journal](notes/m2_learning_journal.md) provides unanswered
+prompts for reconciling a ledger yourself.
+
 ## Project layout
 
 ```text
@@ -229,6 +335,7 @@ Dockerfile                 Self-contained Python web runtime on port 8000
 .dockerignore              Minimal build context for local or remote engines
 src/filab/pricing/          Reusable pricing calculations
 src/filab/risk/             Yield derivatives and comparison scenarios
+src/filab/analytics/        Cash/position event ledger and holding-period returns
 src/filab/web/curriculum.py Published lessons and milestone registry
 src/filab/web/app.py        Lesson routes and numerical API
 src/filab/web/content/      Website lesson Markdown
@@ -243,8 +350,9 @@ The website Markdown is the source for website lessons. Original notes and
 Notebook 01 remain available as reference artifacts. The [project
 plan](fixed_income_lab_plan.md) evaluates the existing implementation and defines
 milestones for learning, educational lessons, and a historical research workbench.
-M1 duration and convexity is implemented. The next milestone is return accounting,
-followed by historical data, discount curves, and a small two-strategy research release.
+M1 duration/convexity and M2 return accounting are implemented. The next milestone
+is historical observations (M3), followed by discount curves and a small two-strategy
+research release.
 Historical research, saved studies, and data feeds are planned, not available yet.
 The website roadmap now shows milestone availability without week-based promises.
 Application resources resolve relative to the package, not the working
@@ -266,10 +374,10 @@ YTM checks include price/yield round trips, independent one-period and
 zero-coupon formulas, zero and negative yields, payment frequencies, and
 invalid prices. Dated pricing, accrued interest, and bill quotation checks use published
 Treasury examples. See [Phase 1 validation](notes/phase_1_validation.md) for
-sources, tolerances, and model limits. Phase 1 software is complete; the
-next implementation milestone is return accounting (M2). M1 software is also
-complete; learner reflection remains separate. See [M1 validation](notes/m1_validation.md)
-and the intentionally unanswered [learning journal](notes/m1_learning_journal.md).
+sources, tolerances, and model limits. M0–M2 software is complete; learner
+reflection remains separate. See [M1 validation](notes/m1_validation.md),
+[M2 validation](notes/m2_validation.md), and the intentionally unanswered
+[M1](notes/m1_learning_journal.md) and [M2](notes/m2_learning_journal.md) journals.
 
 ## Original Python and notebook workflow
 

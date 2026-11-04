@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% from 'controls.html' import control, date_control, choices %}
-{% block body_class %}lesson-page{% endblock %}
+{% block body_class %}lesson-page{% if lesson.milestone == 'M2' %} return-lesson{% endif %}{% endblock %}
 {% block content %}
 <div class="lesson-heading"><div class="eyebrow"><span class="eyebrow-line"></span> LESSON {{ '%02d'|format(lesson_number) }} <span class="eyebrow-divider">/</span> {{ lesson.tag|upper }}</div><h1>{{ lesson.headline }}</h1><p>{{ lesson.description }}</p></div>
 <div class="learning-layout">
@@ -9,6 +9,8 @@
 <div class="experiment-scroll" id="lesson-experiment" tabindex="0" role="region" aria-label="Interactive experiment">
 {% if lesson.milestone == 'M1' %}
 {% include 'risk_controls.html' %}
+{% elif lesson.milestone == 'M2' %}
+{% include 'return_lesson.html' %}
 {% elif active == 'bond-pricing-lab' %}
 <section class="lab-section" data-experiment>
 <div class="experiment-tabs" role="group" aria-label="Choose an experiment"><button class="selected" data-mode="maturity" aria-pressed="true">01 <span>Maturity</span></button><button data-mode="coupon" aria-pressed="false">02 <span>Coupon</span></button><button data-mode="sensitivity" aria-pressed="false">03 <span>Payment timing</span></button></div>
@@ -104,8 +106,8 @@
 <section class="reading-pane" aria-labelledby="reading-title">
 <div class="pane-heading"><h2 id="reading-title">Learn the concept</h2><a href="#lesson-experiment">Try the experiment ↗</a></div>
 <div class="reading-scroll" id="lesson-reading" tabindex="0" role="region" aria-label="Lesson explanation">
-{% if lesson.milestone == 'M1' %}
-<section class="card prediction"><div class="card-overline">PREDICT BEFORE YOU MOVE THE CONTROLS</div><p>{{ lesson.prediction }}</p><p class="tiny-note">Prerequisite: <a href="/lessons/{{ lesson.prerequisite }}">review the previous concept</a>. Write a prediction, then look for evidence in the tables.</p><a href="/tools/bond-risk">Open the standalone Risk Explorer ↗</a></section>
+{% if lesson.milestone in ['M1', 'M2'] %}
+<section class="card prediction"><div class="card-overline">PREDICT BEFORE YOU MOVE THE CONTROLS</div><p>{{ lesson.prediction }}</p><p class="tiny-note">Prerequisite: <a href="/lessons/{{ lesson.prerequisite }}">review the previous concept</a>. Write a prediction, then look for evidence in the tables.</p>{% if lesson.milestone == 'M1' %}<a href="/tools/bond-risk">Open the standalone Risk Explorer ↗</a>{% else %}<a href="/tools/bond-return">Open the standalone Return Calculator ↗</a>{% endif %}</section>
 {% endif %}
 <article class="prose">{{ body|safe }}</article>
 {% if implementation %}

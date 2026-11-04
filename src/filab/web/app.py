@@ -22,6 +22,8 @@ from filab.pricing.settlement import SettlementError
 
 from filab.risk.explorer import compare_bonds
 from .curriculum import LESSONS, ROADMAP
+from .returns_api import router as returns_router
+from .return_lessons import RETURN_LESSONS, lesson_spec, router as return_lesson_router
 
 HERE = Path(__file__).resolve().parent
 
@@ -49,6 +51,8 @@ def optional_code(tokens, idx, options, env):
 markdown.renderer.rules["fence"] = optional_code
 templates = Jinja2Templates(directory=str(HERE / "templates"))
 app = FastAPI(title="Fixed-Income Lab", version="0.1.0")
+app.include_router(returns_router)
+app.include_router(return_lesson_router)
 app.mount("/static", StaticFiles(directory=str(HERE / "static")), name="static")
 
 
@@ -139,6 +143,7 @@ def lesson(request: Request, slug: str):
     return templates.TemplateResponse(request=request, name="lesson.html", context={
         "lessons": LESSONS, "lesson": item, "lesson_number": index + 1,
         "active": slug, "page_title": item["title"], "body": markdown.render(content),
+        "return_experiment": lesson_spec(slug) if slug in RETURN_LESSONS else None,
         "implementation": markdown.render((HERE / "content" / "pricing.md").read_text(), {"expand_code": True}) if slug == "present-value" else None,
         "previous": LESSONS[index - 1] if index > 0 else None,
         "next": LESSONS[index + 1] if index + 1 < len(LESSONS) else None,
@@ -377,4 +382,11 @@ def risk_study(study: RiskStudy):
 def risk_tool(request: Request):
     return templates.TemplateResponse(request=request, name='risk.html', context={
         'lessons': LESSONS, 'active': 'bond-risk', 'page_title': 'Bond Risk Explorer',
+    })
+
+
+@app.get('/tools/bond-return')
+def return_tool(request: Request):
+    return templates.TemplateResponse(request=request, name='returns.html', context={
+        'lessons': LESSONS, 'active': 'bond-return', 'page_title': 'Bond Return Calculator',
     })
