@@ -35,6 +35,8 @@ class CashControls(Inputs):
 
 
 class PullToParControls(Inputs):
+    # Retain early-sale requests for API compatibility; the lesson UI teaches
+    # fixed-yield aging, and the holding-period lesson handles early exits.
     coupon_rate: float = Field(default=.04, ge=0, le=.08)
     start_yield: float = Field(default=.05, ge=-.02, le=.10)
     horizon: Literal['maturity', 'before_maturity', 'early_sale'] = 'maturity'
@@ -51,8 +53,7 @@ def choice(name, label, options):
 
 
 HORIZONS = [('maturity', 'At maturity', 'Nov 15, 2028'),
-            ('before_maturity', 'Day before maturity', 'Nov 14, 2028'),
-            ('early_sale', 'Sell after six months', 'May 15, 2027')]
+            ('before_maturity', 'Day before maturity', 'Nov 14, 2028')]
 
 RETURN_LESSONS = {
     'holding-period-returns': dict(
@@ -95,28 +96,26 @@ RETURN_LESSONS = {
                   dict(id='zero-cash', label='Cash earns 0%', controls={'cash_rate':0})]),
     'pull-to-par': dict(
         model=PullToParControls, default_example='discount-bond',
-        instruction='Compare coupon with purchase YTM. Keep yield fixed to inspect price convergence, then test an early sale.',
+        instruction='Keep yield fixed. Compare discount and premium bonds, then follow the final coupon and principal into cash.',
         input_title='Change coupon or horizon.', chart_title='Follow clean and dirty prices toward maturity.',
         table_title='TERMINAL CASH AND THE REMAINING POSITION',
-        fixed='One $100 face bond, semiannual payments. Buy November 15, 2026 after payment; issue November 15, 2025; maturity November 15, 2028. Cash earns 0%, no fees. YTM stays fixed unless you choose an early sale with a new yield.',
+        fixed='One $100 face bond, semiannual payments. Buy November 15, 2026 after payment; issue November 15, 2025; maturity November 15, 2028. YTM stays fixed. Cash earns 0%, no fees.',
         controls=[number('coupon_rate', 'Annual coupon', 0, 8, .25),
                   number('start_yield', 'Purchase nominal YTM', -2, 10, .25),
-                  choice('horizon', 'Investment horizon', HORIZONS),
-                  dict(**number('end_yield', 'YTM at the early sale', -2, 20, .25),
-                       when=dict(field='horizon', value='early_sale'))],
+                  choice('horizon', 'Investment horizon', HORIZONS)],
         examples=[dict(id='discount-bond', label='Discount bond', controls={}),
                   dict(id='premium-bond', label='Premium bond', controls={'coupon_rate':.06}),
-                  dict(id='early-sale', label='Early sale', controls={'horizon':'early_sale'})]),
+                  dict(id='early-sale', label='Early sale', controls={'horizon':'early_sale'}, legacy=True)]),
 }
 
 
 def lesson_spec(slug):
-    """Public teaching metadata; defaults use the same typed controls as POST."""
+    """Public teaching metadata, omitting API-only legacy examples."""
     profile = RETURN_LESSONS[slug]
-    public = {key: value for key, value in profile.items() if key != 'model'}
+    public = {key: value for key, value in profile.items() if key not in ('model', 'examples')}
     public['slug'] = slug
     public['examples'] = [dict(example, controls=profile['model'](**example['controls']).model_dump(mode='json'))
-                          for example in profile['examples']]
+                          for example in profile['examples'] if not example.get('legacy')]
     public['initial'] = next(e['controls'] for e in public['examples'] if e['id'] == public['default_example'])
     return public
 
@@ -226,7 +225,7 @@ def focused_results(slug, data, controls):
         if position['status'] == 'sold':
             prices[-1] = dict(prices[-1],clean=position['clean'],dirty=position['dirty'])
         metrics = [metric('Clean purchase price',r['purchase_clean']),metric('Ending wealth',r['ending_wealth']),period]
-        plot = dict(common, title='Clean and dirty bond prices before sale or redemption', reference_y=100,
+        plot = dict(common, title='Clean and dirty bond prices before ' + ('sale' if position['status']=='sold' else 'redemption'), reference_y=100,
                     curves=[curve('Clean price',prices,'clean'),curve('Dirty price',prices,'dirty')])
         columns = [('Terminal item','text'),('Dollars','money')]
         rows = [['Coupons received',r['coupons']],['Principal redeemed' if position['status']=='redeemed' else

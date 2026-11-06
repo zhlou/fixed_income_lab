@@ -1,6 +1,6 @@
 # Fixed-Income Lab — Status and Progress
 
-**Updated:** November 3, 2026 (America/Chicago)
+**Updated:** November 5, 2026 (America/Chicago)
 
 ## Current status
 
@@ -20,6 +20,29 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### M2 lesson progression revised — November 5, 2026
+
+Lessons 10–13 now build from **Coupons, accrual & return → Pull-to-par &
+maturity → Reinvestment & cash → Holding-period return & early sale**. Lesson
+10 introduces return with one bond and coupon cash before the dated example.
+Lesson 11 holds YTM fixed through maturity; early-sale controls and the repeated
+yield-shock example move to the final lesson. Lesson 13 combines the prior
+concepts with costs and keeping versus selling. Portfolio aggregation is an
+optional extension in the full calculator.
+
+Overview cards, sidebar entries, previous/next links, prerequisites, tool links,
+the plan, README, and unanswered journal follow the new order. Lesson URLs,
+financial calculations, saved inputs, and full-calculator interfaces are
+preserved; former pull-to-par early-sale API requests remain supported.
+
+All **429 tests passed** on Python 3.12.16. Browser checks covered all four
+lessons at 1440×900 and 390×844, formulas, navigation, keyboard presets/radios,
+reset, mobile input/results switching, costs, maturity boundaries, and a lesson
+transfer into the full calculator. No formula errors, horizontal page overflow,
+or browser warning/error logs were observed. See [M2 validation](notes/m2_validation.md).
+The temporary local server was stopped. The remote Docker deployment needs a
+rebuild/recreation to serve this source revision. Learner checkpoints remain pending.
 
 ### Focused M2 lesson experiments — November 3, 2026
 
@@ -213,10 +236,10 @@ learner reflection is still pending. See [the review record](notes/lesson_conten
 | 7. Cash-flow timing & duration | `/lessons/macaulay-duration` | Present-value weights, zero/coupon comparisons, Macaulay duration |
 | 8. Modified duration & DV01 | `/lessons/modified-duration-dv01` | Yield sensitivity, face scaling, dated numerical checks |
 | 9. Convexity & approximation error | `/lessons/convexity` | Exact vs first/second-order repricing and signed shock errors |
-| 10. Price change & total return | `/lessons/holding-period-returns` | Early sale, costs, mark/liquidation, and aggregate wealth |
-| 11. Coupons, accrual & return | `/lessons/coupons-and-return` | Dirty-price accounting across a coupon date |
+| 10. Coupons, accrual & return | `/lessons/coupons-and-return` | Simple return and dirty-price accounting across a coupon date |
+| 11. Pull-to-par & maturity | `/lessons/pull-to-par` | Fixed-YTM discount/premium convergence and final redemption |
 | 12. Reinvestment & cash | `/lessons/reinvestment-and-cash` | Zero-interest/explicit cash and the two-period ledger |
-| 13. Pull-to-par & the horizon | `/lessons/pull-to-par` | Discount/premium convergence, redemption, and early exit |
+| 13. Holding-period return & early sale | `/lessons/holding-period-returns` | Integrated early sale, costs, and keeping versus selling |
 
 Each lesson has an overview card, sidebar entry, and previous/next navigation.
 Python examples are optional and collapsed. Original notes and Notebook 01

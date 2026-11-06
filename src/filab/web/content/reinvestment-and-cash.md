@@ -4,7 +4,10 @@ A fixed-coupon bond pays the promised coupon amount. It does not automatically
 increase that amount because you reinvested an earlier payment. Interest on a
 received coupon comes from a separate investment or cash account.
 
-Prerequisite: [coupons and accrual in returns](/lessons/coupons-and-return).
+Prerequisite: [pull-to-par and maturity](/lessons/pull-to-par).
+
+The previous lesson kept coupon receipts at zero interest through redemption.
+Now keep the bond's payments the same and change only what its received cash earns.
 
 **Goal:** Reconcile a two-period ledger by hand, then explain why an annual
 purchase YTM and a compounded wealth return can differ even when all promised

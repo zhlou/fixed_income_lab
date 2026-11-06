@@ -4,7 +4,8 @@ import pytest
 pytest.importorskip('fastapi')
 from fastapi.testclient import TestClient
 from filab.web.app import app
-from filab.web.return_lessons import RETURN_LESSONS
+from filab.web.curriculum import LESSONS
+from filab.web.return_lessons import RETURN_LESSONS, lesson_spec
 
 client = TestClient(app)
 
@@ -40,6 +41,28 @@ def test_lessons_reject_unrelated_controls_and_scenarios(slug):
 
 def test_unknown_lesson_is_not_found():
     assert calculate('missing',example='none').status_code==404
+
+
+def test_m2_prerequisites_precede_the_lessons_that_use_them():
+    positions = {lesson['slug']: index for index, lesson in enumerate(LESSONS)}
+    for lesson in LESSONS:
+        if lesson['milestone'] == 'M2':
+            assert positions[lesson['prerequisite']] < positions[lesson['slug']]
+
+
+@pytest.mark.parametrize('example',['discount-bond','premium-bond'])
+@pytest.mark.parametrize('horizon',['maturity','before_maturity'])
+def test_visible_pull_to_par_scenarios_keep_yield_fixed(example,horizon):
+    spec = lesson_spec('pull-to-par')
+    assert [e['id'] for e in spec['examples']] == ['discount-bond','premium-bond']
+    assert {f['name'] for f in spec['controls']} == {'coupon_rate','start_yield','horizon'}
+    horizons = next(f for f in spec['controls'] if f['name']=='horizon')['options']
+    assert [option[0] for option in horizons] == ['maturity','before_maturity']
+    data = calculate('pull-to-par',{'horizon':horizon},example=example).json()
+    assert data['inputs']['yield_path'] == 'fixed'
+    assert data['result']['sale_fees'] == 0
+    assert data['result']['cash_interest'] == 0
+    assert data['result']['positions'][0]['status'] == ('redeemed' if horizon=='maturity' else 'held')
 
 
 def test_return_lesson_distinguishes_price_return_and_coupon_inclusive_return():

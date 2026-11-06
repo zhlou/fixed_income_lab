@@ -82,3 +82,11 @@ cash growth, costs, and mark/liquidation treatment. Its independent two-period
 example, nine published OTS/OCC horizon-return checks, tolerances, and model limits
 are recorded in [M2 validation](m2_validation.md). This does not extend the pricing
 model to stubs, holidays, ex-coupon rules, or market settlement lags.
+
+### November 5, 2026 curriculum revision
+
+M2 now teaches coupon accounting, fixed-YTM pull-to-par, cash reinvestment, and
+integrated early-sale return in that order. The pricing model and published
+reference benchmarks above are unchanged. Independently recomputed simple-return
+and fixed-yield zero-coupon teaching examples, regression tolerances, and
+desktop/mobile checks are recorded in [M2 validation](m2_validation.md).

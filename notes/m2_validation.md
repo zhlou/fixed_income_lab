@@ -292,3 +292,49 @@ A deliberate 503 during full-tool recalculation also passed: the transfer kept
 the stale-result notice and disabled input/ledger exports, without claiming
 successful restoration. All focused input panels visibly label the experiment
 as hypothetical.
+
+## Lesson progression revision — November 5, 2026
+
+The current sequence is 10 coupons/accrual and simple return; 11 fixed-YTM
+pull-to-par and maturity; 12 cash reinvestment; 13 integrated holding-period
+return and early sale. Lesson 10's worked example now values the bond still
+held, matching its experiment. With no exit costs, this has the same wealth as
+the earlier hypothetical sale. The 7% exit-yield example is taught once, in
+lesson 13. Pull-to-par exposes only maturity and the day before maturity, with
+discount/premium examples; its old early-sale API requests remain compatible.
+Pricing, ledger arithmetic, conventions, and full-calculator inputs are unchanged.
+
+Existing authoritative references and benchmark tolerances above continue to
+apply; no new external source verification was needed for this reordering.
+Independent arithmetic checks reproduced the introductory hypothetical example:
+$99 remaining bond + $2 cash − $100 purchase = $1 profit, or 1%. The revised
+zero-coupon transfer exercise gives $100/1.05² = $90.702947845805 at purchase,
+$100/1.05 = $95.238095238095 after one year at fixed yield, a 5% one-year marked
+return, and a 10.25% two-period return at redemption. Compare these derived
+values with the existing regular-period price identities at $1e-10 absolute
+price tolerance and 1e-13 absolute return tolerance. They are hypothetical
+examples, not additional published market benchmarks.
+
+**429 tests passed** on Python 3.12.16. Five added cases check that prerequisites
+precede their lessons and that all four visible discount/premium and
+maturity/pre-maturity combinations use fixed yield, zero cash interest, and the
+correct held/redeemed status. Navigation checks now assert the new lesson
+numbers and both previous/next destinations. Existing worked cases, full-API
+parity, saved studies, and the former pull-to-par early-sale case still pass.
+The existing Starlette/httpx deprecation warning remains.
+
+Browser checks at **1440×900** and **390×844** covered all four pages, their
+numbers, formulas, controls, charts, and absence of horizontal page overflow.
+Keyboard coupon/premium/cash presets, horizon radio selection, coupon reset,
+and mobile input/results switching worked. A premium bond remained held on
+the day before maturity with its final payment still in value; redemption
+instead left zero face. In lesson 13, 10 bp costs charged $0.10 each at purchase
+and sale; keeping the mark removed only the sale cost. Transferring the final
+lesson to the full calculator restored the −0.327631% early-sale case and the
+same $97.80 ending wealth. The sidebar displayed the new order. No KaTeX errors
+or browser warning/error logs were observed; desktop/mobile screenshots were
+inspected. The temporary verification server was stopped after checks.
+
+The remote Docker container requires a rebuild/recreation for this source
+revision. The journal prompts were reordered but remain unanswered; these
+checks establish software behavior, not learner mastery.

@@ -135,10 +135,10 @@ with BuildKit; it does not require builder-specific features.
 | `/lessons/modified-duration-dv01` | Percentage sensitivity, dollar duration, and DV01 |
 | `/lessons/convexity` | Exact repricing, curvature, and approximation error |
 | `/tools/bond-risk` | Reusable two-bond risk comparison with JSON export/import |
-| `/lessons/holding-period-returns` | Price change, profit, and closed-portfolio return |
-| `/lessons/coupons-and-return` | Dirty-price accounting across a coupon date |
+| `/lessons/coupons-and-return` | Simple period return and dirty-price accounting across a coupon date |
+| `/lessons/pull-to-par` | Fixed-YTM price convergence and final redemption |
 | `/lessons/reinvestment-and-cash` | Explicit cash growth and the two-period ledger |
-| `/lessons/pull-to-par` | Price convergence, redemption, and early-sale outcomes |
+| `/lessons/holding-period-returns` | Integrated early-sale return, costs, and keeping versus selling |
 | `/tools/bond-return` | One/two-position return calculator with input and ledger exports |
 
 The six foundations lessons are **Bond Basics → Present Value and Bond Pricing
@@ -150,8 +150,10 @@ M1 adds three lessons: **Cash-flow timing & duration → Modified duration & DV0
 → Convexity & approximation error**. Each has prediction prompts, a derivation,
 a worked example, reflection questions, and a transfer exercise with a collapsed
 answer. The shared Risk Explorer is also available outside the lesson sequence.
-M2 adds **Price change & total return → Coupons, accrual & return → Reinvestment
-& cash → Pull-to-par & the horizon**, bringing the total to thirteen lessons.
+M2 adds **Coupons, accrual & return → Pull-to-par & maturity → Reinvestment
+& cash → Holding-period return & early sale**, bringing the total to thirteen lessons.
+The first page introduces a simple return; the final page combines the pieces
+with exit-yield changes and trading costs. Existing lesson URLs are preserved.
 Their focused experiments share the same return ledger, which processes every
 payment before measuring wealth. The complete calculator has its own tool page.
 
@@ -247,10 +249,10 @@ assumptions stated explicitly:
 
 | Lesson | Adjustable controls | Chart emphasis |
 |---|---|---|
-| 10. Price change & total return | Exit YTM, trading cost, mark/sell | Dirty price change versus investment return |
-| 11. Coupons, accrual & return | Nearby purchase/valuation dates, coupon rate | Coupon-date transfer from bond value to cash |
+| 10. Coupons, accrual & return | Nearby purchase/valuation dates, coupon rate | Coupon-date transfer from bond value to cash |
+| 11. Pull-to-par & maturity | Coupon, purchase YTM, maturity or day-before-maturity horizon | Clean/dirty price convergence at fixed YTM and final redemption |
 | 12. Reinvestment & cash | Cash rate, coupon rate, reporting horizon | Extra wealth relative to cash at 0% |
-| 13. Pull-to-par & the horizon | Coupon, purchase YTM, horizon; exit YTM for an early sale | Clean/dirty price convergence before sale or redemption |
+| 13. Holding-period return & early sale | Exit YTM, trading cost, mark/sell | Dirty price change versus investment return |
 
 At desktop widths of 1200 pixels or more, the input column and results scroll
 independently. **View chart** remains beneath the controls. Short desktop windows
@@ -303,14 +305,17 @@ return, components, and residuals), `cash_comparison`, solved purchase yields,
 complete `inputs`, and a convention version. `/docs` describes every field.
 
 `POST /api/lesson-returns/{slug}` accepts an `example` identifier and a `controls`
-object for the four M2 lesson slugs. It accepts only the controls in the table
-above, then constructs fixed assumptions in Python and calls the shared ledger.
-For example, lesson 10 accepts `{"example":"yield-rise","controls":{"end_yield":0.07,"cost_bp":10}}`.
+object for the four M2 lesson slugs. The lesson controls are listed in the table
+above; Python supplies the fixed assumptions and calls the shared ledger.
+For example, lesson 13 at `/api/lesson-returns/holding-period-returns` accepts
+`{"example":"yield-rise","controls":{"end_yield":0.07,"cost_bp":10}}`.
 Lesson dates are constrained to its teaching window; unrelated controls and
 examples are rejected. The response contains complete transferable `inputs`,
 the shared `result`, and lesson-specific metrics, curves, and numerical rows.
 Rates remain decimal fractions. Existing full-calculator APIs and their bounds
-are preserved.
+are preserved. For compatibility, the pull-to-par API still accepts its former
+`early-sale` example, `early_sale` horizon, and `end_yield`; the lesson page
+offers fixed-yield scenarios, with early exits taught in lesson 13.
 
 `POST /api/return-ledger` exposes the domain workflow: common `start_date` and
 `end_date`, `cash_rate`, `cost_bp`, `end_treatment`, optional `valuation_dates`,

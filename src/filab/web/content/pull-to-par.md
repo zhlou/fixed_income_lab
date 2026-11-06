@@ -6,11 +6,16 @@ discounting separates it from today. A premium bond instead gives back part of
 its premium as it approaches redemption. Coupon income and this price movement
 both matter for return.
 
-Prerequisites: [reinvestment and cash](/lessons/reinvestment-and-cash) and
+Prerequisites: [coupons and return](/lessons/coupons-and-return) and
 [dated settlement](/lessons/settlement-and-accrued-interest).
 
 **Goal:** Explain pull-to-par under a fixed-YTM assumption, reconcile a
-hold-to-maturity return, and distinguish it from an early sale after a yield change.
+hold-to-maturity return, and account for the final coupon and principal without
+leaving a second bond value beside the cash.
+
+The last lesson followed one coupon into cash. Now follow all the remaining
+payments through maturity. Keep YTM fixed, retain receipts at 0%, and leave
+changes in market yields and cash reinvestment for later lessons.
 
 ## Derive the regular-period price gap
 
@@ -59,8 +64,9 @@ arrive during the holding period:
 | Total profit | $9.880987104 |
 
 Ending wealth is **$108.00**, entirely cash. The whole-period return is
-$108/98.119012896-1=\mathbf{10.070410\%}$. It is not simply two times the 5%
-purchase YTM: payments arrived at different dates and were held at zero interest.
+$108/98.119012896-1=\mathbf{10.070410\%}$. It covers the entire two-year holding
+period; the 5% purchase YTM is an annual nominal rate. Payments arrived at
+different dates and were held at zero interest.
 The model pays the final $2 coupon and $100 principal once each. A maturity
 horizon redeems the bond; it creates no additional sale or fee.
 
@@ -68,23 +74,7 @@ The [TreasuryDirect pricing explanation](https://www.treasurydirect.gov/marketab
 provides the coupon/yield premium-discount relationship and principal-redemption
 context. This worked return is our own hypothetical calculation.
 
-## An early horizon changes the question
-
-Select **Early sale**. The same bond sells six months after purchase
-when YTM jumps to 7%. The sale produces $95.797544529 plus the $2 coupon already
-received: ending wealth is $97.797544529. Return is **−0.327631%**.
-
-The bond still promises $100 at maturity, but that is not the sale price today.
-Pull-to-par under fixed YTM cannot protect an early seller from a large yield
-rise. The immediate shock in M1 and this six-month return also differ because
-the bond has aged and made a payment.
-
-For an otherwise identical investor who holds through redemption, hypothetical
-yield marks change interim wealth but do not change fixed promised payments.
-That does not remove default risk, cash reinvestment risk, or the possibility of
-needing to sell early; this calculator assumes all promised payments arrive.
-
-## Experiment: isolate time, yield, and the exit rule
+## Experiment: follow the remaining payments
 
 1. Run the worked maturity case. Find the final coupon and redemption in the ledger.
    Verify zero face held and zero ending bond value.
@@ -93,17 +83,22 @@ needing to sell early; this calculator assumes all promised payments arrive.
 3. Keep the 4% coupon and choose **Day before maturity**. The position still
    contains the final coupon and principal; redemption
    has not happened yet. Compare clean, accrued, dirty, and cash.
-4. Restore the early-sale case. Change only the yield-change size. Explain why the
-   terminal price changes but the received coupon stays $2.
-5. Use **Full calculator** to continue with these inputs and add the ten-year
-   Bond B at equal face. Equal face does not imply equal capital, remaining
-   maturity, or interest-rate exposure. Inspect each terminal mark there.
+4. Set coupon equal to YTM at 5%. On coupon dates the price is par. Just before
+   maturity, distinguish the clean price near $100 from the dirty value near
+   $102.50, which still includes the final coupon.
+5. Set the coupon to zero. There are no interim coupon receipts or accrued
+   interest. At maturity the $100 principal moves to cash and no bond remains.
 
-This lesson exposes coupon, purchase YTM, and three relevant horizons. A new
-exit-yield control appears only for an early sale. Cash remains at 0% and costs
-remain zero. The price chart stops before redemption; the terminal table separately
-records the final cash payment and zero remaining position, so redemption does
-not look like a price collapse.
+This lesson exposes coupon, purchase YTM, and a choice between the day before
+maturity and maturity itself. Each scenario keeps YTM fixed through time;
+changing purchase YTM starts a different fixed-yield scenario. Cash remains at
+0% and costs remain zero. The price chart stops before redemption; the terminal
+table separately records the final cash payment and zero remaining position,
+so redemption does not look like a price collapse.
+
+Use **Full calculator** to continue with your current inputs. The next lesson
+changes the [cash policy](/lessons/reinvestment-and-cash); the final lesson
+examines [early sale after a yield change](/lessons/holding-period-returns).
 
 ## Misconceptions and boundaries
 
@@ -111,6 +106,10 @@ Pull-to-par describes a specified fixed-YTM path. It does not guarantee a smooth
 observed clean-price path. Dirty prices fall on payment dates, and between-date
 clean prices reflect the fractional pricing convention. Even a bond with coupon
 equal to YTM need not be exactly at clean par between dates under this model.
+
+This calculation assumes every promised payment arrives. Redemption at face
+does not establish what you could receive if you had to sell earlier. The
+early-sale lesson will let the exit yield differ from the purchase yield.
 
 **Roll-down** along a curved term structure asks how the yield assigned to an
 aging bond changes as its remaining maturity shortens. That requires a discount
@@ -121,18 +120,19 @@ YTM fixed here does not measure curved-term-structure roll-down.
 
 - Why is redemption principal part of cash, with no remaining bond value?
 - Explain how a premium bond can lose capital value and still earn a positive return.
-- Which assumptions make a hold-to-maturity cash total insensitive to interim marks?
+- Why does changing purchase YTM change the purchase price without changing promised payments?
 - Why does this lesson not yet establish historical roll-down profits?
 
 ## Transfer exercise
 
 A zero-coupon bond promises $100 in two annual periods. Buy at 5% annual YTM.
-What is its price and its two-period return if held to redemption? If sold after
-one year at a 10% yield, what is the one-year return? Ignore costs.
+What is its price and its two-period return if held to redemption? What is its
+value after one year if YTM stays at 5%? Ignore costs and keep cash at 0%.
 
 ::: answer
 Purchase price is $100/1.05^2=$90.702947846. Redemption gives a two-period
-return of $100/$90.702947846−1=10.25%. The early sale is $100/1.10=$90.909090909,
-giving a one-year return of 0.227273%. With no coupons and a horizon exactly at
-redemption or sale, there is no intervening cash to reinvest.
+return of $100/$90.702947846−1=10.25%. After one year the remaining promise is
+worth $100/1.05=$95.238095238, giving a one-year marked return of 5%. At
+redemption the bond value becomes zero and cash becomes $100; those are not
+two separate $100 assets.
 :::

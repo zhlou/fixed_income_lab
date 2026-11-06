@@ -1,6 +1,6 @@
 # Fixed-Income Lab — Learning, Education, and Research Workbench
 
-**Revised:** November 3, 2026 (America/Chicago)
+**Revised:** November 5, 2026 (America/Chicago)
 
 **Primary daily use:** Research bond strategies and historical returns.
 
@@ -217,14 +217,20 @@ shocks weaken a duration-only approximation.
 
 ### M2 — Holding-period returns before backtesting
 
-**Lessons:** price change versus return; coupons/accrual; reinvestment and cash;
-pull-to-par. Complete curved-term-structure roll-down in M4.
+**Lessons, revised November 5, 2026:** coupons/accrual and simple return →
+pull-to-par and maturity → reinvestment and cash → holding-period return and
+early sale. Introduce return as profit per dollar invested on the first page,
+then build from one coupon to redemption and cash growth before the integrated
+early-sale case. Portfolio aggregation is an optional full-calculator extension.
+Complete curved-term-structure roll-down in M4.
 
 **Teaching interface:** each lesson now limits its controls and examples to its
-own question. Lesson 10 varies exit yield and costs; 11 varies dates around a
-coupon and coupon size; 12 varies cash rate, coupon, and cash/reporting horizon;
-13 varies coupon, purchase yield, and holding horizon, with an exit yield only
-for an early sale. Each has a focused chart and numerical table. Keep the full
+own question. Lesson 10 varies dates around a coupon and coupon size; 11 varies
+coupon, purchase yield, and maturity/pre-maturity horizon with YTM fixed through
+time; 12 varies cash rate, coupon, and cash/reporting horizon; 13 varies exit
+yield, trading costs, and keeping versus selling. Each has a focused chart and
+numerical table. Early-sale repricing belongs in the final lesson rather than
+being repeated in pull-to-par. Keep stable lesson URLs and the full
 calculator at `/tools/bond-return`; transfer current lesson inputs there for
 portfolio, quotation, date, or saved-file experiments. Financial calculations
 remain shared. Fixed assumptions must be visible rather than disguised as

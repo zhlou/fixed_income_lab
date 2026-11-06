@@ -5,12 +5,41 @@ After payment, that coupon is no longer part of the remaining bond. It is cash
 in the owner's account. The dirty-price drop alone is therefore a poor measure
 of that owner's return.
 
-Prerequisites: [holding-period return](/lessons/holding-period-returns) and
-[settlement and accrued interest](/lessons/settlement-and-accrued-interest).
+Prerequisite: [settlement and accrued interest](/lessons/settlement-and-accrued-interest).
 
-**Goal:** Cross a coupon date and account for both the accrued interest paid at
-purchase and the coupon received. Explain who receives a payment under this
-model's settlement convention.
+**Goal:** Calculate a simple holding-period return, then cross a coupon date
+without mistaking a payment for new profit or a price drop for a wealth loss.
+
+## Start with the money invested and the money left
+
+A **holding-period return** compares what an investment is worth at the end
+with the money put in at the beginning. For this first experiment, buy one
+bond, keep every receipt as cash at 0%, and pay no fees. There are no later
+deposits or withdrawals.
+
+In a hypothetical example, pay $100 dirty, then later hold a bond worth $99
+dirty and $2 of coupon cash. Ending wealth is $101, profit is $1, and the
+period return is 1%. The $1 bond-price decline describes only part of the
+outcome. Selling for the same $99 with no fees leaves $101, now entirely cash.
+
+Write $P_0^d$ for the full dirty purchase price, $V_H^d$ for the dirty value of
+the bond still held at ending date $H$, and $B_H$ for the coupon cash received.
+All three amounts refer to the same face value and are in dollars. Ending
+wealth is $V_H^d+B_H$. Subtract the purchase cost to find profit:
+
+$$
+\text{profit}=V_H^d+B_H-P_0^d.
+$$
+
+Return is profit per dollar invested:
+
+$$
+R_H=\frac{V_H^d+B_H-P_0^d}{P_0^d}.
+$$
+
+This is an **accounting identity** under the stated assumptions. It covers the
+whole holding period, with no annualization. Count coupon cash once in ending
+wealth. We will add reinvestment and trading costs in later lessons.
 
 ## Accrued interest belongs in the purchase cost
 
@@ -20,7 +49,7 @@ previous coupon, and $d$ the actual number of days in that coupon period.
 Accrued interest is $AI=C(a/d)$.
 
 Write $P^c$ for clean price, $P^d$ for dirty price, and subscripts $0,H$ for
-purchase and sale dates. The settlement identity is
+purchase and ending valuation dates. The settlement identity is
 
 $$
 P^d=P^c+AI.
@@ -39,9 +68,9 @@ $$
 $$
 
 This is an **identity**, obtained by substituting clean plus accrued into the
-return equation. It is not a causal attribution model. With cash interest add
-that interest; with fees subtract those fees. Return divides total profit by
-dirty purchase cost plus the entry fee.
+profit equation above. It is not a causal attribution model. Here return
+divides this profit by the dirty purchase cost. Later lessons add cash interest
+and trading costs explicitly.
 
 ## Worked example: buy one day before the coupon
 
@@ -49,7 +78,8 @@ Choose **Buy before the coupon**. All dates and prices here are hypothetical:
 
 - $100 face, 4% coupon, semiannual payments, 5% nominal YTM held fixed.
 - Issue November 15, 2025; maturity November 15, 2028.
-- Buy November 14, 2026; sell November 16, 2026. No fees; cash earns zero.
+- Buy November 14, 2026; value the bond still held on November 16, 2026.
+  No fees; cash earns zero.
 
 The current coupon period is May 15–November 15, 2026: **184 days**.
 At purchase **183 days** have elapsed. Each coupon is $2, so
@@ -70,8 +100,8 @@ elapsed, so $AI_H=2/181=0.011049724$.
 | Coupon received | +2.000000000 |
 | Profit | +0.026824865 |
 
-Ending wealth after that hypothetical sale is **$100.13**, and the two-day return is
-**+0.026797%**. The dirty sale price alone is **$98.13**, about $1.97 below the
+Ending wealth is **$100.13**, and the two-day return is
+**+0.026797%**. The remaining dirty bond value is **$98.13**, about $1.97 below the
 dirty purchase price. That comparison omits the $2 already in cash. The calculator
 keeps full precision; cent-rounded displays can differ by one cent when summed.
 
@@ -96,9 +126,9 @@ ordering, rather than a universal rule for all bond markets.
 
 ## Experiment: follow one coupon through the ledger
 
-1. Use the worked case. The experiment **keeps the bond at the horizon** and
-   compares its dirty value with bond value plus cash. With no sale costs, that
-   marked wealth equals the worked example's hypothetical sale wealth.
+1. Use the worked case. The experiment **keeps the bond at the horizon**.
+   Compare its dirty value with bond value plus cash, then divide the total
+   profit by the dirty purchase cost to reproduce the period return.
 2. Set the valuation date to November 15. Accrued interest resets to zero;
    the coupon has already been credited before the closing valuation.
 3. Choose **Buy on the coupon date**. The opening-date coupon disappears from
@@ -111,7 +141,7 @@ ordering, rather than a universal rule for all bond markets.
 
 The date controls stay near this coupon, while YTM, face amount, cash policy,
 and costs are fixed. Use **Full calculator** to carry the current case into a
-wider date window or examine an actual horizon sale.
+wider date window. Next, [follow the bond through maturity](/lessons/pull-to-par).
 
 ## Misconceptions and boundaries
 
@@ -128,6 +158,7 @@ only a few valuation dates.
 ## Reflection checkpoint
 
 - Reconcile the worked $2 coupon with only about three cents of profit.
+- Why does a fall in bond value alone not determine the investment return?
 - Why does accrued interest fall sharply without creating an equal wealth loss?
 - Explain the difference between a coupon date purchase and a coupon date sale.
 

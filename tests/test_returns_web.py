@@ -144,7 +144,7 @@ def test_explicit_paths_reject_future_fill_and_duplicate_dates():
 
 
 def test_m2_pages_have_separate_lessons_formulas_navigation_and_local_assets():
-    slugs=['holding-period-returns','coupons-and-return','reinvestment-and-cash','pull-to-par']
+    slugs=['coupons-and-return','pull-to-par','reinvestment-and-cash','holding-period-returns']
     for index,slug in enumerate(slugs):
         response=client.get('/lessons/'+slug)
         assert response.status_code==200
@@ -158,7 +158,9 @@ def test_m2_pages_have_separate_lessons_formulas_navigation_and_local_assets():
         assert '::: answer' not in text
         if index<3:
             assert f'href="/lessons/{slugs[index+1]}" class="next-lesson"' in text
-    assert 'href="/lessons/holding-period-returns" class="next-lesson"' in client.get('/lessons/convexity').text
+        previous = slugs[index-1] if index else 'convexity'
+        assert f'href="/lessons/{previous}"><small>← PREVIOUS LESSON</small>' in text
+    assert 'href="/lessons/coupons-and-return" class="next-lesson"' in client.get('/lessons/convexity').text
     home=client.get('/').text
     assert '13 available lessons' in home
     assert 'Open Bond Return Calculator' in home

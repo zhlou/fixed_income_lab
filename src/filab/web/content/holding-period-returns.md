@@ -5,15 +5,20 @@ A **holding-period return** asks what happened to the investor's whole wealth
 between two dates. During that time, a coupon can leave the bond and arrive in
 cash. Looking only at the bond price loses sight of that cash.
 
-Prerequisite: [yield to maturity](/lessons/yield-to-maturity). The earlier
-[risk lessons](/lessons/modified-duration-dv01) change yield instantly, without
-letting time pass. Here both the dates and the payments matter.
+Prerequisites: [coupons and accrual](/lessons/coupons-and-return),
+[pull-to-par and maturity](/lessons/pull-to-par), and
+[reinvestment and cash](/lessons/reinvestment-and-cash).
+
+You have followed a coupon into cash, reconciled redemption, and given receipts
+an explicit cash policy. Now combine those pieces for an investor who may sell
+before maturity. The earlier [risk lessons](/lessons/modified-duration-dv01)
+change yield instantly; this investment also ages and makes payments.
 
 **Goal:** Reconcile a return from beginning wealth, ending bond value, credited
 cash, and trading costs. Explain why a purchase YTM is not a shorter-horizon
 return forecast.
 
-## Define the portfolio boundary first
+## Put the pieces into one wealth calculation
 
 This calculator models a **closed portfolio**: all capital is present at the
 opening, and there are no later contributions or withdrawals. Coupons stay
@@ -25,10 +30,11 @@ Use these symbols, all in matching dollar units:
 | Symbol | Meaning |
 |---|---|
 | $P_0^d$ | Full dirty purchase price for the chosen face amount |
+| $P_H^d$ | Full dirty sale price for the same face amount, if sold |
 | $K_b$ | Purchase fee |
 | $W_0$ | Beginning wealth, $P_0^d+K_b$ |
 | $V_H$ | Dirty value of any bonds still held at horizon $H$ |
-| $B_H$ | Cash balance at that horizon, including payments and sales, net of costs |
+| $B_H$ | Cash balance at that horizon, including payments, cash interest, and sales, net of costs |
 | $W_H$ | Ending wealth, $V_H+B_H$ |
 | $R_H$ | Net return over the entire holding period |
 
@@ -40,7 +46,7 @@ R_H=\frac{W_H-W_0}{W_0}=\frac{V_H+B_H}{W_0}-1.
 $$
 
 This is an **accounting identity**, given the closed-portfolio boundary. For an
-early sale of one bond, cash initially earning zero, total coupons $C_H$, and
+early sale of one bond, cash earning zero throughout, total coupons $C_H$, and
 sale fee $K_s$, the same identity becomes
 
 $$
@@ -88,6 +94,12 @@ Using unrounded values gives a **−0.327631%** holding-period return. The dirty
 price change alone is about **−2.37%**. The coupon reduces the loss, but does not
 eliminate it. Neither percentage is the purchase YTM of 5%.
 
+The [maturity lesson](/lessons/pull-to-par) kept the bond through redemption.
+Here the investor sells before that final payment. The promise of $100 at
+maturity does not set today's sale price. If held through redemption with all
+promised payments arriving, interim yield marks would not change those payments;
+cash reinvestment would still be a separate assumption.
+
 ## Experiment: explain each change
 
 1. Run the worked case. Find the coupon before the sale in the event ledger.
@@ -105,12 +117,12 @@ eliminate it. Neither percentage is the purchase YTM of 5%.
 
 This lesson fixes the bond terms, dates, and zero-interest cash policy so you
 can isolate the exit yield and costs. The **Full calculator** link carries your
-current inputs to the dedicated tool. There you can add Bond B and check that
-the two opening costs sum to portfolio capital.
+current inputs to the dedicated tool. There you can also apply the earlier
+cash-policy lesson to received payments.
 
-For multiple positions at the same dates, profit and capital add. Portfolio
-return is the opening-capital-weighted average of position returns when the cash
-and cost assumptions match; adding percentages directly is incorrect.
+Multiple-position comparisons are an optional extension in the full calculator.
+First reconcile the single bond's purchase, coupon, sale or remaining value,
+and fees before adding another position.
 
 ## Conventions and common mistakes
 
@@ -120,9 +132,10 @@ default, and no tax. It preserves the existing dated pricing conventions:
 Actual/Actual coupon-period accrual and simple first fractional discounting.
 Stub coupons, holidays, ex-coupon rules, and settlement lags are excluded.
 
-The step yield changes on its entered date and stays fixed thereafter. All
-prices are model-derived, except a user-entered purchase quote. No observed
-market history is used. A shorter horizon still depends on the sale price and
+In this lesson YTM changes on the horizon date. The coupon is received first,
+then the remaining bond is valued or sold at the exit YTM. Earlier marks use
+the purchase YTM. These are hypothetical model prices; no observed market
+history is used. A shorter horizon still depends on the sale price and
 cash treatment; the [SEC's early-sale explanation](https://www.investor.gov/introduction-investing/investing-basics/glossary/bonds-selling-maturity)
 describes the possibility of selling above or below face value.
 
