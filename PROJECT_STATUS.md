@@ -21,6 +21,29 @@ questions or demonstrated the learning checkpoints.
 
 ## Completed work
 
+### Docker dependency cache — November 5, 2026
+
+The Dockerfile uses pip 26.2+ and its native `--only-deps ".[web,build]"`
+option before copying source. Build tools are declared in the new `build`
+extra in `pyproject.toml`, alongside the existing application and web dependencies.
+There is no custom TOML parser in the Dockerfile. Setuptools reads metadata
+with the real README and an empty source directory; the complete source arrives
+before the final `--no-deps --no-build-isolation` application install. A source
+change rebuilds the application wheel without resolving dependencies or
+downloading build tools again. README or metadata changes invalidate the
+dependency layer. The README links pip's documentation and explains refreshes.
+
+Two verification builds succeeded on the existing `deepl` Docker engine. A
+temporary source-only comment reused the same dependency layer (`ccf3c7d2fb1d`)
+and rebuilt the application package; the checkout's source was not modified.
+`pip check` found no broken requirements. An unprivileged test container with
+networking disabled served ten pages/assets and reproduced the known bond price
+through `/api/valuation`, using the installed package from outside `/app`.
+Temporary containers and the source-variant image tag were removed afterward.
+The baseline verification image remains available as
+`fixed-income-lab:pip-deps-check`. The running deployment was not replaced. Validation targeted the
+changed build and runtime packaging; financial and UI code are unchanged.
+
 ### M2 lesson progression revised — November 5, 2026
 
 Lessons 10–13 now build from **Coupons, accrual & return → Pull-to-par &

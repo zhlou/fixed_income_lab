@@ -6,12 +6,19 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-COPY pyproject.toml README.md ./
-COPY src/ ./src/
+RUN python -m pip install --no-cache-dir "pip>=26.2"
 
-RUN python -m pip install --no-cache-dir ".[web]" \
+COPY pyproject.toml README.md ./
+
+# Setuptools needs the source directory to read metadata before source is copied.
+RUN mkdir src \
+    && python -m pip install --no-cache-dir --only-deps ".[web,build]" \
     && groupadd --system filab \
     && useradd --system --gid filab --create-home filab
+
+COPY src/ ./src/
+
+RUN python -m pip install --no-cache-dir --no-deps --no-build-isolation .
 
 USER filab
 

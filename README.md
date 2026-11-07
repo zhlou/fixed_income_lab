@@ -61,6 +61,15 @@ needed to download the base image and dependencies during the build; the website
 works offline afterward. Dependency versions follow `pyproject.toml` and are not
 locked, so a fresh build can pick up newer compatible releases.
 
+The Dockerfile uses pip 26.2 or newer and its
+[`--only-deps` option](https://pip.pypa.io/en/stable/user_guide/#installing-only-dependencies)
+to install the dependencies of `.[web,build]` before copying the source. The
+`build` extra in `pyproject.toml` declares the tools needed for the later
+application build without isolation. Source changes reuse the dependency layer;
+only the application package is rebuilt. Changing `pyproject.toml` or README
+invalidates that layer. To refresh allowed dependency versions explicitly,
+rebuild with `docker build --no-cache`.
+
 From the checkout root, build and run using the **currently selected Docker
 context**:
 
