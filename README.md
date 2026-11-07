@@ -63,12 +63,14 @@ locked, so a fresh build can pick up newer compatible releases.
 
 The Dockerfile uses pip 26.2 or newer and its
 [`--only-deps` option](https://pip.pypa.io/en/stable/user_guide/#installing-only-dependencies)
-to install the dependencies of `.[web,build]` before copying the source. The
+to install the dependencies of `.[web,build]` before copying README and source. The
 `build` extra in `pyproject.toml` declares the tools needed for the later
-application build without isolation. Source changes reuse the dependency layer;
-only the application package is rebuilt. Changing `pyproject.toml` or README
-invalidates that layer. To refresh allowed dependency versions explicitly,
-rebuild with `docker build --no-cache`.
+application build without isolation. An empty README satisfies the metadata-only
+dependency step; the real README is copied before building the application wheel
+so its package description is preserved. Source and README changes reuse the
+dependency layer; only the application package is rebuilt. Changing
+`pyproject.toml` invalidates that layer. To refresh allowed dependency versions
+explicitly, rebuild with `docker build --no-cache`.
 
 From the checkout root, build and run using the **currently selected Docker
 context**:
@@ -168,10 +170,13 @@ payment before measuring wealth. The complete calculator has its own tool page.
 
 On desktop windows at least 1200 pixels wide, lessons place the experiment on the
 left and the explanation on the right. Each side scrolls independently, so the
-chart stays in place while you read. The experiment receives most of the width;
-open **Course** in the header for navigation. Narrower windows stack the sections
-with links between them. The top bar provides Overview, Previous, Next, and the
-current lesson number; previous/next links also sit at the end of the explanation.
+chart stays in place while you read. The experiment receives most of the width.
+Hover over **Lesson 08 of 13 ▾** in the header to jump to any lesson, grouped under
+Foundations, Risk, and Returns. Click to keep the picker open, or use Enter/Space
+and Tab by keyboard. Escape closes it. On phones, tap the compact **08 / 13 ▾**
+button to open a scrollable lesson list. **Course** opens the full navigation.
+Narrower windows stack the sections with links between them. The top bar also
+provides Overview, Previous, and Next; previous/next links sit at the end of the explanation.
 On desktop, only the two content panels scroll, keeping the header in view.
 Discrete controls use visible option cards so every choice is shown without
 opening a dropdown. Use Tab and arrow keys to select an option by keyboard.

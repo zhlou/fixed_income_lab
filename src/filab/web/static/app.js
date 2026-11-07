@@ -282,4 +282,75 @@ const navToggle=$('#nav-toggle');if(navToggle){
   $$('a',$('#course-nav')).forEach(link=>link.addEventListener('click',()=>setNavigation(false)));
   window.addEventListener('resize',()=>{if(!document.body.classList.contains('lesson-page')&&window.innerWidth>680)setNavigation(false);});
 }
+const lessonPicker = $('.lesson-picker');
+if (lessonPicker) {
+  const toggle = $('#lesson-picker-toggle', lessonPicker);
+  const panel = $('#lesson-picker-panel', lessonPicker);
+  let openTimer;
+  let closeTimer;
+  let pinned = false;
+  let pointerInside = false;
+
+  function clearTimers() {
+    clearTimeout(openTimer);
+    clearTimeout(closeTimer);
+  }
+
+  function openPicker() {
+    clearTimers();
+    panel.hidden = false;
+    toggle.setAttribute('aria-expanded', 'true');
+  }
+
+  function closePicker(restoreFocus = false) {
+    clearTimers();
+    pinned = false;
+    panel.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) toggle.focus();
+  }
+
+  lessonPicker.addEventListener('pointerenter', event => {
+    if (event.pointerType === 'touch' || !window.matchMedia('(any-hover: hover)').matches || document.body.classList.contains('nav-open')) return;
+    pointerInside = true;
+    clearTimers();
+    openTimer = setTimeout(openPicker, 120);
+  });
+
+  lessonPicker.addEventListener('pointerleave', () => {
+    pointerInside = false;
+    clearTimers();
+    closeTimer = setTimeout(() => {
+      if (!pinned && !lessonPicker.contains(document.activeElement)) closePicker();
+    }, 250);
+  });
+
+  toggle.addEventListener('click', () => {
+    if (!panel.hidden && pinned) {
+      closePicker();
+      return;
+    }
+    if (document.body.classList.contains('nav-open')) navToggle.click();
+    pinned = true;
+    openPicker();
+  });
+
+  lessonPicker.addEventListener('focusout', event => {
+    if (!lessonPicker.contains(event.relatedTarget) && !pointerInside) closePicker();
+  });
+  panel.addEventListener('click', event => {
+    if (event.target.closest('a')) closePicker();
+  });
+  document.addEventListener('click', event => {
+    if (!lessonPicker.contains(event.target)) closePicker();
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && !panel.hidden) {
+      event.preventDefault();
+      closePicker(lessonPicker.contains(document.activeElement));
+    }
+  });
+  navToggle.addEventListener('click', () => closePicker());
+  window.addEventListener('resize', () => closePicker());
+}
 if(window.katex)$$('.math').forEach(node=>{try{window.katex.render(node.textContent,node,{displayMode:node.classList.contains('block'),throwOnError:false,strict:'ignore'});}catch(error){console.warn('Formula could not be rendered',error);}});

@@ -1,6 +1,6 @@
 # Fixed-Income Lab — Status and Progress
 
-**Updated:** November 5, 2026 (America/Chicago)
+**Updated:** November 7, 2026 (America/Chicago)
 
 ## Current status
 
@@ -20,6 +20,42 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### README changes preserve the Docker dependency cache — November 7, 2026
+
+The real README is now copied after dependency installation, alongside source.
+An empty README and source directory satisfy setuptools during the metadata-only
+`--only-deps` step. The final application build reads the real README, preserving
+its package description. README and source edits now leave the dependency layer
+cached when `pyproject.toml` is unchanged. README build guidance is updated.
+
+Two builds on `deepl` confirmed that simultaneous README and source edits reused
+dependency layer `079f05753a1e`. Installed package metadata matched the complete
+README in both images, including the temporary verification edit in the second.
+`pip check` passed; an unprivileged offline container served ten pages/assets
+and the known pricing API example. Temporary containers and the edited test
+image were removed, retaining parent layers and the baseline verification image
+`fixed-income-lab:readme-cache-check`. The running deployment was not replaced.
+Validation targeted Docker packaging and cache behavior.
+
+### Hover lesson picker — November 7, 2026
+
+The header lesson counter now opens a picker after 120 ms of hover, with a
+250 ms grace period when leaving the button or list. All thirteen lessons appear
+under Foundations, Risk, and Returns, using the curriculum registry and marking
+the current lesson. Clicking keeps it open. Enter/Space, Tab, Escape, outside
+clicks, and the Course drawer support keyboard use and dismissal. Phones show
+a compact counter and a full-width scrollable list. Small headers use arrows
+for Previous/Next while retaining their accessible names.
+
+All **442 tests passed** on Python 3.12.16, including all thirteen lesson picker
+pages. Chrome checks covered hover timing, diagonal movement and a one-click
+lesson jump, click persistence, focus preservation/restoration, keyboard links,
+Course dismissal, and responsive layouts. Every lesson header fit at 390 and
+320 pixels, and the final destination was reachable by touch. Short-window checks
+at 1440×480, 390×600, and 320×480 also reached the final lesson, scrolling the
+phone list as needed. No JavaScript, formula, or console errors were observed.
+README navigation guidance is updated. The temporary local server was stopped.
 
 ### Docker dependency cache — November 5, 2026
 
@@ -296,7 +332,7 @@ in `src/filab/risk/`. The [README](README.md) documents these interfaces.
 
 - Place experiments and explanations side by side at desktop widths of 1200px
   and above, with independent scrolling and most of the width for the experiment.
-  Lesson navigation opens from the Course button; narrower screens stack the
+  The header lesson picker opens on hover or click; narrower screens stack the
   sections with direct links between them. Risk charts precede detailed measures.
 - Keep the desktop page within the viewport and contain positioned formula
   accessibility content inside its panel, preventing blank outer-page scrolling.

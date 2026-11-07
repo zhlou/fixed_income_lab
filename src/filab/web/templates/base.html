@@ -43,8 +43,24 @@
     {% if lesson is defined %}
     <nav class="topbar-navigation" aria-label="Lesson navigation">
       <a href="/" class="topbar-overview">Overview</a>
-      {% if previous %}<a href="/lessons/{{ previous.slug }}" aria-label="Previous lesson: {{ previous.title }}" title="{{ previous.title }}">← <span>Previous</span></a>{% else %}<span class="nav-unavailable" aria-disabled="true">← <span>Previous</span></span>{% endif %}
-      <span class="lesson-position" aria-label="Lesson {{ lesson_number }} of {{ lessons|length }}">{{ '%02d'|format(lesson_number) }} / {{ '%02d'|format(lessons|length) }}</span>
+      {% if previous %}<a href="/lessons/{{ previous.slug }}" aria-label="Previous lesson: {{ previous.title }}" title="{{ previous.title }}">← <span>Previous</span></a>{% else %}<span class="nav-unavailable" aria-disabled="true" aria-label="Previous lesson unavailable">← <span>Previous</span></span>{% endif %}
+      <div class="lesson-picker">
+        <button type="button" id="lesson-picker-toggle" class="lesson-picker-toggle" aria-controls="lesson-picker-panel" aria-expanded="false" aria-label="Choose lesson, current lesson {{ lesson_number }} of {{ lessons|length }}">
+          <span class="lesson-picker-label">Lesson {{ '%02d'|format(lesson_number) }} of {{ lessons|length }}</span>
+          <span class="lesson-picker-compact" aria-hidden="true">{{ '%02d'|format(lesson_number) }} / {{ lessons|length }}</span>
+          <span aria-hidden="true">▾</span>
+        </button>
+        <div id="lesson-picker-panel" class="lesson-picker-panel" hidden>
+          {% for milestone, title in [('M0', 'Foundations'), ('M1', 'Risk'), ('M2', 'Returns')] %}
+          <section class="lesson-picker-group" aria-labelledby="lesson-picker-{{ milestone }}">
+            <h2 id="lesson-picker-{{ milestone }}">{{ title }}</h2>
+            {% for item in lessons %}{% if item.milestone == milestone %}
+            <a href="/lessons/{{ item.slug }}" class="lesson-picker-link"{% if active == item.slug %} aria-current="page"{% endif %}><span class="nav-number">{{ '%02d'|format(loop.index) }}</span><span>{{ item.title }}</span></a>
+            {% endif %}{% endfor %}
+          </section>
+          {% endfor %}
+        </div>
+      </div>
       {% if next %}<a href="/lessons/{{ next.slug }}" aria-label="Next lesson: {{ next.title }}" title="{{ next.title }}"><span>Next</span> →</a>{% else %}<a href="/#curriculum" aria-label="Continue to the curriculum"><span>Curriculum</span> →</a>{% endif %}
     </nav>
     {% else %}<span class="engine"><span class="status-dot"></span> Python-powered</span>{% endif %}

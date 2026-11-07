@@ -8,14 +8,16 @@ WORKDIR /app
 
 RUN python -m pip install --no-cache-dir "pip>=26.2"
 
-COPY pyproject.toml README.md ./
+COPY pyproject.toml ./
 
-# Setuptools needs the source directory to read metadata before source is copied.
+# Setuptools needs these placeholders to read dependency metadata.
 RUN mkdir src \
+    && touch README.md \
     && python -m pip install --no-cache-dir --only-deps ".[web,build]" \
     && groupadd --system filab \
     && useradd --system --gid filab --create-home filab
 
+COPY README.md ./
 COPY src/ ./src/
 
 RUN python -m pip install --no-cache-dir --no-deps --no-build-isolation .

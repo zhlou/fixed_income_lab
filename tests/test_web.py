@@ -1,12 +1,15 @@
 """HTTP behavior and financial parity for the local learning website."""
 
 from math import isclose
+from html import unescape
+import re
 import pytest
 
 pytest.importorskip("fastapi")
 from fastapi.testclient import TestClient
 from filab.web.app import app
 from filab.web.app import markdown
+from filab.web.curriculum import LESSONS
 
 client = TestClient(app)
 
@@ -24,6 +27,22 @@ def test_pages_load_with_navigation(path):
 
 def test_unknown_lesson_is_not_found():
     assert client.get('/lessons/not-a-lesson').status_code == 404
+
+
+@pytest.mark.parametrize('lesson_number, lesson', list(enumerate(LESSONS, start=1)), ids=[item['slug'] for item in LESSONS])
+def test_lesson_picker_destinations_and_current_lesson(lesson_number, lesson):
+    response = client.get('/lessons/' + lesson['slug'])
+    assert response.status_code == 200
+    page = response.text
+    assert 'aria-controls="lesson-picker-panel" aria-expanded="false"' in page
+    assert f'current lesson {lesson_number} of {len(LESSONS)}' in page
+    panel = re.search(r'<div id="lesson-picker-panel"[^>]* hidden>(.*?)</div>', page, re.S).group(1)
+    assert re.findall(r'<h2[^>]*>(.*?)</h2>', panel) == ['Foundations', 'Risk', 'Returns']
+    links = re.findall(r'<a href="(/lessons/[^"]+)"([^>]*)>(.*?)</a>', panel, re.S)
+    assert [href for href, _, _ in links] == ['/lessons/' + item['slug'] for item in LESSONS]
+    assert [href for href, attrs, _ in links if 'aria-current="page"' in attrs] == ['/lessons/' + lesson['slug']]
+    for number, ((_, _, label), item) in enumerate(zip(links, LESSONS), start=1):
+        assert unescape(re.sub(r'<[^>]+>', '', label)) == f'{number:02d}{item["title"]}'
 
 
 @pytest.mark.parametrize("instrument, expected", [("coupon", 981.1901289599514), ("zero", 905.9506447997552)])
@@ -183,7 +202,6 @@ def test_currency_is_not_mistaken_for_inline_math():
 
 
 def test_lesson_sequence_and_optional_implementation():
-    import re
     home = client.get('/').text
     assert '13 available lessons' in home
     assert home.count('class="lesson-card"') == 13

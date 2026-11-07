@@ -36,11 +36,22 @@
 .lesson-page .topbar{height:64px;justify-content:flex-start;gap:22px;position:relative;z-index:11}
 .lesson-page .topbar .engine{margin-left:auto}
 .lesson-page .nav-toggle{display:block;background:white;border:1px solid var(--line);border-radius:4px;color:#31553b;padding:6px 10px;white-space:nowrap}
-.topbar-navigation{display:flex;align-items:center;gap:10px;margin-left:auto;font-size:11px;white-space:nowrap}
+.topbar-navigation{display:flex;align-items:center;align-self:stretch;gap:10px;margin-left:auto;font-size:11px;white-space:nowrap}
 .topbar-navigation>a{padding:7px 10px;border:1px solid var(--line);border-radius:4px;background:white;color:#365b42}
 .topbar-navigation>a:hover{background:#edf3e2;border-color:#8ba17d}
 .topbar-navigation .topbar-overview{margin-right:8px}
-.lesson-position{padding:0 5px;font:10px ui-monospace,monospace;color:#6b7b6b}
+.lesson-picker{display:flex;align-items:center;align-self:stretch}
+.lesson-picker-toggle{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line);border-radius:4px;background:white;color:#365b42;font:inherit;white-space:nowrap}
+.lesson-picker-toggle:hover,.lesson-picker-toggle[aria-expanded="true"]{background:#edf3e2;border-color:#8ba17d}
+.lesson-picker-compact{display:none}
+.lesson-picker-panel{position:absolute;top:100%;right:20px;width:min(900px,calc(100vw - 40px));max-height:calc(100dvh - 84px);overflow-y:auto;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;padding:20px;background:white;border:1px solid var(--line);border-radius:0 0 7px 7px;box-shadow:0 12px 28px #0d251d25;white-space:normal}
+.lesson-picker-panel[hidden]{display:none}
+.lesson-picker-group{min-width:0}
+.lesson-picker-group h2{margin:0 10px 10px;font:600 12px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#607465;letter-spacing:0}
+.lesson-picker-link{display:flex;align-items:baseline;gap:10px;margin:3px 0;padding:10px;border-radius:4px;font-size:12px;line-height:1.5}
+.lesson-picker-link .nav-number{flex-shrink:0}
+.lesson-picker-link:hover{background:#edf3e2}
+.lesson-picker-link[aria-current="page"]{background:var(--lime);color:#1c382c;font-weight:600}
 .nav-unavailable{padding:7px 10px;color:#94a090}
 .learning-layout,.experiment-pane,.reading-pane{min-width:0}
 .pane-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 2px 13px}
@@ -99,9 +110,13 @@
   .topbar-navigation{gap:6px;font-size:10px}
   .topbar-navigation>a,.nav-unavailable{padding:7px}
   .topbar-navigation .topbar-overview{margin-right:0}
-  .lesson-position{font-size:9px;padding:0}
+  .lesson-picker-label{display:none}
+  .lesson-picker-compact{display:inline}
+  .lesson-picker-toggle{padding:7px;gap:5px}
+  .lesson-picker-panel{left:0;right:0;width:auto;max-height:calc(100dvh - 74px);grid-template-columns:1fr;gap:16px;padding:16px 19px}
+  .lesson-picker-link{min-height:44px}
 }
-@media(max-width:380px){.topbar-navigation .lesson-position{display:none}.topbar-navigation{gap:4px}}
+@media(max-width:440px){.topbar-navigation>a>span,.nav-unavailable>span{display:none}}
 
 /* Return calculator: the same ledger and controls in lessons and the tool. */
 .return-calculator,.return-calculator .results{min-width:0}
