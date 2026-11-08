@@ -1,5 +1,7 @@
 ## Price is also a date
 
+In the worked example, the buyer sees a **$97.88 clean quote** and pays **$98.88 dirty**, including **$1.00 accrued interest**. Start by finding those three amounts in the experiment. The dates below explain why the accrued interest belongs in the purchase amount.
+
 **Goal:** Calculate what a buyer actually pays between coupon dates. Prerequisite: [yield to maturity](/lessons/yield-to-maturity). Keep the distinction between promised payments and their present values in mind.
 
 The earlier lessons valued a bond just after a coupon payment. Now choose
@@ -93,6 +95,8 @@ The clean price is **$97.88**, accrued interest is **$1.00**, and the amount pai
 To practice a quote conversion without rounding ambiguity, select **YTM from price**, enter **$98.00 Clean**, and verify a **$99.00 dirty** amount. Then select **Dirty** and enter **$99.00**: the implied yield should be the same.
 
 ## Watch the bond approach par
+
+Move settlement to November 15, 2026, a coupon date. Accrued interest resets to zero. This lab treats settlement as after payment, so that day’s coupon belongs to the previous holder. Find the next payment still belonging to the buyer in the schedule.
 
 This tendency toward face value as maturity approaches is called **pull-to-par**. Unlike the earlier yield shocks, time now passes and payments leave the bond.
 

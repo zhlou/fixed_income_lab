@@ -157,6 +157,8 @@ only a few valuation dates.
 
 ## Reflection checkpoint
 
+Find the $2 coupon in the ledger. Reconcile its transfer from accrued interest in the purchase price to cash after payment, then explain the **$0.026824865** two-day profit using the table’s four components.
+
 - Reconcile the worked $2 coupon with only about three cents of profit.
 - Why does a fall in bond value alone not determine the investment return?
 - Why does accrued interest fall sharply without creating an equal wealth loss?

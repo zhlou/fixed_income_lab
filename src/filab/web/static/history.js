@@ -1,6 +1,6 @@
 /* All financial differences come from Python. Rendering never fills a missing rate. */
 (() => {
-  const bp = value => value === null ? 'Unavailable' : `${value > 0 ? '+' : ''}${value.toFixed(0)} bp`;
+  const bp = value => value === null ? '—' : `${value > 0 ? '+' : ''}${value.toFixed(0)} bp`;
   const rate = observation => observation === null ? 'Missing tenor' : `${observation.original_percent}%`;
   async function request(url, options) {
     const response = await fetch(url, options);
@@ -18,7 +18,7 @@
   function chart(container, data, scale) {
     container.replaceChildren();
     const values = data.tenors.flatMap(t => [t.first?.rate, t.second?.rate]).filter(v => v !== undefined);
-    if (!values.length) {container.append(element('p','No published values on these exact dates. Choose dates within coverage.')); return;}
+    if (!values.length) {container.append(element('p','No data')); return;}
     const width=Math.max(260,Math.round(container.clientWidth)), height=310;
     const left=54,right=width-23,top=65,bottom=250;
     const log=scale==='log', minimum=1/12, maximum=30;
@@ -49,7 +49,9 @@
   document.querySelectorAll('[data-history]').forEach(root=>{
     const form=root.querySelector('[data-compare-form]'), error=root.querySelector('[data-history-error]'), results=root.querySelector('.history-results');
     let catalog, selected, bundled, sequence=0, controller, refreshing=false, refreshed, lastResult, availabilitySequence=0;
-    const lesson=root.dataset.pinned==='true';
+    const lesson=root.dataset.pinned==='true', storage=new window.FilabHistoryStore();
+    const failedMonths=new Set();
+    const updateCatalog=async()=>{catalog.snapshots=await storage.list();return catalog;};
     let monthLoader, latestMonth;
     const datePicker=new window.FilabHistoryDates(root,(month,force)=>queueMonth(month,force));
     function monthStatus(message,retry=false) {
@@ -73,12 +75,14 @@
       status:monthStatus,
       load:async(month,force)=>{
         const [year,number]=month.split('-').map(Number);
-        const job=await request('/api/history/month-load',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({year,month:number,base_snapshot_id:selected,force})});
-        let state;
-        do {await new Promise(resolve=>setTimeout(resolve,350));state=await request(`/api/history/jobs/${job.job_id}`);}while(state.state==='running');
-        if(state.state!=='complete')throw new Error(state.message);
-        const [dates,nextCatalog]=await Promise.all([request(`/api/history/snapshots/${state.snapshot_id}/dates`),request('/api/history/snapshots')]);
-        return {...state,dates,catalog:nextCatalog};
+        try {
+          const snapshot=await storage.month(year,number,selected,force,catalog.current_year,catalog.current_month);
+          failedMonths.delete(month);
+          return {snapshot_id:snapshot.id,dates:await storage.dates(snapshot.id),catalog:await updateCatalog()};
+        } catch (_) {
+          failedMonths.add(month);
+          return {snapshot_id:selected,dates:await storage.dates(selected),catalog,warning:'No data'};
+        }
       },
       apply:state=>{
         if(selected!==state.snapshot_id){selected=state.snapshot_id;invalidate();}
@@ -112,7 +116,7 @@
     }
     function refreshAvailability() {
       const ticket=++availabilitySequence, id=selected;datePicker.clearAvailability();
-      request(`/api/history/snapshots/${id}/dates`).then(data=>{
+      storage.dates(id).then(data=>{
         if(ticket===availabilitySequence&&selected===id)datePicker.setAvailability(data);
       }).catch(()=>{
         if(ticket===availabilitySequence&&selected===id&&datePicker.snapshotId!==id)datePicker.clearAvailability('Date availability unavailable. You can still type a date and compare.');
@@ -125,9 +129,9 @@
       root.querySelector('[data-spread-second]').textContent=bp(data.spread_bp[1]);
       root.querySelector('[data-spread-change]').textContent=bp(data.spread_change_bp);
       lastResult=data;drawChart();
-      const states={published:'published row',no_published_row:'no published row (nonpublication or source gap)',outside_coverage:'outside cached coverage'};
+      const states={published:'published row',no_published_row:'no published row (nonpublication or source gap)',outside_coverage:'No data'};
       root.querySelector('[data-date-states]').textContent=data.dates.map((day,i)=>`${day}: ${states[data.date_states[i]]}`).join('. ')+'.';
-      root.querySelector('[data-history-table]').replaceChildren(table(['Tenor',data.dates[0],data.dates[1],'Change · bp'],data.tenors.map(t=>[t.label,t.first===null&&data.date_states[0]!=='published'?'No row':rate(t.first),t.second===null&&data.date_states[1]!=='published'?'No row':rate(t.second),t.included?bp(t.change_bp):'Excluded'])));
+      root.querySelector('[data-history-table]').replaceChildren(table(['Tenor',data.dates[0],data.dates[1],'Change · bp'],data.tenors.map(t=>[t.label,t.first===null&&data.date_states[0]!=='published'?'No data':rate(t.first),t.second===null&&data.date_states[1]!=='published'?'No data':rate(t.second),t.included?bp(t.change_bp):'—'])));
       root.querySelector('[data-sample-note]').textContent=`Common tenors: ${data.common_tenors.join(', ') || 'none'}. Excluded: ${data.excluded_tenors.join(', ') || 'none'}. 2y/10y common-date sample: ${data.spread_sample_dates.length} published dates; ${data.spread_excluded_dates.length} excluded published dates. No dates are filled.`;
       const evidence=root.querySelector('[data-history-provenance]'); evidence.replaceChildren();
       evidence.append(element('p',data.data_kind === 'hypothetical' ? (data.revision_scenario.applied?'HYPOTHETICAL REVISION · the second-date ten-year yield has been changed for this experiment.':'HYPOTHETICAL REVISION UNAVAILABLE · no source observation was changed.') : 'Historical observations · Treasury nominal constant-maturity par yields.'));
@@ -149,7 +153,7 @@
           `A hypothetical revision is unavailable: ${scenario.date} ${reason}. Choose a date with a published ten-year yield. No missing rate is invented.`;
       }
       const note=root.querySelector('[data-revision-result]');if(note)note.textContent=data.data_kind==='hypothetical'?(scenario.applied?'Hypothetical result. The source snapshot was not modified.':'Hypothetical revision unavailable. No observation was changed.'):'Published observations. The hypothetical assumption has not been applied.';
-      root.querySelector('[data-snapshot-download]')?.setAttribute('href',`/api/history/snapshots/${data.snapshot_id}`);
+
     }
     async function compareDates(loadMissing=false) {
       const inputs=[form.elements.first.value,form.elements.second.value];
@@ -163,10 +167,9 @@
       }
       const ticket=++sequence;controller?.abort();controller=new AbortController();error.textContent='';results.setAttribute('aria-busy','true');results.classList.add('history-stale');
       try {
-        const query=new URLSearchParams({snapshot_id:selected,first:form.elements.first.value,second:form.elements.second.value,hypothetical_revision:revision()});
-        const data=await request(`/api/history/compare?${query}`,{signal:controller.signal});
+        const data=await storage.compare(selected,form.elements.first.value,form.elements.second.value,revision(),controller.signal);
         if(ticket!==sequence)return;
-        render(data);results.setAttribute('aria-busy','false');results.classList.remove('history-stale');
+        render(data);if(inputs.some(value=>failedMonths.has(value.slice(0,7))))monthStatus('No data');results.setAttribute('aria-busy','false');results.classList.remove('history-stale');
       } catch(e) {if(ticket===sequence && e.name!=='AbortError'){error.textContent=e.message;results.setAttribute('aria-busy','false');}}
     }
     function showSnapshots(rebuild=true) {
@@ -190,20 +193,34 @@
       datePicker.sync();refreshAvailability();compareDates();
     });});
     root.querySelectorAll('[name="revision"]').forEach(r=>r.addEventListener('change',()=>{invalidate();compareDates(true);}));
+    root.querySelector('[data-snapshot-download]')?.addEventListener('click',async()=>{
+      try {
+        const archive=await storage.export(selected), url=URL.createObjectURL(new Blob([JSON.stringify(archive)],{type:'application/json'}));
+        const link=element('a');link.href=url;link.download='treasury-dataset.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+      } catch(e) {error.textContent=e.message;}
+    });
+    root.querySelector('[data-snapshot-import]')?.addEventListener('change',async event=>{
+      const file=event.target.files[0];if(!file)return;
+      try {
+        if(file.size>32000000)throw new Error('Dataset file exceeds 32 MB.');
+        const id=await storage.import(JSON.parse(await file.text()));
+        monthLoader.cancel();selected=id;await updateCatalog();showSnapshots();refreshAvailability();compareDates();
+      } catch(e) {error.textContent=e.message;}
+      finally {event.target.value='';}
+    });
     const refreshForm=root.querySelector('[data-refresh-form]');
     refreshForm?.addEventListener('submit',async e=>{
       e.preventDefault();if(refreshing||!refreshForm.reportValidity())return;
       refreshing=true;const button=refreshForm.querySelector('button'),status=root.querySelector('[data-refresh-status]');button.disabled=true;root.querySelector('[data-use-refreshed]').hidden=true;status.textContent='Starting refresh…';
       try {
-        const job=await request('/api/history/refresh',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({start_year:Number(refreshForm.elements.start_year.value),end_year:Number(refreshForm.elements.end_year.value)})});
-        let state;
-        do {await new Promise(resolve=>setTimeout(resolve,900));state=await request(`/api/history/refresh/${job.job_id}`);status.textContent=state.message;} while(state.state==='running');
-        if(state.state==='complete'){refreshed=state.snapshot_id;catalog=await request('/api/history/snapshots');showSnapshots();root.querySelector('[data-use-refreshed]').hidden=false;}
-      } catch(e) {status.textContent=e.message+' Your current comparison and cached snapshots are retained.';}
+        refreshed=await storage.years(Number(refreshForm.elements.start_year.value),Number(refreshForm.elements.end_year.value),selected,message=>status.textContent=message);
+        await updateCatalog();showSnapshots();status.textContent='Dataset saved in this browser.';root.querySelector('[data-use-refreshed]').hidden=false;
+      } catch(e) {status.textContent='No data';}
       finally {refreshing=false;button.disabled=false;}
     });
     root.querySelector('[data-use-refreshed]')?.addEventListener('click',()=>{monthLoader?.cancel();monthStatus('');selected=refreshed;refreshAvailability();showSnapshots();compareDates();});
-    request('/api/history/snapshots').then(data=>{
+    Promise.all([request('/api/history/snapshots'),storage.open()]).then(async([data])=>{
+      data.snapshots=await storage.list();
       catalog=data;bundled=data.bundled_snapshot_id;selected=lesson?bundled:data.viewer_snapshot_id;samples.forEach(input=>input.disabled=false);refreshAvailability();showSnapshots();
       if(refreshForm){['start_year','end_year'].forEach(name=>{refreshForm.elements[name].value=data.default_year;refreshForm.elements[name].max=data.current_year;});}
       compareDates();

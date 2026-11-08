@@ -107,6 +107,8 @@ For example, the percentage calculation is $-1.893956(0.01)=-0.01893956$, which 
 
 ## Test the prediction
 
+A **basis point** is **0.01 percentage point**, or 0.0001 in decimal yield. Double face value and compare DV01 with modified duration and the percentage price change. Which dollar amounts doubled, and why did percentage sensitivity stay the same?
+
 1. Double face value. Modified duration should stay fixed; dollar duration and
    DV01 should double.
 2. Compare the default two-year A and ten-year B at +25 bp, then +200 bp.

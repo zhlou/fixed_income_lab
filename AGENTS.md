@@ -2,7 +2,7 @@
 
 ## Purpose and Working Approach
 
-This is both a fixed-income learning environment and a local interactive website. Financial understanding is the goal; Python implementation is supplementary. Read `fixed_income_lab_plan.md`, `PROJECT_STATUS.md`, and relevant code before extending a module. Confirm actual implementation rather than treating roadmap directories as existing features.
+This is a fixed-income learning website and research environment for first-time visitors and returning users. A shared public installation and a local installation use the same application. Financial understanding is the goal; Python implementation is supplementary. Read `fixed_income_lab_plan.md`, `PROJECT_STATUS.md`, and relevant code before extending a module. Confirm actual implementation rather than treating roadmap directories as existing features.
 
 For learning questions, explain the intuition and conventions before introducing equations. For development requests, deliver the calculation, lesson, experiment, and appropriate validation together. Distinguish software completion from the learner completing reflection questions.
 
@@ -31,7 +31,7 @@ Use authoritative financial references and record sources and tolerances for ben
 
 ## Web Implementation and Accessibility
 
-Use FastAPI/Jinja, plain JavaScript/SVG, Markdown, and local KaTeX. Resolve resources relative to the package. Keep the website usable offline after installation; avoid unnecessary frameworks, CDNs, accounts, or hosting work.
+Use FastAPI/Jinja, plain JavaScript/SVG, Markdown, and local KaTeX. Resolve resources relative to the package. Keep the website usable offline after installation; avoid unnecessary frameworks, CDNs, or accounts. Treasury downloads run directly in the browser and are stored in IndexedDB. Keep normalization and financial calculations in stateless Python endpoints. Failed downloads show No data. Never fetch Treasury or persist visitor data through the web server.
 
 Use visible radio option cards instead of dropdowns. Order frequencies Annual → Semiannual → Quarterly → Monthly where available; preserve the semiannual default. Support keyboard navigation, readable mobile layouts, clear selected/disabled states, input errors, resets, and stale-response protection. Keep implementation details out of financial learning controls.
 

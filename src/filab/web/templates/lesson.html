@@ -109,7 +109,7 @@
 <div class="pane-heading"><h2 id="reading-title">Learn the concept</h2><a href="#lesson-experiment">Try the experiment ↗</a></div>
 <div class="reading-scroll" id="lesson-reading" tabindex="0" role="region" aria-label="Lesson explanation">
 {% if lesson.milestone in ['M1', 'M2', 'M3'] %}
-<section class="card prediction"><div class="card-overline">PREDICT BEFORE YOU MOVE THE CONTROLS</div><p>{{ lesson.prediction }}</p><p class="tiny-note">Prerequisite: <a href="/lessons/{{ lesson.prerequisite }}">review the previous concept</a>. Write a prediction, then look for evidence in the tables.</p>{% if lesson.milestone == 'M1' %}<a href="/tools/bond-risk">Open the standalone Risk Explorer ↗</a>{% elif lesson.milestone == 'M3' %}<a href="/tools/treasury-history">Open the Treasury History Viewer ↗</a>{% else %}<a href="/tools/bond-return">Open the standalone Return Calculator ↗</a>{% endif %}</section>
+<section class="card prediction"><div class="card-overline">PREDICT BEFORE YOU MOVE THE CONTROLS</div><p>{{ lesson.prediction }}</p><p class="tiny-note">Prerequisite: <a href="/lessons/{{ lesson.prerequisite }}">{{ (lessons|selectattr("slug", "equalto", lesson.prerequisite)|first).title }}</a>. Write a prediction, then look for evidence in the tables.</p>{% if lesson.milestone == 'M1' %}<a href="/tools/bond-risk">Open the Bond Risk Explorer ↗</a>{% elif lesson.milestone == 'M3' %}<a href="/tools/treasury-history">Open the Treasury History Viewer ↗</a>{% else %}<a href="/tools/bond-return">Open the Bond Return Calculator ↗</a>{% endif %}</section>
 {% endif %}
 <article class="prose">{{ body|safe }}</article>
 {% if implementation %}

@@ -76,6 +76,8 @@ context. This worked return is our own hypothetical calculation.
 
 ## Experiment: follow the remaining payments
 
+Keep YTM fixed at 5% while following this price path. At maturity, identify the **$2 final coupon** and **$100 principal repayment** separately in the ledger. Explain how they produce the final $102 receipt.
+
 1. Run the worked maturity case. Find the final coupon and redemption in the ledger.
    Verify zero face held and zero ending bond value.
 2. Select **Premium bond**, or change coupon to 6%, keeping 5% YTM. Predict a premium purchase and a capital
@@ -113,7 +115,7 @@ early-sale lesson will let the exit yield differ from the purchase yield.
 
 **Roll-down** along a curved term structure asks how the yield assigned to an
 aging bond changes as its remaining maturity shortens. That requires a discount
-curve and a stated curve evolution assumption; it belongs in M4. Keeping one
+curve and a stated curve evolution assumption; it belongs in the planned discount-curves lessons. Keeping one
 YTM fixed here does not measure curved-term-structure roll-down.
 
 ## Reflection checkpoint

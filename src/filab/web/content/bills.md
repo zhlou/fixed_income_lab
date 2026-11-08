@@ -84,6 +84,8 @@ discount quote.
 
 ### Why the chart bends at half a year
 
+Read the denominator in each quotation. Bank discount yield divides the discount by face value, while investment yield relates the gain to the purchase price. Point to the half-year marker on the chart. Why do both investment-yield formulas give the same growth factor at that boundary?
+
 **At a positive discount quote, the yield stays continuous, but the formula's slope changes.** “Continuous” means no jump in the quoted yield; a slope change means it rises at a different pace. At a zero discount quote, both yield curves are flat at zero. Before the
 boundary, the quote uses simple annualization. After it, the quote includes
 the semiannual compounding adjustment. For a positive gain, compounding lets
@@ -146,7 +148,7 @@ Set the bank discount quote to 4%, days to 90, and year basis to 365. Predict pr
 Price is $100 × (1 − 0.04 × 90 / 360) = **$99.00**. The gain is **$1.00**, so the 90-day return is $1 / $99 ≈ **1.0101%**. Simple investment yield is that return × 365 / 90 ≈ **4.0965%**. A 366-day basis gives **4.1077%**; the price and actual 90-day return do not change. The 4% discount quote uses a different denominator and clock.
 :::
 
-## Foundations checkpoint (M0)
+## Foundations review
 
 Before moving to duration and convexity, explain these in your own words:
 
@@ -157,8 +159,6 @@ Before moving to duration and convexity, explain these in your own words:
 5. Why can bonds with the same maturity and YTM have different sensitivity?
 
 For the last question, revisit the coupon and payment-timing experiments:
-earlier cash receipts change how much of today's price comes from distant payments. The next three lessons (M1) turn that intuition into duration and convexity. Completing the software
-makes these experiments available; completing the learning checkpoint means
-you can explain their results.
+earlier cash receipts change how much of today's price comes from distant payments. The next three lessons turn that intuition into duration and convexity. Explain the difference between a price change and an investment return before continuing.
 
 **Next:** [Cash-flow timing and Macaulay duration](/lessons/macaulay-duration).

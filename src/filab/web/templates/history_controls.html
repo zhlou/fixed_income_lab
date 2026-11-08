@@ -4,7 +4,7 @@
 <div class="card-overline">HISTORICAL OBSERVATIONS · NOMINAL PAR YIELDS</div>
 <h2>Compare two published curves.</h2>
 <p>Annual par yields at constant maturities. No particular bond, price, or return is implied.</p>
-{% if lesson is defined %}<p class="convention">The worked example is pinned to {{ history_example.period }}. Explore other months in the calendar. Reset example restores the lesson's original observations. <a href="/tools/treasury-history">Open the full history viewer</a> for saved datasets and year refreshes.</p>{% endif %}
+{% if lesson is defined %}<p class="convention">The worked example is pinned to {{ history_example.period }}. Explore other months in the calendar. Reset example restores the lesson's original observations. <a href="/tools/treasury-history">Open the Treasury History Viewer</a> for saved datasets, export/import, and year downloads.</p>{% endif %}
 <form data-compare-form>
 {% if active == 'par-yields-and-quotes' %}
 {{ choices('history-example', 'history_sample', 'Published example', [('recent', 'Recent example', history_example.dates_label), ('series-introduction', 'Series introduction', history_reference.dates_label)], '', selected='recent') }}
@@ -25,13 +25,13 @@
 <p class="tiny-note" data-example-status aria-live="polite"></p>
 {% if lesson is defined %}<p class="convention" data-lesson-example role="status">Worked example · {{ history_example.dates_label }}. The lesson starts with pinned observations.</p>{% endif %}
 <p class="error" role="alert" data-history-error></p>
-<p class="tiny-note">Changing calendar months loads available Treasury history automatically. Cached months work offline; the current month is checked at most hourly{% if lesson is defined %} when exploring beyond the pinned example{% endif %}. Compare dates to update the curves.</p>
+<p class="tiny-note">Your browser downloads additional Treasury history when you change calendar months. Saved history belongs to this browser. Failed downloads show No data. The current month is checked at most hourly{% if lesson is defined %} when exploring beyond the pinned example{% endif %}. Compare dates to update the curves.</p>
 <p class="tiny-note" data-month-status role="status"></p><button type="button" class="reset" data-retry-month hidden>Retry month</button>
 {% if lesson is not defined %}
 <p class="tiny-note" data-cache-summary></p>
-<details class="history-snapshots"><summary>Choose a saved dataset</summary><fieldset data-snapshot-options><legend>Snapshot · an open comparison keeps this version</legend></fieldset><a data-snapshot-download download="treasury-snapshot.json">Download this snapshot (JSON)</a></details>
+<details class="history-snapshots"><summary>Choose a saved dataset</summary><fieldset data-snapshot-options><legend>Snapshot · an open comparison keeps this version</legend></fieldset><button type="button" class="reset" data-snapshot-download>Export selected dataset</button><label class="history-import">Import dataset<input type="file" accept=".json,application/json" data-snapshot-import></label><p class="tiny-note">Exports include the snapshot and raw source files. Import a dataset to use it in another browser. Clearing site data removes saved history.</p></details>
 <details><summary>Load or refresh selected years</summary>
-<p>Use this to refresh revisions in saved years. Calendar navigation also loads individual months. A failed refresh keeps your saved data. New observations become a new snapshot; your comparison stays on its selected version.</p>
+<p>Use this to refresh revisions in saved years. Calendar navigation also loads individual months. Downloads are saved in this browser. A failed download shows No data. New observations become a new snapshot; your comparison stays on its selected version.</p>
 <form data-refresh-form><div class="history-dates"><label>First year<input name="start_year" type="number" min="1990" required></label><label>Last year<input name="end_year" type="number" min="1990" required></label></div><button class="button primary" type="submit">Load / refresh</button></form>
 <p role="status" aria-live="polite" data-refresh-status></p><button type="button" class="reset" data-use-refreshed hidden>Open refreshed snapshot</button>
 </details>

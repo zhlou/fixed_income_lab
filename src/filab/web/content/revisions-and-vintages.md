@@ -24,6 +24,8 @@ Toggle **Hypothetical revised ten-year yield** in the experiment. Its second-dat
 
 ## Predict, then experiment
 
+In the full viewer, use **Export selected dataset** to save the snapshot and its raw source responses. Use **Import dataset** in another browser to reopen that same evidence. Saved datasets otherwise belong to the browser that downloaded them. Clearing site data removes them from that browser.
+
 Predict whether the first-date spread will change when only the second-date ten-year observation is revised. Toggle the version, reconcile both spreads, and return to the published sample. Compare the provenance identifier before and after: the hypothetical calculation is tied to the same source snapshot and is explicitly labeled as a modification.
 
 Use either calendar to explore another month, then compare your chosen dates. The hypothetical revision always adds 10 bp to the selected second date's published ten-year yield; its description follows that date and its original yield. A missing observation cannot be revised. The exploration notice separates your selected data from the worked example above. **Reset example** restores the pinned November dates, source observations, and published-sample setting.
@@ -32,7 +34,7 @@ In the full viewer, save or note a snapshot identifier, refresh a selected year 
 
 ## Misconceptions and limits
 
-Today's retrieval of old dates is not proof that today's values were originally published unchanged. Keeping acquisitions from now onward builds a local revision history; it cannot recover unobserved historical vintages. A checksum identifies bytes, not financial correctness. Source agreement and calculation checks are still required.
+Today's retrieval of old dates is not proof that today's values were originally published unchanged. Keeping acquisitions from now onward builds a revision history in this browser; it cannot recover unobserved historical vintages. A checksum identifies bytes, not financial correctness. Source agreement and calculation checks are still required.
 
 The Federal Reserve's fitted nominal curve is a separate potential source for later valuation work. Its revised parameter history must retain its own provenance; it must not be silently merged with Treasury par yields.
 

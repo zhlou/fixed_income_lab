@@ -1,10 +1,14 @@
 # Fixed-Income Lab
 
-A local, interactive learning website for fixed-income mathematics, growing
-toward a reproducible workbench for bond strategies and historical returns. Each
-lesson combines a working experiment, an explanation, and optional Python
-examples. The Python backend uses tested `filab.pricing`, `filab.risk`, and
-`filab.analytics` calculations.
+Interactive lessons and tools for understanding bond payments, prices,
+interest-rate risk, returns, and published Treasury yields. Start with Bond
+basics or open the Bond Risk Explorer, Bond Return Calculator, or Treasury
+History Viewer. Sixteen lessons connect explanations to worked examples and
+experiments. Python examples are optional.
+
+A hosted installation gives visitors one shared website. Inputs and downloaded
+Treasury datasets belong to each visitor’s browser. The same application can
+also run on your computer using the instructions below.
 
 ## Start the website
 
@@ -12,7 +16,7 @@ Use Python 3.12 locally to match the Docker runtime. On macOS with Homebrew,
 install it with `brew install python@3.12`; see the
 [Homebrew formula](https://formulae.brew.sh/formula/python@3.12).
 
-From the project root (currently `/Users/zhlou/Work/fixed_income_lab`):
+From your checkout’s project root:
 
 ```bash
 python3.12 -m venv .venv  # Only when creating a new environment.
@@ -100,17 +104,16 @@ Linux/x86 platform.
 
 The published `127.0.0.1:8000` belongs to the **Docker engine host**, as described in
 [Docker's port-publishing documentation](https://docs.docker.com/engine/network/port-publishing/).
-For the currently configured `deepl` context at `ssh://deepl.lan`, open an SSH
-tunnel from the client in a separate terminal:
+For a remote Docker engine, open an SSH tunnel from your computer in a separate terminal. Replace `user@server.example` with the engine host:
 
 ```bash
 ssh -N -o ExitOnForwardFailure=yes \
-  -L 127.0.0.1:18000:127.0.0.1:8000 deepl.lan
+  -L 127.0.0.1:18000:127.0.0.1:8000 user@server.example
 ```
 
 Open [the container website](http://127.0.0.1:18000) or
 [its API documentation](http://127.0.0.1:18000/docs) on the client. Replace
-`deepl.lan` with the engine's SSH destination if the context changes. Port 18000
+`user@server.example` with your server’s SSH destination. Port 18000
 on the client avoids conflicting with a local server on port 8000; change that
 first port if needed. Stop the tunnel with Ctrl+C. With a local Docker engine,
 the same container command is reachable directly at
@@ -131,9 +134,7 @@ the engine is occupied, change the middle port in `--publish` (for example,
 container's final port at 8000. Images and containers live on the selected
 engine; no registry push or local Docker daemon is required.
 
-The current Docker client builds successfully with the legacy builder and emits
-a deprecation warning because Buildx is not installed. This Dockerfile also works
-with BuildKit; it does not require builder-specific features.
+The Dockerfile supports both the legacy builder and BuildKit.
 
 ## Lessons
 
@@ -422,166 +423,116 @@ print(f"${price:.2f}")  # $981.19
 ```
 
 The existing [Notebook 01](notebooks/01_bond_pricing_fundamentals.ipynb)
-can still be opened with `python -m jupyterlab`. Its optional Node.js tools
-are installed under this user's `~/.local/`; Bash PATH setup is in
-`~/.bash_profile`. These are independent of the website runtime.
+can still be opened with `python -m jupyterlab`. Node.js is optional for the JavaScript helper tests. Install it through your preferred package manager if you want to run those checks.
 
 ## Bundled software
 
 KaTeX 0.16.22 is vendored under `src/filab/web/static/vendor/katex/`,
 including its MIT license and fonts. JavaScript handles presentation;
-financial calculations run on the local Python server.
+financial calculations run on the Python server.
 
-## Treasury history (M3)
+## Treasury history
 
-Open `/tools/treasury-history` to compare nominal constant-maturity **par yields**
-on two exact dates. A fresh installation opens bundled October–November 2026
-history: **21 October rows and five November rows (November 2–6)**, with
-coverage October 1 through November 7. The default
-November 5/6 comparison reproduces a 2s10s spread of **38 bp → 35 bp** (−3 bp).
-This starter dataset works offline. November 7 has no row; later dates remain
-outside coverage until acquired. Opening the page makes no Treasury request.
+The Treasury History Viewer compares nominal constant-maturity **par yields** on
+exact dates. Prices and bond returns require different inputs and calculations.
+The application includes October–November 2026 starter history, a pinned
+November 5–6 lesson example (38 → 35 bp), and the February 2025 example
+(21 → 26 bp). Bundled examples work without access to Treasury.
 
-A second bundled sample covers February 1–28, 2025, with 19 published dates.
-Lesson 14's **Series introduction** option uses February 14/18 to explain the
-missing 1.5-month tenor. Its original snapshot ID and +5 bp benchmark remain
-available. Lesson reset restores the frozen recent November example. The standalone
-viewer opens the active cached history and offers both lesson samples through
-its saved-dataset radio cards; reset restores the November dates on that history.
-Lessons 14–16 explain rate types and comparable observations, information timing,
-and vintages. Lesson 14 includes the missing-observations checkpoint. The source
-observations are annual percentages; numerical API rates are decimals and
-differences have explicit basis-point units.
+The browser requests additional months when you navigate a calendar or type a
+date. **Load or refresh selected years** requests an inclusive year range from
+1990 through the current year. The browser contacts Treasury directly using its
+official XML feed. This requires Treasury to allow cross-origin browser requests.
+If access is blocked, offline, or unsuccessful, the period shows **No data**.
+The available date’s values remain visible in a two-date comparison. Unavailable
+two-date changes display dashes. A download failure never establishes that
+Treasury published no row on a date. The server makes no Treasury requests.
 
-Use **Load or refresh selected years** for an inclusive range from 1990 through
-the current year. The default is the last completed calendar year. That
-button fetches Treasury's annual XML feed and can check saved years for revisions. A current year is covered only through
-the retrieval date. Coverage means the requested period, not a guarantee of a
-row on every date. Missing dates and tenors remain absent, and the UI never
-silently selects a nearby date. The chart's lines only connect published nodes.
+Successful downloads are validated and normalized in Python through stateless
+HTTP requests. Raw response bytes, SHA-256 hashes, browser-reported UTC retrieval
+timestamps, original percentage strings, decimal rates, coverage, and immutable
+snapshots are saved in IndexedDB. Complete historical months are reused. The
+current month is checked at most hourly, with explicit retry available. A year
+range is saved in one browser transaction only after every year validates.
+Existing saved versions survive failed downloads and storage failures.
 
-Each date field has a calendar annotated from the **selected snapshot**:
-**● Published row**, **— No published row** inside its coverage, and **? Outside
-cached coverage**. Dates without data stay selectable. A published row may still
-lack individual tenors. You can also type a real date as `YYYY-MM-DD`; the status
-updates immediately, before you press Compare. Invalid dates such as February
-30 are rejected. In the viewer and lessons 14–16, **opening or changing the
-calendar month**, or typing a valid date, loads the selected month through a
-same-origin Python endpoint. The browser never calls Treasury directly.
-Requests are debounced and serialized; rapid navigation discards obsolete UI
-responses. Complete historical months are reused. The current month is checked
-at most hourly after successful acquisition; **Retry month** explicitly retries
-failures. Future months and dates before 1990 make no Treasury request.
+**Choose a saved dataset** reopens a version in the same browser. A completed
+range download offers **Open refreshed snapshot** to switch explicitly.
+**Export selected dataset** saves a versioned JSON archive including raw sources.
+**Import dataset** validates and restores an archive, including on another device.
+Clearing site data removes downloaded history. If browser storage is unavailable,
+bundled examples remain readable. No visitor cache is shared with another browser.
+An archive or stateless request is limited to 32 MB, a source response to 4 MB,
+and a normalized snapshot to 15,000 rows. An archive contains at most 100 snapshots
+and 500 raw responses.
 
-The calendar updates when data arrives. **Compare dates** explicitly calculates
-against the resulting snapshot; the previous curves and their source ID remain
-visible until then. Failed requests keep cached dates and show a retry option.
-Cached coverage never extends to days that were not acquired. Successful empty
-monthly feeds mean no published rows inside the acquired period; an invalid or
-failed response does not establish that coverage.
+Lessons start from pinned examples. **Reset example** restores the original dates,
+dataset, Log maturity axis, and published-observation setting. Log/Linear changes
+horizontal spacing only. Source publication times remain unknown, and the
+hypothetical +10 bp revision in lesson 16 is calculated separately in Python.
+Calendar buttons support keyboard navigation, typed Gregorian dates, and live
+availability labels. Missing dates remain selectable.
 
-Lessons 14–16 start from their pinned sample. Opening a lesson, opening its
-pinned month, and **Reset example** work offline without checking Treasury.
-Exploring other months enables the same automatic loader as the full viewer.
-A visible notice distinguishes exploration from the worked example in the text;
-Reset restores the original November dates, dataset, Log axis, and published
-revision setting. Lesson 14 also retains its separate February worked example.
-Lesson 16's hypothetical +10 bp description follows the selected second date and
-its actual ten-year yield; missing rows or tenors cannot be revised. The API
-supplies both original and hypothetical rates, keeping the arithmetic in Python.
+### Migrate an existing server cache
 
-The calendar supports arrow keys for days, Home/End for the week, Page Up/Down
-for months, Shift + Page Up/Down for years, and Escape to close and return focus.
-Month changes clamp the day to the target month (January 31 → February 28, or 29
-in a leap year). On smaller screens the dialog scrolls vertically when needed.
-
-The maturity axis defaults to **Log**, with a visible **Linear** option. Log
-spacing gives the short tenors room: equal maturity ratios occupy equal
-horizontal distances (for example, 1→2 years and 5→10 years). Linear spacing
-shows equal additional years. The yield axis stays linear, and changing maturity
-spacing preserves every rate, spread, table value, and missing-data gap. Tick
-labels use familiar month/year maturities and adapt to screen width. Reset
-restores the example dates and Log spacing.
-
-The refresh runs in the background with progress and duplicate-submission
-protection. All selected years must parse and validate before a single atomic
-catalog transaction activates the candidate. A failed or interrupted refresh
-leaves the previous snapshot active; raw responses already acquired are retained.
-Previously cached years outside the selected range remain in the candidate.
-Identical normalized values and coverage reuse a snapshot even when raw feed
-metadata changes. Different values or coverage create a new immutable version.
-Choose old versions with the saved-dataset radio cards. Completing a refresh
-does not switch your open comparison; use **Open refreshed snapshot** explicitly.
-
-The runtime store defaults to `~/.local/share/fixed-income-lab/`. Override it by
-setting `FILAB_DATA_DIR` to an absolute writable directory before starting the
-server. It contains `raw/<sha256>.xml` exact response files and
-`catalog.sqlite3` with immutable normalized snapshot JSON, acquisition metadata,
-the active pointer, and the latest successful normalized month checks. Raw files include generation timestamps exactly as
-received; these are not treated as historical release times. Snapshot IDs use
-SHA-256 over normalized numerical observations, coverage, and normalizer version.
-Every snapshot retains the original source percentages and source references.
-Successful duplicate retrievals are logged separately without rewriting snapshots.
-Download a selected normalized snapshot from the viewer; for a complete backup,
-stop the server and copy the entire runtime store, including its raw directory.
-Both pinned examples remain packaged and readable even if that directory is
-absent or read-only. Additional downloaded history belongs to the configured
-runtime cache; the bundled examples are not the entire Treasury archive. No runtime database belongs in Git.
-
-The local refresh-job status is transient and intended for the default single
-Uvicorn process. If the server restarts, reopen saved datasets and retry the
-refresh. Completed snapshots persist; unfinished candidates never activate.
-A POSIX file lock also prevents concurrent cache writers on macOS and Linux.
-There is no scheduled polling, account, or market-data credential.
-
-For Docker persistence, use an engine-host named volume (also valid with the
-remote `deepl` context). Docker initializes a new volume with the image's
-unprivileged user's home permissions:
+The website now reads only bundled data from the server. Existing SQLite caches
+and the `filab.data.store.SnapshotStore` Python interface remain available to local
+research scripts. To transfer an old cache into browser storage, run this read-only
+export command, then import its output in the viewer:
 
 ```bash
-docker volume create fixed-income-lab-data
-docker run --detach --name fixed-income-lab \
-  --publish 127.0.0.1:8000:8000 \
-  --env FILAB_DATA_DIR=/home/filab/.local/share/fixed-income-lab \
-  --mount source=fixed-income-lab-data,target=/home/filab \
-  fixed-income-lab:local
+python -m filab.data.browser "$HOME/.local/share/fixed-income-lab" treasury-history.json
 ```
 
-Use this command when creating the container, with the existing container stopped
-and removed as described above. A host bind mount must be writable by the
-container's `filab` user. The volume is optional for the bundled offline example;
-without persistence, removing a container discards its downloaded history.
+The exporter opens SQLite read-only and preserves raw files. The destination
+must be a new file. Keep the original cache as a backup. `FILAB_DATA_DIR` applies
+to local research scripts, while the website uses browser storage everywhere.
+A public installation never exposes a pre-existing server cache.
 
-Read interfaces:
+### History interfaces
 
-| Endpoint | Purpose |
+| Endpoint | Behavior |
 |---|---|
-| `GET /api/history/snapshots` | Active/viewer/recent/reference IDs, example date defaults, labeled saved coverage, latest observations, recent acquisitions |
-| `GET /api/history/snapshots/{snapshot_id}` | Complete immutable normalized dataset and provenance |
-| `GET /api/history/snapshots/{snapshot_id}/dates` | Snapshot ID, coverage intervals, and sorted published row dates for the calendars |
-| `GET /api/history/compare?snapshot_id=…&first=YYYY-MM-DD&second=YYYY-MM-DD` | Exact-date curves, tenor changes, spreads, common sample, missing counts, source metadata |
-| `POST /api/history/month-load` | Load an integer `year`/`month` onto `base_snapshot_id`; optional `force` bypasses the cache; returns a job ID |
-| `GET /api/history/jobs/{job_id}` | Month job state, warning, cache-hit flag, and completed snapshot ID |
-| `POST /api/history/refresh` | Start an explicit refresh with integer `start_year` and `end_year`; returns a job ID |
-| `GET /api/history/refresh/{job_id}` | Running/complete/failed status, progress, completed snapshot ID |
+| `GET /api/history/snapshots` | Bundled catalog, date defaults, current year/month |
+| `GET /api/history/bundled-archive` | Bundled snapshots and raw source files |
+| `GET /api/history/snapshots/{id}` | One bundled normalized snapshot |
+| `GET /api/history/snapshots/{id}/dates` | Bundled coverage and published dates |
+| `GET /api/history/compare` | Existing bundled comparison by snapshot ID |
+| `POST /api/history/normalize` | Normalize browser-provided base64 XML onto a supplied snapshot using `year`, optional `month`, and `retrieved_at` |
+| `POST /api/history/overlay` | Overlay a supplied cached month onto a supplied snapshot |
+| `POST /api/history/compare` | Compare supplied `snapshot`, `first`, `second`, optional `hypothetical_revision` |
+| `POST /api/history/validate-archive` | Validate a versioned snapshots/raw archive before browser import |
 
-Comparison requests require a snapshot ID. Missing observations return JSON null;
-`date_states` distinguishes `published`, `no_published_row`, and
-`outside_coverage`. The optional `hypothetical_revision=true` comparison flag
-adds 10 bp to the second date's ten-year rate in memory for lesson 16 and labels
-the response `hypothetical`; it never writes to the source snapshot. Each
-comparison includes `revision_scenario` with its date, +10 bp assumption, original
-and proposed decimal rates/percentage strings, and whether it was applied. Neither
-these observations nor the spread comparison provide security prices or returns.
-Exact historical publication times remain unknown. See
-[M3 validation and the M4 feasibility assessment](notes/m3_validation.md).
+The former `/refresh`, `/month-load`, `/refresh/{job_id}`, and `/jobs/{job_id}`
+interfaces return HTTP 410 with migration guidance. There are no server refresh
+jobs or persisted visitor datasets. See `/docs` for complete request schemas.
 
-Optional calendar helper checks, using Node.js when available:
+## Prepare a shared HTTPS deployment
+
+Build the Docker image and run one service behind your hosting platform’s HTTPS
+reverse proxy. Forward traffic to container port 8000. Bind that port to loopback
+if the proxy runs on the same host, using the Docker command above. Use a
+host-managed certificate and redirect HTTP to HTTPS. Set an upstream request-body
+limit of 32 MB and a response timeout of at least 60 seconds. Configure request
+rate limits and worker concurrency for the chosen host’s capacity.
+
+The application needs no persistent volume, Treasury credentials, scheduled
+refresh, or account service. It can run with a read-only filesystem:
+
+```bash
+docker run --detach --name fixed-income-lab \
+  --read-only --cap-drop ALL --security-opt no-new-privileges \
+  --publish 127.0.0.1:8000:8000 fixed-income-lab:local
+```
+
+For a deployment smoke check, open the landing page and a pinned history lesson,
+compare November 5–6, open two separate browser profiles, and verify that a dataset
+saved in one is absent from the other. Block Treasury and verify **No data** for an
+uncached date while the bundled example remains usable. Choose the host and public
+URL when ready to publish.
+
+Optional JavaScript helper checks:
 
 ```bash
 node --test tests/history_dates.test.cjs tests/history_months.test.cjs
 ```
-
-Node.js is not required to run the website. These tests check strict Gregorian
-dates, leap years, month/year movement, availability states, request ordering,
-deduplication, cancellation, errors, and retries.

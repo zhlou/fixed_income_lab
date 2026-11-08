@@ -1,160 +1,140 @@
-"""Snapshot-pinned read APIs and explicitly requested, single-server refresh jobs."""
-from datetime import date
+"""Bundled read APIs and stateless Python operations for browser-owned datasets."""
 from copy import deepcopy
-from threading import Lock, Thread
-from uuid import uuid4
+from datetime import date
+from typing import Optional
 
 from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field
 
+from filab.data.browser import acquire, bundled_archive, validate_archive, validate_snapshot
 from filab.data.store import SnapshotStore
-from filab.data.treasury import DataError, compare, month_bounds, revision_scenario, today
+from filab.data.treasury import DataError, compare, revision_scenario, today
 
 router = APIRouter(prefix='/api/history', tags=['historical observations'])
-_jobs = {}
-_jobs_lock = Lock()
 
 
-def store():
-    return SnapshotStore()
-
-
-class RefreshInputs(BaseModel):
-    model_config = ConfigDict(extra='forbid', strict=True)
-    start_year: int = Field(ge=1990)
-    end_year: int = Field(ge=1990)
-
-    @model_validator(mode='after')
-    def ordered(self):
-        if not self.start_year <= self.end_year <= today().year:
-            raise ValueError('Choose an ordered year range through the current year.')
-        return self
-
-
-class MonthInputs(BaseModel):
-    model_config = ConfigDict(extra='forbid', strict=True)
-    year: int = Field(ge=1990)
-    month: int = Field(ge=1, le=12)
-    base_snapshot_id: str = Field(pattern=r'^[a-f0-9]{64}$')
-    force: bool = False
-
-    @model_validator(mode='after')
-    def available_month(self):
-        month_bounds(self.year, self.month)
-        return self
+def bundled(identifier):
+    try:
+        return SnapshotStore().bundled[identifier]
+    except KeyError as exc:
+        raise HTTPException(404, 'Unknown bundled snapshot. Import browser datasets with a stateless request.') from exc
 
 
 @router.get('/snapshots')
 def snapshots():
-    return store().catalog()
+    store = SnapshotStore()
+    return {'active_snapshot_id': store.viewer['id'], 'viewer_snapshot_id': store.viewer['id'],
+            'bundled_snapshot_id': store.fixture['id'], 'reference_snapshot_id': store.reference_fixture['id'],
+            'example_defaults': store.fixture['example'], 'reference_defaults': store.reference_fixture['example'],
+            'current_month': today().month, 'current_year': today().year, 'default_year': today().year - 1,
+            'snapshots': [{'id': s['id'], 'created_at': s['created_at'], 'coverage': s['coverage'],
+                           'latest_observation': max(s['rows'], default=None), 'row_count': len(s['rows']),
+                           'bundled': True, 'label': s['label']} for s in store.bundled.values()],
+            'acquisitions': []}
+
+
+@router.get('/bundled-archive')
+def archive_download():
+    return bundled_archive()
+
+
+def comparison_result(snapshot, first, second, hypothetical):
+    scenario = revision_scenario(snapshot, second.isoformat())
+    scenario['applied'] = hypothetical and scenario['revised'] is not None
+    if scenario['applied']:
+        snapshot = deepcopy(snapshot)
+        snapshot['rows'][second.isoformat()]['BC_10YEAR'] = scenario['revised']
+    result = compare(snapshot, first.isoformat(), second.isoformat())
+    result['revision_scenario'] = scenario
+    result['data_kind'] = 'hypothetical' if hypothetical else 'historical_observations'
+    return result
 
 
 @router.get('/compare')
 def comparison(snapshot_id: str, first: date, second: date, hypothetical_revision: bool = False):
-    try:
-        snapshot = store().get(snapshot_id)
-        scenario = revision_scenario(snapshot, second.isoformat())
-        scenario['applied'] = hypothetical_revision and scenario['revised'] is not None
-        if scenario['applied']:
-            snapshot = deepcopy(snapshot)
-            snapshot['rows'][second.isoformat()]['BC_10YEAR'] = scenario['revised']
-        result = compare(snapshot, first.isoformat(), second.isoformat())
-        result['revision_scenario'] = scenario
-        result['data_kind'] = 'hypothetical' if hypothetical_revision else 'historical_observations'
-        return result
-    except DataError as exc:
-        raise HTTPException(404, str(exc)) from exc
+    return comparison_result(bundled(snapshot_id), first, second, hypothetical_revision)
 
 
 @router.get('/snapshots/{snapshot_id}')
 def snapshot_download(snapshot_id: str):
-    try:
-        return store().get(snapshot_id)
-    except DataError as exc:
-        raise HTTPException(404, str(exc)) from exc
+    return bundled(snapshot_id)
 
 
 @router.get('/snapshots/{snapshot_id}/dates')
 def snapshot_dates(snapshot_id: str):
-    """Published rows and requested coverage, independent of selected dates/tenors."""
+    snapshot = bundled(snapshot_id)
+    return {'snapshot_id': snapshot_id, 'coverage': snapshot['coverage'], 'published_dates': sorted(snapshot['rows'])}
+
+
+class BrowserInputs(BaseModel):
+    model_config = ConfigDict(extra='forbid', strict=True, allow_inf_nan=False)
+    snapshot: dict
+
+
+class AcquisitionInputs(BrowserInputs):
+    year: int = Field(ge=1990, le=9999)
+    month: Optional[int] = Field(default=None, ge=1, le=12)
+    raw_base64: str = Field(max_length=5_333_336)
+    retrieved_at: str = Field(max_length=40)
+
+
+class ComparisonInputs(BrowserInputs):
+    # Date strings are parsed explicitly because strict JSON Python-mode models reject them.
+    first: str = Field(pattern=r'^\d{4}-\d{2}-\d{2}$')
+    second: str = Field(pattern=r'^\d{4}-\d{2}-\d{2}$')
+    hypothetical_revision: bool = False
+
+
+@router.post('/normalize')
+def normalize_download(inputs: AcquisitionInputs):
     try:
-        snapshot = store().get(snapshot_id)
-        return {'snapshot_id': snapshot['id'], 'coverage': snapshot['coverage'],
-                'published_dates': sorted(snapshot['rows'])}
-    except DataError as exc:
-        raise HTTPException(404, str(exc)) from exc
+        return acquire(inputs.snapshot, inputs.year, inputs.month, inputs.raw_base64, inputs.retrieved_at)
+    except (DataError, ValueError) as exc:
+        raise HTTPException(422, str(exc)) from exc
 
 
-@router.post('/refresh', status_code=202)
-def refresh(inputs: RefreshInputs):
-    with _jobs_lock:
-        if any(job['state'] == 'running' for job in _jobs.values()):
-            raise HTTPException(409, 'Another refresh is already running.')
-        identifier = uuid4().hex
-        # Bounded history; jobs are transient and snapshots survive server restarts.
-        if len(_jobs) >= 30:
-            del _jobs[next(iter(_jobs))]
-        _jobs[identifier] = {'id': identifier, 'state': 'running', 'message': 'Starting refresh', 'snapshot_id': None}
-
-    def update(message):
-        with _jobs_lock:
-            _jobs[identifier]['message'] = message
-
-    def work():
-        try:
-            result = store().refresh(inputs.start_year, inputs.end_year, progress=update)
-            with _jobs_lock:
-                _jobs[identifier].update(state='complete', snapshot_id=result)
-        except Exception as exc:
-            message = str(exc) if isinstance(exc, (DataError, OSError)) else 'Refresh failed; the previous snapshot is retained.'
-            with _jobs_lock:
-                _jobs[identifier].update(state='failed', message=message)
-
-    Thread(target=work, daemon=True).start()
-    return {'job_id': identifier}
-
-
-@router.post('/month-load', status_code=202)
-def load_month(inputs: MonthInputs):
+@router.post('/compare')
+def browser_comparison(inputs: ComparisonInputs):
     try:
-        store().get(inputs.base_snapshot_id)
+        return comparison_result(validate_snapshot(inputs.snapshot), date.fromisoformat(inputs.first),
+                                 date.fromisoformat(inputs.second), inputs.hypothetical_revision)
+    except (DataError, ValueError) as exc:
+        raise HTTPException(422, str(exc)) from exc
+
+
+@router.post('/validate-archive')
+def archive_import(archive: dict):
+    try:
+        return validate_archive(archive)
     except DataError as exc:
-        raise HTTPException(404, str(exc)) from exc
-    key = (inputs.year, inputs.month, inputs.base_snapshot_id, inputs.force)
-    with _jobs_lock:
-        for identifier, job in _jobs.items():
-            if job['state'] == 'running' and job.get('key') == key:
-                return {'job_id': identifier}
-        if sum(job['state'] == 'running' for job in _jobs.values()) >= 4:
-            raise HTTPException(409, 'Other months are loading. Please retry shortly.')
-        # Never evict a running job; readers may still be polling it.
-        for identifier in list(_jobs):
-            if len(_jobs) < 30:
-                break
-            if _jobs[identifier]['state'] != 'running':
-                del _jobs[identifier]
-        identifier = uuid4().hex
-        _jobs[identifier] = {'id': identifier, 'key': key, 'state': 'running',
-                             'message': f'Loading {inputs.year}-{inputs.month:02d}…', 'snapshot_id': None}
-
-    def work():
-        try:
-            result = store().ensure_month(inputs.year, inputs.month, inputs.base_snapshot_id, force=inputs.force)
-            with _jobs_lock:
-                _jobs[identifier].update(result, state='complete', message=result.get('warning') or 'Month ready.')
-        except Exception as exc:
-            message = str(exc) if isinstance(exc, (DataError, OSError)) else 'Month could not be loaded; cached observations are retained.'
-            with _jobs_lock:
-                _jobs[identifier].update(state='failed', message=message)
-
-    Thread(target=work, daemon=True).start()
-    return {'job_id': identifier}
+        raise HTTPException(422, str(exc)) from exc
 
 
-@router.get('/refresh/{job_id}')
-@router.get('/jobs/{job_id}')
-def refresh_status(job_id: str):
-    with _jobs_lock:
-        if job_id not in _jobs:
-            raise HTTPException(404, 'Refresh status is no longer available. Reopen cached snapshots; incomplete refreshes never activate.')
-        return {key: value for key, value in _jobs[job_id].items() if key != 'key'}
+@router.post('/refresh', deprecated=True)
+@router.post('/month-load', deprecated=True)
+@router.get('/refresh/{job_id}', deprecated=True)
+@router.get('/jobs/{job_id}', deprecated=True)
+def retired_job(job_id: str = ''):
+    raise HTTPException(410, 'Treasury downloads now run in the browser. Use /normalize and POST /compare for supplied data.')
+
+
+class OverlayInputs(BrowserInputs):
+    patch: dict
+    year: int = Field(ge=1990)
+    month: int = Field(ge=1, le=12)
+
+
+@router.post('/overlay')
+def overlay_cached_month(inputs: OverlayInputs):
+    from filab.data.store import covers, overlay
+    from filab.data.treasury import month_bounds
+    try:
+        base, patch = validate_snapshot(inputs.snapshot), validate_snapshot(inputs.patch)
+        start, end = (d.isoformat() for d in month_bounds(inputs.year, inputs.month))
+        if not covers(patch, start, end):
+            raise DataError('Cached dataset does not cover this month.')
+        # Restrict rows, sources, and coverage to the requested period.
+        from filab.data.store import slice_month
+        return overlay(base, slice_month(patch, start, end), start, end)
+    except (DataError, ValueError) as exc:
+        raise HTTPException(422, str(exc)) from exc

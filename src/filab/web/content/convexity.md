@@ -76,6 +76,8 @@ means the estimate predicts a higher ending price than exact repricing does.
 
 ## Inspect the error, not just the estimate
 
+Read the **+100 bp** row from left to right. Exact repricing gives a **−$7.08** change, duration estimates **−$7.43**, and duration plus convexity estimates **−$7.07**. Explain which correction moved the estimate closer and why a small error remains.
+
 1. Start with ±25 bp, then move through ±50, ±100, and ±200 bp. Inspect errors
    in dollars and in percentage points of initial price.
 2. Repeat at two-year maturity. Explain why the approximation behaves differently.
@@ -121,7 +123,7 @@ Predict its second-order change for +100 bp and −100 bp.
 calculate the exact changes from just these two derivatives.
 :::
 
-## M1 reflection checkpoint
+## Interest-rate risk review
 
 - Explain maturity, Macaulay duration, modified duration, DV01, and convexity
   in your own words, with their units.
@@ -133,7 +135,7 @@ calculate the exact changes from just these two derivatives.
 
 Record your prediction, observation, explanation, and remaining uncertainty.
 Your answers establish learning completion; implementation does not. Next,
-M2 will add time, payments, and a cash ledger to explain **holding-period returns**.
+Continue with [coupons, accrual and return](/lessons/coupons-and-return) to follow the payments and cash that enter a holding-period return.
 
 ```python
 from filab.risk import bond_risk

@@ -1,18 +1,19 @@
 # Fixed-Income Lab — Status and Progress
 
-**Updated:** November 7, 2026 (America/Chicago)
+**Updated:** November 8, 2026 (America/Chicago)
 
 ## Current status
 
 **Foundations implementation and independent reference validation are complete
 for the regular-coupon educational model** (original Phase 1, now M0).
-The local website has **sixteen interactive lessons**. **M1 risk, M2 return
+The website has **sixteen interactive lessons**. **M1 risk, M2 return
 accounting, and M3 historical observations are implemented and validated**,
 including the Risk Explorer, Bond Return Calculator, and Treasury History Viewer.
 **M4 discount curves is next.** Curve valuation and historical strategy research
-remain planned.
+remain planned. The visitor experience and browser-owned Treasury history are
+prepared for one shared public deployment.
 
-The revised plan prioritizes the user's intended daily use: **researching bond
+The research roadmap prioritizes: **researching bond
 strategies and historical returns**. It brings return accounting forward, targets
 a small two-strategy historical research release at M5, and places TIPS, macro,
 credit, and advanced models after the nominal Treasury research core.
@@ -21,6 +22,37 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### Shared-site preparation and browser-owned history — November 8, 2026
+
+The landing page now offers lessons and tools, groups all sixteen lesson cards,
+and shows roadmap status on mobile. All lesson headlines are questions, with
+specific prompts connecting worked examples to payments, charts, and tables.
+Shared navigation and tool introductions address first-time visitors. Setup
+instructions are portable and include a single-service HTTPS deployment guide.
+
+Additional Treasury months and years download directly in each browser. IndexedDB
+stores successful raw responses and immutable snapshots. Python normalization,
+comparison, archive validation, and month overlays are stateless. The server
+exposes only bundled observations, including when an old runtime cache exists.
+Retired refresh/job endpoints return HTTP 410. A read-only legacy-cache exporter
+supports browser import. Failed downloads show **No data**, retain the available
+curve, and leave dependent changes unavailable. A multi-year download publishes
+only after every year validates and the browser transaction commits.
+
+Validation passed **525 Python tests** and **7 JavaScript helper tests**. Browser
+checks covered all lessons and tools at 1440 and 390 pixels, the landing page at
+320 pixels, keyboard activation, formulas, no horizontal overflow, isolated
+browser profiles against the final Docker image, download/reload, export/import,
+interrupted year ranges and browser write transactions, and
+bundled October exploration with Treasury blocked. No uncaught JavaScript errors
+were observed. Download success tests used intercepted fixture responses,
+including clearly synthetic dates for an uncached period. Live Treasury CORS
+availability remains unverified. A clean installed Docker image served pages,
+assets, and the −3 bp comparison with a read-only filesystem and networking
+disabled. Detailed evidence is appended to [M3 validation](notes/m3_validation.md).
+Public hosting and URL publication remain future actions.
+
 
 ### Month exploration inside history lessons — November 7, 2026
 

@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "fixed-income-lab"
 version = "0.1.0"
-description = "A learning-driven fixed-income research laboratory."
+description = "Interactive fixed-income lessons and tools for bond prices, risk, returns, and Treasury history."
 readme = "README.md"
 requires-python = ">=3.9"
 dependencies = [

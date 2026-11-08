@@ -118,3 +118,12 @@ Lesson month exploration now reuses those source benchmarks for a hypothetical
 the original observation remains intact. Python/API checks distinguish missing
 observations from genuine zero. The lesson/deployment section of
 [M3 validation](m3_validation.md) records exact spread cases and UI checks.
+
+
+## Visitor wording review — November 8, 2026
+
+The landing page and sixteen lessons now use visitor-facing questions and explicit
+experiment prompts. Existing pricing examples, conventions, sources, and tolerances
+are retained. The full Python suite passed 525 tests. Browser checks covered
+rendered formulas and desktop/mobile lesson openings. The browser-owned Treasury
+workflow and its limits are recorded in notes/m3_validation.md.

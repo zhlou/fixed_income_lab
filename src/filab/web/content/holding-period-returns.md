@@ -145,6 +145,8 @@ different return treatment; this closed-portfolio formula does not support them.
 
 ## Reflection checkpoint
 
+Reconcile the **$95.80 sale proceeds** and **$2.00 coupon cash** against the **$98.12 purchase amount**. Use unrounded values to explain the small loss. What would a comparison of bond prices alone omit?
+
 - Explain the difference between dirty price change, dollar profit, and return.
 - Why is the coupon in ending cash rather than added to wealth a second time?
 - Why does a marked position still carry risk after this horizon?
@@ -162,5 +164,4 @@ itself describe the investment outcome.
 :::
 
 Reuse the [Bond Return Calculator](/tools/bond-return) and save the inputs. Record
-your own reconciliation in the M2 learning journal; publishing the software does
-not complete that reflection.
+your explanation of the loss using the sale proceeds, coupon cash, and original purchase amount.

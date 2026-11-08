@@ -54,6 +54,8 @@ Suppose you purchase a hypothetical note with $1,000 face value, a 4% annual cou
 | 18 months | $20 | $0 | $20 |
 | 24 months | $20 | $1,000 | $1,020 |
 
+In the table, locate the three $20 payments. Why is the fourth payment $1,020? In the experiment, enter $1,000 face value, a 4% coupon, two years, and semiannual payments, then find the same four receipts on the timeline.
+
 Total future receipts are $1,080. That does **not** make today's value $1,080: you must wait for those payments. Your purchase price is a separate cash outflow at time zero.
 
 ## 4. Why waiting changes value

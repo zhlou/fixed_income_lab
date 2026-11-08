@@ -75,7 +75,7 @@ def test_milestone_navigation_lessons_tool_and_local_assets():
         assert 'data-risk' in text and 'data-valuation data-lesson' not in text
         assert 'Predict' in text or 'PREDICT' in text
         assert 'Transfer exercise' in text
-        assert 'Reflection' in text or 'reflection checkpoint' in text
+        assert 'Reflection' in text or 'Interest-rate risk review' in text
         assert 'math block' in text
         if index<2:
             assert f'href="/lessons/{slugs[index+1]}" class="next-lesson"' in text

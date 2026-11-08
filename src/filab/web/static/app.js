@@ -272,7 +272,7 @@ const experimentRoot=$('[data-experiment]');if(experimentRoot){let mode='maturit
   $$('[data-mode]',experimentRoot).forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
   $('.reset',form).addEventListener('click',()=>setMode(mode,true));
 }
-const homeChart=$('[data-home-chart]');if(homeChart)fetch('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'maturity'})}).then(response=>{if(!response.ok)throw Error();return response.json();}).then(data=>drawLines($('#home-chart'),data,true)).catch(()=>$('#home-chart').replaceChildren(element('p','Start the Python server to load the experiment.','loading')));
+const homeChart=$('[data-home-chart]');if(homeChart)fetch('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'maturity'})}).then(response=>{if(!response.ok)throw Error();return response.json();}).then(data=>drawLines($('#home-chart'),data,true)).catch(()=>$('#home-chart').replaceChildren(element('p','The experiment could not load. Please try again.','loading')));
 const navToggle=$('#nav-toggle');if(navToggle){
   const backdrop=$('.nav-backdrop');
   function setNavigation(open,restoreFocus=false){document.body.classList.toggle('nav-open',open);navToggle.setAttribute('aria-expanded',String(open));backdrop.hidden=!open;if(restoreFocus)navToggle.focus();}

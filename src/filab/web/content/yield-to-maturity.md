@@ -14,6 +14,8 @@ YTM is an annual nominal rate compounded at the selected payment frequency.
 
 ## Three rates, three questions
 
+Enter **$98.12** as the purchase price for the $100-face bond described above. Before solving, try 4%, 6%, and 5% in the trial-price table below. Which yield brings the discounted receipts closest to the amount paid?
+
 - **Coupon rate:** What coupon does the contract promise? Divide annual coupon dollars by face value.
 - **Current yield:** How much annual coupon income is there relative to the price? Divide annual coupon dollars by purchase price.
 - **YTM:** What single rate accounts for price and payment timing? Find the rate that discounts every remaining coupon and principal payment to the purchase price.

@@ -448,3 +448,43 @@ Temporary local verification servers were stopped. The running deployment still
 has no persistent volume, matching its prior configuration; README Docker volume
 guidance applies to preserving future downloads across container replacement.
 Learner reflections remain unanswered.
+
+
+## Browser-owned history and visitor wording — November 8, 2026
+
+This update supersedes the earlier web refresh/cache behavior. The original
+acquisition and financial validation records above describe their dated releases.
+The reusable on-disk SnapshotStore remains available for research scripts.
+
+- Python 3.12.16 passed 525 tests. New coverage checks stateless normalization and
+  comparison, raw-source/snapshot agreement, malformed imports, size bounds,
+  cached-month overlays, retired web jobs, and read-only legacy export/import.
+  The suite emits one existing Starlette/httpx deprecation warning.
+- The February reference still gives 21 → 26 bp, with a +5 bp spread change.
+  The pinned November reference still gives 38 → 35 bp, with a −3 bp change.
+  These are exact differences of the published percentage strings in Decimal,
+  with no new benchmark tolerance or financial convention.
+- Seven Node calendar/loader tests passed strict dates, movement, availability,
+  debounce, serialization, stale responses, reset, failure, and retry.
+- Headless Chrome inspected all sixteen question headlines and three tools at
+  1440×900 and 390×900, plus the landing page at 320×900. Formula markup rendered
+  without KaTeX errors. No horizontal document overflow or uncaught JavaScript
+  errors were observed. Keyboard Enter activated the tools anchor on mobile.
+- Browser tests blocked Treasury to exercise No data with one available curve.
+  Successful downloads used intercepted XML from the bundled fixture. To avoid
+  using an already bundled month, one test shifted fixture date years to 2019.
+  Those dates were synthetic test input, never empirical observations or bundled
+  teaching data. Source hashes were computed from the actual test response bytes.
+- Two isolated browser profiles against the same final Docker instance demonstrated private caches. Reload reused a
+  saved month without another Treasury download. Export/import reproduced +5 bp
+  in the other profile. A failure after the first successful annual response
+  left the selected version and saved dataset list intact. An aborted IndexedDB write transaction also preserved saved snapshots and showed No data for the affected month. October exploration
+  from a pinned November lesson reused bundled responses with Treasury blocked.
+- A clean installed wheel in Docker served the landing page, lesson, new script,
+  and stateless −3 bp comparison with --read-only and --network none. No runtime
+  Treasury cache directory was created. The verification containers, local server, and SSH tunnel were stopped after checks.
+
+The direct Treasury success path has been validated with intercepted responses.
+Live CORS permission from a future public origin remains unverified. The intended
+fallback for an inaccessible month is No data. Browser snapshots are lost when
+site data is cleared, so portable exports include the original response bytes.

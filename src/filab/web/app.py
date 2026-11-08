@@ -24,6 +24,7 @@ from filab.pricing.settlement import SettlementError
 from filab.data.treasury import pinned_snapshot
 from filab.risk.explorer import compare_bonds
 from .history_api import router as history_router
+from .history_limits import HistoryBodyLimit
 from .curriculum import LESSONS, ROADMAP
 from .returns_api import router as returns_router
 from .return_lessons import RETURN_LESSONS, lesson_spec, router as return_lesson_router
@@ -60,6 +61,7 @@ templates.env.globals['asset_versions'] = {
     for path in (HERE / 'static').iterdir() if path.suffix in {'.js', '.css'}
 }
 app = FastAPI(title="Fixed-Income Lab", version="0.1.0")
+app.add_middleware(HistoryBodyLimit)
 app.include_router(history_router)
 app.include_router(returns_router)
 app.include_router(return_lesson_router)
@@ -137,7 +139,7 @@ async def validation_error(request, exc):
 @app.get("/")
 def home(request: Request):
     return templates.TemplateResponse(request=request, name="home.html", context={
-        "lessons": LESSONS, "roadmap": ROADMAP, "active": "home", "page_title": "Your learning desk",
+        "lessons": LESSONS, "roadmap": ROADMAP, "active": "home", "page_title": "Explore how bonds work",
     })
 
 

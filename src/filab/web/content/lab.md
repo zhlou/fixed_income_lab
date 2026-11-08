@@ -28,6 +28,8 @@ Each point on a curve repeats this calculation at a different yield. The horizon
 
 ## 1. Maturity: move the principal repayment date
 
+Start here with 20 years remaining and **Compare at YTM** at 5%. Hold face value, the 4% annual coupon, and semiannual frequency fixed. Read the percentage change column for each bond after the same +100 bp yield move. Then follow the timeline to the principal repayment and explain how its later date affects sensitivity. These percentages measure immediate price changes.
+
 Only the maturity control is enabled. The annual coupon stays at 4%, so
 each half-year payment is $2 per $100 face value. Changing maturity changes
 how many coupons remain and when the $100 principal is repaid.

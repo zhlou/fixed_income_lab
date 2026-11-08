@@ -68,6 +68,8 @@ repayment shifts the center of value outward.
 
 ## Predict, experiment, explain
 
+First locate the final **$102** payment. It represents about **94.18%** of today’s price in the two-year example. Use that weight to explain why Macaulay duration is close to **1.94 years**.
+
 1. Keep both maturities at ten years. Set A's coupon to zero and B's to 4%.
    Predict which duration is longer, then open the payment-weight chart.
 2. Increase A's coupon to 8%. Where does the center of value move?
@@ -112,7 +114,7 @@ its modified duration is three years.
 - What observation in the payment table changed your prediction?
 
 Write your own explanation before opening [modified duration and DV01](/lessons/modified-duration-dv01).
-Completing this page's software does not complete your learning checkpoint.
+Before changing the coupon to zero, predict the duration of a two-year zero-coupon bond. Explain your prediction using its single payment.
 
 ```python
 from filab.risk import bond_risk

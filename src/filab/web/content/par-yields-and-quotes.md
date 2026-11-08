@@ -42,6 +42,8 @@ linear; a log maturity axis starts at the positive one-month tenor, not zero.
 
 ## Which observations can we compare?
 
+If a requested month cannot be downloaded, the viewer shows **No data** for that period. This describes data unavailable in your browser. Only a successfully downloaded period can establish that a particular date has no published row. When one date has data, its curve remains visible and two-date changes requiring missing values appear as dashes.
+
 Before calculating a change, check whether both inputs exist. **Missing does
 not mean zero.** Open either date calendar to see **● published rows**, **— dates
 with no published row**, and **? dates outside cached coverage**. These markers

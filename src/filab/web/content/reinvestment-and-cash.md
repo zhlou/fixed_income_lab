@@ -100,6 +100,8 @@ The two-period worked case avoids that mismatch intentionally.
 
 ## Experiment and boundary cases
 
+Keep the horizon **At maturity** and compare **Cash earns 0%** with **Cash earns 5%** for the annual-coupon bond. Locate the **$0.20** cash interest. The first $4 coupon earns it over the one year from November 15, 2026 to November 15, 2027. Why does the final coupon earn no interest before the horizon?
+
 1. Compare **Cash earns 0%** with **Cash earns 5%**. Reconcile the $0.20 difference
    in the table and ledger. The chart isolates the extra wealth from cash
    interest, so the small difference remains visible.

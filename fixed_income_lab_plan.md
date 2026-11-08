@@ -1,6 +1,6 @@
 # Fixed-Income Lab — Learning, Education, and Research Workbench
 
-**Revised:** November 7, 2026 (America/Chicago)
+**Revised:** November 8, 2026 (America/Chicago)
 
 **Primary daily use:** Research bond strategies and historical returns.
 
@@ -10,7 +10,7 @@
 
 ## 1. Direction and assessment
 
-Build one local application in which learning produces reusable research tools.
+Build one application for first-time visitors and returning researchers, with lessons and standalone tools. A public URL serves the same application to everyone. Additional Treasury downloads and saved datasets belong to each browser, with stateless Python validation and calculations. The same application can run locally.
 Each concept should become an explanation, a controlled experiment, and a validated
 calculation. The eventual workbench should answer: **What did this bond strategy
 earn, why, under which assumptions, and how robust is the result?**
@@ -478,15 +478,12 @@ Use typed instrument, position, observation, curve, and run records as needed.
 HTTP request models should not define the financial domain. Keep valuation,
 payment, observation, and information-availability dates distinct.
 
-Start saved comparisons with versioned JSON export/import. For data/research,
-use raw files plus immutable normalized snapshots and, if needed, a small SQLite
-catalog for studies/runs. Add pandas for time-series work when required.
+Use versioned JSON export/import for saved comparisons. The website keeps Treasury raw responses and immutable normalized snapshots in browser IndexedDB, with stateless Python normalization and calculations. Existing on-disk observations can be exported read-only for browser import. Choose storage for future research studies when that workflow is implemented. Add pandas for time-series work when required.
 DuckDB/Parquet are responses to measured volume, not initial prerequisites.
 
 Extract lesson-specific templates/JS from current conditional pages as modules
 arrive. Use one small curriculum registry for prerequisites, availability, and
-roadmap labels. Preserve existing interfaces. No framework rewrite, hosting,
-accounts, cloud sync, or browser-executed financial Python is required.
+roadmap labels. Preserve existing interfaces. Retain the framework and Python calculations. Prepare a single Docker service for HTTPS hosting, with browser-owned Treasury history. Accounts and cloud sync remain later work.
 
 ## 7. Definition of done
 

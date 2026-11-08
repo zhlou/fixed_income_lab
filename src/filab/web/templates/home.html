@@ -1,11 +1,46 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="eyebrow"><span class="eyebrow-line"></span> A PERSONAL FIXED-INCOME WORKSPACE</div>
-<section class="home-hero"><div><h1>Less memorizing.<br>More <em>understanding.</em></h1><p class="hero-description">Explore bonds one cash flow at a time. Read the idea, change an input, and watch the mathematics come to life.</p><a href="/lessons/bond-basics" class="button primary">Start with the basics <span>→</span></a><div class="hero-meta"><span>{{ lessons|length }} available lessons</span><span>Learn → experiment → research</span><span>Built for curiosity</span></div></div>
-<div class="home-chart card" data-home-chart><div class="card-overline">A QUESTION TO START WITH</div><h2>Why does time change risk?</h2><p>Same 4% coupon. Different maturities.</p><div class="chart" id="home-chart" aria-live="polite"><p class="loading">Calculating curves in Python…</p></div><div class="tiny-note">Hypothetical prices per $100 face value. Semiannual coupons.</div></div></section>
-<p class="tool-entry"><a class="button primary" href="/tools/bond-risk">Open Bond Risk Explorer →</a> <span>Compare sensitivity · inspect errors · save your inputs</span></p>
-<p class="tool-entry"><a class="button primary" href="/tools/bond-return">Open Bond Return Calculator →</a> <span>Track payments · reconcile wealth · export the ledger</span></p>
-<p class="tool-entry"><a class="button primary" href="/tools/treasury-history">Open Treasury History Viewer →</a> <span>Compare dates · inspect coverage · preserve source evidence</span></p>
-<section aria-labelledby="lessons-heading"><div class="section-heading"><div><div class="eyebrow">START EXPLORING</div><h2 id="lessons-heading">Your first {{ lessons|length }} lessons</h2></div><span class="section-aside">M0–M3 / FOUNDATIONS THROUGH HISTORY</span></div><div class="lesson-grid">{% for item in lessons %}<a href="/lessons/{{ item.slug }}" class="lesson-card"><div class="lesson-card-top"><span class="lesson-index">{{ '%02d'|format(loop.index) }}</span><span class="lesson-time">{{ item.duration }} <span>↗</span></span></div><div class="card-overline">{{ item.tag }}</div><h3>{{ item.title }}</h3><p>{{ item.description }}</p><span class="card-action">Open lesson <span>→</span></span></a>{% endfor %}</div></section>
-<section id="curriculum" class="curriculum" aria-labelledby="curriculum-heading"><div class="section-heading"><div><div class="eyebrow">THE BIGGER PICTURE</div><h2 id="curriculum-heading">A path through fixed income</h2></div><p class="section-aside">One useful experiment at a time.</p></div><div class="roadmap">{% for number, title, weeks, status in roadmap %}<div class="roadmap-row"><span class="roadmap-number">{{ number }}</span><span class="roadmap-title">{{ title }}</span><span class="roadmap-weeks">{{ weeks }}</span><span class="roadmap-status {{ 'available' if status == 'Available' else '' }}">{{ status }}</span></div>{% endfor %}</div></section>
+<section class="home-hero">
+  <div>
+    <h1>Explore how<br><em>bonds work.</em></h1>
+    <p class="hero-description">Follow a bond’s payments, see how its price responds to interest rates, and calculate what an investor earns. Start with a lesson or open a tool to explore a question of your own.</p>
+    <div class="home-actions"><a href="/lessons/bond-basics" class="button primary">Start with bond basics →</a><a href="#tools" class="button">Explore the tools ↓</a></div>
+    <p class="hero-meta">{{ lessons|length }} available lessons</p>
+  </div>
+  <div class="home-chart card" data-home-chart>
+    <h2>How do 10-year and 20-year bond prices respond to the same yield change?</h2>
+    <div class="chart" id="home-chart" aria-live="polite"><p class="loading">Calculating prices…</p></div>
+    <p class="tiny-note">Both hypothetical bonds pay a 4% annual coupon in two semiannual payments. Prices are per $100 of face value.</p>
+    <a class="card-action" href="/lessons/bond-pricing-lab">Try the bond pricing experiment →</a>
+  </div>
+</section>
+<section id="tools" class="home-tools" aria-labelledby="tools-heading">
+  <div class="section-heading"><h2 id="tools-heading">Explore the tools</h2></div>
+  <div class="tool-grid">
+    {% for slug, title, description in [
+      ('bond-risk', 'Bond Risk Explorer', 'Compare how much two bonds change in price when their yields move by the same amount.'),
+      ('bond-return', 'Bond Return Calculator', 'Choose purchase and ending dates, then see how the bond’s value, coupon payments, cash interest, and fees contribute to the return.'),
+      ('treasury-history', 'Treasury History Viewer', 'Compare published U.S. Treasury par yields on two dates and see which maturities have observations on both.')
+    ] %}
+    <a href="/tools/{{ slug }}" class="lesson-card tool-card"><h3>{{ title }}</h3><p>{{ description }}</p><span class="card-action">Open {{ title }} →</span></a>
+    {% endfor %}
+  </div>
+</section>
+<section aria-labelledby="lessons-heading">
+  <div class="section-heading"><h2 id="lessons-heading">Browse the lessons</h2></div>
+  {% for milestone, title in [('M0', 'Foundations'), ('M1', 'Interest-rate risk'), ('M2', 'Bond returns'), ('M3', 'Treasury history')] %}
+  <section class="home-lesson-group" aria-labelledby="group-{{ milestone }}">
+    <h3 id="group-{{ milestone }}">{{ title }}</h3>
+    <div class="lesson-grid">
+      {% for item in lessons %}{% if item.milestone == milestone %}
+      <a href="/lessons/{{ item.slug }}" class="lesson-card"><div class="lesson-card-top"><span class="lesson-time">{{ item.duration }}</span></div><h4>{{ item.title }}</h4><p>{{ item.headline }}</p><span class="card-action">Open lesson →</span></a>
+      {% endif %}{% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+</section>
+<section id="curriculum" class="curriculum" aria-labelledby="curriculum-heading">
+  <div class="section-heading"><h2 id="curriculum-heading">Curriculum roadmap</h2></div>
+  <div class="roadmap">{% for number, title, activity, status in roadmap %}<div class="roadmap-row"><span class="roadmap-number">{{ number }}</span><span class="roadmap-title">{{ title }}</span><span class="roadmap-weeks">{{ activity }}</span><span class="roadmap-status {{ 'available' if status == 'Available' else '' }}">{{ status }}</span></div>{% endfor %}</div>
+</section>
 {% endblock %}

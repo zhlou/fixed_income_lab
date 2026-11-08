@@ -20,7 +20,7 @@
         const result=await this.load(task.month,task.force);
         if(task.epoch===this.epoch){this.apply(result);this.status(result.warning||`${task.month} ready${result.cache_hit?' · cached data':''}. Compare dates to update the curves.`,Boolean(result.warning));}
       } catch(error) {
-        if(task.epoch===this.epoch)this.status(`${task.month}: ${error.message} Cached dates and the previous comparison are retained.`,true);
+        if(task.epoch===this.epoch)this.status('No data',true);
       } finally {
         this.running=null;
         if(this.queued&&!this.timer)this.drain();

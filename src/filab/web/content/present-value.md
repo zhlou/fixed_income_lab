@@ -2,7 +2,7 @@
 
 Prerequisite: [Lesson 1 glossary](/lessons/bond-basics).
 
-## 1. Our assumptions
+## 1. Assumptions for this example
 
 All examples are hypothetical. We value fixed, promised cash flows using a single supplied annual nominal yield y, compounded m times per year. We are not estimating market interest rates in this lesson.
 
@@ -81,7 +81,9 @@ $$
 
 The coupon sum includes the final coupon; the last term adds principal once.
 
-### Worked example: our note from Lesson 1
+### Worked example: a two-year coupon note
+
+The hypothetical note has $1,000 face value, a 4% annual coupon, and four half-year payments remaining. At a 5% annual nominal YTM with semiannual compounding, the first $20 coupon is worth $20/1.025 = **$19.51** today. Find that coupon in the payment table before adding the later payments. Set face value to $1,000 in the experiment to reproduce these dollar amounts.
 
 Use $1,000 face value, a 4% annual coupon, two years remaining, semiannual payments, and a supplied 5% nominal YTM compounded semiannually.
 

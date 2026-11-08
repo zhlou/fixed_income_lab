@@ -290,3 +290,8 @@
 .history-calendar-top { position:sticky; top:0; z-index:1; background:white; }
 .history-calendar .tiny-note { font-size:12px; line-height:1.5; }
 .history-controls .choice-options { grid-template-columns:repeat(2,minmax(0,1fr)); }
+
+/* First-visit entry points share the lesson card vocabulary. */
+.home-actions{display:flex;flex-wrap:wrap;gap:12px}.home-actions .button{white-space:normal}.home-chart h2{font-size:24px;line-height:1.3}.home-chart .card-action{margin-top:16px}.home-tools{margin-bottom:42px;scroll-margin-top:24px}.tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.tool-grid .lesson-card{min-width:0}.tool-grid .lesson-card p{min-height:0}.home-lesson-group{margin-bottom:32px}.home-lesson-group>h3{font-size:20px;margin:20px 0 14px}.lesson-card h4{font-size:20px;line-height:1.3;margin:0 0 12px}.sidebar nav{min-height:0;overflow-y:auto}.sidebar .sidebar-caption{flex-shrink:0}
+@media(max-width:1000px){.tool-grid{grid-template-columns:1fr}.tool-grid .lesson-card p{max-width:none}}
+@media(max-width:680px){.home-hero h1{font-size:40px}.home-chart h2{font-size:22px}.roadmap-row{grid-template-columns:23px minmax(0,1fr) 65px}.roadmap-weeks{display:none}.roadmap-status{display:block;font-size:10px}.home-actions{align-items:flex-start;flex-direction:column}}
