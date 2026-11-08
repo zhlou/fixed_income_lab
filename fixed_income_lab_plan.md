@@ -4,9 +4,9 @@
 
 **Primary daily use:** Research bond strategies and historical returns.
 
-**Current release:** Seven core lessons and a standalone Treasury Bill Calculator, regular-bond pricing, M1 risk tools, M2 return accounting, and M3 versioned Treasury observations.
+**Current release:** Seven core lessons plus two M4 curve lessons, a standalone Treasury Bill Calculator, regular-bond pricing, M1 risk tools, M2 return accounting, M3 Treasury observations, and the Discount Curve Explorer.
 
-**Next release:** M4 discount curves and the historical-adapter feasibility gate.
+**Next research dependency:** Validate subyear discounting before M5 coupon-bond strategies. M4 synthetic calculations and historical curve exploration are delivered.
 
 ## 1. Direction and assessment
 
@@ -111,6 +111,28 @@ followed by timing and vintages. History charts default to log maturity spacing
 with a linear alternative. All 479 tests pass after consolidation. This changes
 the teaching interface and sequence, with financial and source conventions intact.
 
+### M4 delivery update — November 8, 2026
+
+Two appended lessons teach payment discounting and aging on an unchanged curve.
+The Discount Curve Explorer provides bootstrapping, payment PVs, forwards, aging,
+a pinned October 29–30 Fed comparison, and browser-owned full CSV import. The
+six exact source-check rows retain the full acquisition hash and metadata.
+
+The full official acquisition was audited across 16,309 model-bearing dates and
+749 missing-data rows. Sixteen dates fail parameter-to-published-yield checks at
+rounding precision. Published observations remain visible, with valuation blocked
+on those dates. Historical discounting conservatively supports one year through
+each row's published maximum. All coupon payments are checked; new and aged
+semiannual coupon notes require unsupported subyear factors. M5 therefore retains
+an open historical-coupon valuation dependency. Synthetic scenarios and supported
+zero-coupon principal valuations are available. See [M4 validation](notes/m4_validation.md).
+
+The original 20–32-hour M4 allowance is superseded by the 24–40-hour implementation
+planning allowance, including full-file browser import. These estimates are not
+logged work time. The unresolved source/short-end investigation needs its own
+estimate once an alternative convention or source is selected. M5's 24–40 hours
+remain conditional; no historical strategy delivery date follows from this release.
+
 ### Three separate measures of success
 
 **Teaching review, November 3, 2026:** All nine published lessons have been
@@ -197,7 +219,7 @@ learning pace and data issues may extend it. Useful releases arrive along the wa
 | M1 Interest-rate risk | M0 | Sensitivity and approximation error | Delivered; learner checkpoint pending | Original estimate: 12–18 h |
 | M2 Returns and cash accounting | M0; M1 for risk comparisons | Reconcile a holding-period return | Delivered; learner checkpoint pending | Original estimate: 12–20 h |
 | M3 Historical observations | M0; independent of M2 | Understand dataset meaning | Delivered; learner checkpoint pending | Original estimate: 16–24 h |
-| M4 Discount curves | M1, M3 | Par, spot, forward, and YTM distinctions | Curve valuation and historical adapter | 20–32 h, including feasibility gate |
+| M4 Discount curves | M1, M3 | Par, spot, forward, and YTM distinctions | Synthetic valuation and Fed explorer delivered; historical coupon coverage gate open | 24–40 h planning allowance including browser import |
 | M5 First strategy study | M1–M4 | Explain historical strategy returns | Two-strategy backtest, saved runs, exports | 24–40 h |
 | M6 Robustness and curve risk | M5 | Test stability of a finding | Horizon analysis and key-rate scenarios | 16–24 h |
 | M7 Daily-use release | M5–M6 | Reproduce and communicate research | Reliable research desk and acceptance study | 12–20 h |
@@ -494,7 +516,7 @@ optimization until a concrete research need justifies the scope.
 
 ## 9. Immediate implementation backlog
 
-The curriculum tightening is delivered in the source application. Continue with the two M4 questions above and their source/short-end feasibility checks. Use the revised editorial rules for every future lesson. The learner completes the journal work independently.
+The curriculum tightening and two M4 questions are delivered in the source application. Resolve the documented historical short-end coverage dependency before M5 coupon-bond strategies. Use the revised editorial rules for every future lesson. The learner completes the journal work independently.
 
 1. Complete the M1 learner journal: predict, inspect payment weights, reconcile a
    shock row, and export/reload a comparison. Software does not answer these prompts.
@@ -506,8 +528,8 @@ The curriculum tightening is delivered in the source application. Continue with 
    from future immutable historical research runs.
 
 M2 supplies holding-period accounting; M3 supplies versioned par observations.
-Discount-curve valuation, historical strategy results, and saved research studies
-remain future work.
+Synthetic discount-curve valuation and Fed history exploration are delivered.
+Historical coupon-bond strategies and saved research studies retain future work.
 
 **Post-M2 estimate review:** The original remaining M3–M7 component budgets sum
 to **84–132 focused hours**. M2 has resolved the core event-ordering and cash

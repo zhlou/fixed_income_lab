@@ -313,3 +313,15 @@
 [data-core-experiment] .metric strong{font-size:clamp(20px,2.4vw,32px)}
 .history-workspace[data-pinned="true"]{display:flex;flex-direction:column;gap:16px}
 .history-workspace[data-pinned="true"] .history-results{order:-1}
+
+/* Discount curves share the site's cards, calendars, and readable table scroll. */
+[data-curve-synthetic] input[type="number"], [data-curve-history] input[type="number"] {display:block; width:100%; max-width:24rem; margin:.5rem 0 1rem;}
+[data-curve-synthetic] .card, [data-curve-history] .card {margin-bottom:1rem; min-width:0;}
+[data-curve-results] .chart, [data-fed-results] .chart {width:100%; min-width:0;}
+[data-curve-results] svg, [data-fed-results] svg {display:block; width:100%;}
+[data-fed-datasets] .history-option {overflow-wrap:anywhere;}
+[data-fed-results] p {overflow-wrap:anywhere;}
+.curve-stale {opacity:.55;}
+.curve-stale::before {content:'Inputs changed. Calculate or compare to update this result.'; display:block; padding:.75rem; font-weight:600;}
+[data-curve-synthetic] .card, [data-curve-history] .card {padding:1.5rem;}
+[data-curve-synthetic] input[type="number"], [data-curve-history] input[type="number"] {padding:.65rem; border:1px solid var(--line, #cbd4cd); border-radius:5px; font:inherit; background:white; color:inherit;}

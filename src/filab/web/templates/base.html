@@ -18,6 +18,7 @@
   <script defer src="/static/history_months.js?v={{ asset_versions['history_months.js'] }}"></script>
   <script defer src="/static/history_store.js?v={{ asset_versions['history_store.js'] }}"></script>
   <script defer src="/static/history.js?v={{ asset_versions['history.js'] }}"></script>
+<script defer src="/static/curves.js?v={{ asset_versions['curves.js'] }}"></script>
 </head>
 <body class="{% block body_class %}{% endblock %}">
 <a class="skip-link" href="#main">Skip to main content</a>
@@ -37,8 +38,9 @@
   <a class="overview-link {{ 'active' if active == 'bond-risk' else '' }}" href="/tools/bond-risk" {% if active == 'bond-risk' %}aria-current="page"{% endif %}>Bond Risk Explorer ↗</a>
   <a class="overview-link {{ 'active' if active == 'bond-return' else '' }}" href="/tools/bond-return" {% if active == 'bond-return' %}aria-current="page"{% endif %}>Bond Return Calculator ↗</a>
   <a class="overview-link" href="/tools/treasury-history">Treasury History Viewer ↗</a>
+  <a class="overview-link {{ 'active' if active == 'discount-curves' else '' }}" href="/tools/discount-curves" {% if active == 'discount-curves' %}aria-current="page"{% endif %}>Discount Curve Explorer ↗</a>
   <div class="sidebar-caption coming-caption">UP NEXT</div>
-  <div class="up-next">Discount curves <small>NEXT TOPIC</small></div>
+  <div class="up-next">Strategy research <small>COVERAGE GATE OPEN</small></div>
   <a class="roadmap-link" href="/#curriculum">View the full curriculum <span>→</span></a>
   <div class="sidebar-bottom"><span class="status-dot"></span> EXPLORE FIXED INCOME <div>Learn by changing the inputs.</div></div>
 </aside>
@@ -46,7 +48,7 @@
 <div class="page-shell">
   <header class="topbar">
     <button id="nav-toggle" class="nav-toggle" aria-controls="course-nav" aria-expanded="false" aria-label="Toggle course navigation">☰ <span>Lessons</span></button>
-    <div class="breadcrumb">Fixed-Income Lab <span>/</span> {{ 'Overview' if active == 'home' else 'Experiments' if active in ['bond-risk', 'bond-return', 'treasury-history'] else 'Learn' }}</div>
+    <div class="breadcrumb">Fixed-Income Lab <span>/</span> {{ 'Overview' if active == 'home' else 'Experiments' if active in ['bond-risk', 'bond-return', 'treasury-history', 'discount-curves'] else 'Learn' }}</div>
     {% if lesson is defined %}
     <nav class="topbar-navigation" aria-label="Lesson navigation">
       <a href="/" class="topbar-overview">Overview</a>

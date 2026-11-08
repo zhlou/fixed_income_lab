@@ -1,0 +1,26 @@
+{
+  "source_url": "https://www.federalreserve.gov/data/yield-curve-tables/feds200628.csv",
+  "retrieved_at": "2026-11-08T23:02:04.308145+00:00",
+  "parent_sha256": "3130a6f0c7af3bf85d3b6076db19085a45c09932745a56cc3c45b60f496c4051",
+  "parent_bytes": 16668595,
+  "parent_rows": 17058,
+  "parent_coverage": [
+    "1961-06-14",
+    "2026-10-30"
+  ],
+  "excerpt_dates": [
+    "1961-06-14",
+    "1979-12-31",
+    "1980-01-01",
+    "1980-01-02",
+    "2026-10-29",
+    "2026-10-30"
+  ],
+  "units": "Source yields and betas percent per annum; taus years. Normalized yields/betas decimals.",
+  "missing_values": [
+    "NA",
+    "-999.99",
+    ""
+  ],
+  "acquisition": "Exact CSV header, preamble, and selected original row lines. Parent file retained in validation environment."
+}

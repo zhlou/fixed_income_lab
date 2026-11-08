@@ -6,11 +6,12 @@
 
 **Foundations implementation and independent reference validation are complete
 for the regular-coupon educational model** (original Phase 1, now M0).
-The website has **seven core interactive lessons plus a standalone Treasury Bill Calculator**. **M1 risk, M2 return
+The website has **seven core lessons, two M4 curve lessons, and a standalone Treasury Bill Calculator**. **M1 risk, M2 return
 accounting, and M3 historical observations are implemented and validated**,
 including the Risk Explorer, Bond Return Calculator, and Treasury History Viewer.
-**M4 discount curves is next.** Curve valuation and historical strategy research
-remain planned. The visitor experience and browser-owned Treasury history are
+**M4 synthetic discount-curve valuation and the Fed history explorer are implemented.**
+Historical coupon-bond valuation retains an open short-maturity coverage gate ahead
+of M5 strategy research. The visitor experience and browser-owned Treasury history are
 prepared for one shared public deployment.
 
 The research roadmap prioritizes: **researching bond
@@ -22,6 +23,52 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### Dependency files and Docker cache — November 8, 2026
+
+Moved dependency lists into `requirements/base.txt`, `web.txt`, `dev.txt`, and
+`build.txt`. Setuptools reads them as dynamic dependencies and extras, preserving
+existing package installation commands and version constraints. `MANIFEST.in`
+includes the files in source distributions for setuptools 64+.
+
+Docker installs base, web, and build requirements before copying `pyproject.toml`,
+development requirements, README and source. An isolated pyproject-only change
+reused all eight filesystem layers through dependency installation, rebuilding
+only subsequent application layers on the configured `deepl` engine. A source
+distribution included all four files; rebuilding its wheel preserved the original
+base and extra dependency declarations. Editable-install metadata preparation
+also passed. The installed image served pages, bundled data and a pricing API
+with a read-only filesystem and networking disabled. The dependency-check image
+is retained for cache reuse; disposable verification containers were removed.
+The existing legacy Docker builder deprecation notice remains.
+
+
+### M4 discount curves — November 8, 2026
+
+Added two registry-driven lessons and `/tools/discount-curves`. Synthetic examples
+bootstrap D(2)=0.90 from the $101.40 calibration bond, reproduce the $97.60 note,
+and reconcile $99.80 remaining value plus $2 coupon cash after six months. The
+standalone Explorer compares fitted Fed curves, shows payment coverage and PVs,
+and imports the official full CSV into browser-owned immutable versions. Raw
+bytes, import timestamps, normalized rows and SHA-256 identities remain local
+to each browser. The packaged six-row sample works offline.
+
+The pinned 16,668,595-byte Fed response contains 17,058 dated rows. Audit found
+16 dates with parameter/published-output discrepancies beyond rounding precision.
+The Explorer identifies those dates and withholds parameter-based prices.
+Historical valuation conservatively requires every nonzero payment to be between
+one year and the row's published maximum. Unsupported subyear coupons prevent
+complete coupon-note prices. Supported zero-coupon principal valuations remain
+available. Historical strategy support retains this open M5 dependency.
+
+Validation includes 543 Python tests, seven JavaScript helper tests, the full
+source audit, desktop/mobile and keyboard browser checks, real full-file import,
+version/reload/profile isolation, interrupted requests, aborted browser writes,
+storage-disabled fallback, stale-response/reset handling and installed-wheel
+checks with external sockets blocked. The existing Starlette/httpx warning
+remains. Details and sensitivity results are in [M4 validation](notes/m4_validation.md).
+Software checks leave learner reflection pending. Deployment is a separate action.
+
 
 ### Seven-lesson curriculum — November 8, 2026
 
@@ -494,6 +541,8 @@ learner reflection is still pending. See [the review record](notes/lesson_conten
 | 5. Settlement & coupon ownership | `/lessons/settlement-and-accrued-interest` | Clean plus accrual equals dirty, payment-date ownership |
 | 6. Hold to maturity | `/lessons/reinvestment-and-cash` | Approach to par and annual-coupon reinvestment |
 | 7. Sell before maturity | `/lessons/holding-period-returns` | Sale proceeds, coupon cash, and costs |
+| 8. Price each payment | `/lessons/discount-factors` | Bootstrap and reprice the semiannual note |
+| 9. Age a bond on a curve | `/lessons/curve-roll-down` | Remaining price, coupon cash and implied forward |
 | Treasury Bill Calculator | `/tools/treasury-bills` | Discount price and investment-yield conventions |
 
 Cards, sidebar, lesson picker, and previous/next links follow this reading order. Each registry entry assigns its own focused experiment. Tools hold complete ledgers, dated risk, diagnostics, source evidence, and data-management workflows. Python remains optional. Original notes and Notebook 01 retain their historical role.
@@ -591,8 +640,9 @@ must lie on the regular maturity-anchored coupon grid.
 
 Stub coupons, holiday adjustments, ex-coupon rules, market settlement lags,
 and auction-specific intermediate rounding are outside this model. The bill
-investment-year basis is an explicit input. Historical Treasury par observations are now available; discount-curve valuation
-remains in M4.
+investment-year basis is an explicit input. Treasury par observations, synthetic
+discount-curve valuation and fitted Fed curve exploration are available. Historical
+coupon-note valuation retains the short-end coverage gate recorded in M4 validation.
 
 ## Running the project
 
@@ -647,8 +697,8 @@ python -m pytest -q
 
 ## Next milestone
 
-Build **M4: Discount curves**, beginning with the Fed source/short-end feasibility
-gate described in [M3 validation](notes/m3_validation.md). Complete the learner's
+Resolve the historical short-end coverage gate recorded in [M4 validation](notes/m4_validation.md)
+before implementing M5 coupon-bond strategies. M4 synthetic valuation and the Fed Explorer are delivered. Complete the learner's
 M1, M2, and M3 reflection independently; software checks do not answer the journals.
 
 ## Revised roadmap and planning audit
@@ -659,7 +709,7 @@ M1, M2, and M3 reflection independently; software checks do not answer the journ
 | M1 Interest-rate risk | Duration, convexity, risk explorer | Software validated; learner checkpoint pending |
 | M2 Return accounting | Deterministic cash/position ledger and return calculator | Software validated; learner checkpoint pending |
 | M3 Historical observations | Versioned data and curve history viewer | Software validated; learner checkpoint pending |
-| M4 Discount curves | Curve valuation and validated historical adapter | Next; short-end feasibility gate open |
+| M4 Discount curves | Synthetic valuation, two lessons, fitted Fed history and browser import | Delivered; historical coupon coverage gate open |
 | M5 Strategy research | Two synthetic Treasury strategies, saved runs, exports | Planned; first historical research release |
 | M6 Robustness | Horizon analysis, curve scenarios, key-rate risk | Planned |
 | M7 Daily use | Research desk, reproducibility, backup/recovery | Planned |
@@ -669,8 +719,9 @@ criteria. M1 comparison inputs and M2 return ledgers/input snapshots are impleme
 M3 observations/snapshots are delivered; saved historical research studies and
 strategy modules remain future work. The 108–170 hour
 budget in the plan was the provisional pre-M1 estimate, not recorded time spent.
-The post-M3 review allows 72–116 focused hours for M4–M7, provisionally until
-the Fed adapter and short-end feasibility gate are validated.
+The post-M3 review provisionally allowed 72–116 focused hours for M4–M7.
+The M4 delivery update above supersedes its M4 allowance and records the remaining
+short-end dependency. These planning figures are separate from logged work time.
 
 The [original plan](notes/fixed_income_lab_plan_original_2026-11-01.md) is preserved
 with its detailed credit curriculum and advanced research topics. These remain

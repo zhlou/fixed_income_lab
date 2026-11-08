@@ -6,7 +6,9 @@
 <section class="experiment-pane" aria-labelledby="experiment-title">
 <div class="pane-heading"><h2 id="experiment-title">Experiment</h2><a href="#lesson-reading">Read the explanation ↗</a></div>
 <div class="experiment-scroll" id="lesson-experiment" tabindex="0" role="region" aria-label="Interactive experiment">
-{% if lesson.experiment == 'history' %}
+{% if lesson.experiment in ['curve-pricing', 'curve-aging'] %}
+{% include 'curve_controls.html' %}
+{% elif lesson.experiment == 'history' %}
 {% include 'history_controls.html' %}
 {% elif lesson.experiment == 'settlement' %}
 {% include 'settlement_controls.html' %}

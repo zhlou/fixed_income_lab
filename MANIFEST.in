@@ -1,0 +1,2 @@
+# Include dependency files when building with the supported setuptools 64+.
+recursive-include requirements *.txt

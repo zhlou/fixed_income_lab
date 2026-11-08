@@ -26,6 +26,7 @@ from filab.risk.explorer import compare_bonds
 from .history_api import router as history_router
 from .history_limits import HistoryBodyLimit
 from .curriculum import LESSONS, ROADMAP
+from .curves_api import router as curves_router
 from .returns_api import router as returns_router
 from .return_lessons import lesson_spec, router as return_lesson_router
 
@@ -72,6 +73,7 @@ templates.env.globals['asset_versions'] = {
 app = FastAPI(title="Fixed-Income Lab", version="0.1.0")
 app.add_middleware(HistoryBodyLimit)
 app.include_router(history_router)
+app.include_router(curves_router)
 app.include_router(returns_router)
 app.include_router(return_lesson_router)
 app.mount("/static", StaticFiles(directory=str(HERE / "static")), name="static")
@@ -450,4 +452,11 @@ def history_tool(request: Request):
     return templates.TemplateResponse(request=request, name='history.html', context={
         'lessons': LESSONS, 'active': 'treasury-history', 'page_title': 'Treasury History Viewer',
         'history_example': HISTORY_EXAMPLE, 'history_reference': HISTORY_REFERENCE,
+    })
+
+
+@app.get("/tools/discount-curves")
+def discount_curve_tool(request: Request):
+    return templates.TemplateResponse(request=request, name="curves.html", context={
+        "lessons": LESSONS, "active": "discount-curves", "page_title": "Discount Curve Explorer",
     })

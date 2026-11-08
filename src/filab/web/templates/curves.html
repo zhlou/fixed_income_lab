@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% from 'controls.html' import choices %}
+{% block content %}
+<div class="lesson-heading"><div class="eyebrow">DISCOUNT CURVES</div><h1>Discount Curve Explorer</h1><p>Trace each payment into a price, then explore Federal Reserve fitted nominal curves on exact dates.</p></div>
+{{ choices('curve-mode', 'curve_mode', 'Explore', [('synthetic', 'Synthetic example', 'Recover a factor and age a bond'), ('fed', 'Fed history', 'Compare fitted historical curves')], '', selected='synthetic') }}
+<div data-curve-panel="synthetic">{% include 'curve_controls.html' %}</div>
+<section data-curve-panel="fed" data-curve-history hidden>
+<div class="card">
+<h2>Compare fitted Fed curves</h2>
+<p>Bundled example · October 29–30, 2026. Import the official CSV to explore more dates.</p>
+<form data-fed-form>
+<div class="history-dates">
+{% for name, label, value in [('first', 'First observation date', '2026-10-29'), ('second', 'Second observation date', '2026-10-30')] %}
+<div class="history-date-field" data-history-date><label for="fed-{{ name }}">{{ label }}</label><div class="history-date-entry"><input id="fed-{{ name }}" name="{{ name }}" type="text" pattern="[0-9]{4}-[0-9]{2}-[0-9]{2}" value="{{ value }}" required aria-describedby="fed-{{ name }}-status"><button type="button" data-open-calendar disabled>Calendar</button></div><small id="fed-{{ name }}-status" data-date-status role="status"></small></div>
+{% endfor %}
+</div>
+<p class="tiny-note">Type YYYY-MM-DD or use the calendar. Choosing dates uses this browser’s selected dataset. Published marks indicate fitted observations; rows containing only missing values have no curve.</p>
+{{ choices('fed-valuation', 'valuation', 'Price using', [('first', 'First date', 'Settlement after payment'), ('second', 'Second date', 'Settlement after payment')], '', selected='second') }}
+{{ choices('fed-maturity', 'maturity_years', 'Original note maturity', [('2', 'Two years', '$100 face'), ('10', 'Ten years', '$100 face')], '', selected='2') }}
+{{ choices('fed-age', 'age_months', 'Note age', [('0', 'New note', 'Six months to next coupon'), ('1', 'One month old', 'About five months to next coupon')], '', selected='0') }}
+<label for="fed-coupon">Annual coupon rate (%)</label><input id="fed-coupon" name="coupon_rate" type="number" min="0" max="20" step="0.1" value="4" required>
+<p class="tiny-note">A zero coupon values principal alone. Curve time uses Actual/365 Fixed, a Lab convention. Accrued interest uses Actual/Actual coupon-period accrual. Contractual dates are unadjusted; coupon-date settlement is after payment. Stub coupons, holidays, ex-coupon rules and settlement lags are excluded.</p>
+<div class="history-actions"><button class="button primary" type="submit">Compare dates</button><button type="button" class="reset" data-fed-reset>↺ Reset example</button></div>
+</form>
+<p class="error" role="alert" data-fed-error></p>
+<details><summary>Saved datasets and CSV import</summary>
+<p><a href="https://www.federalreserve.gov/data/yield-curve-tables/feds200628.csv" target="_blank" rel="noopener">Download Fed CSV ↗</a></p>
+<label class="history-import">Import Fed CSV<input type="file" accept=".csv,text/csv,application/octet-stream" data-fed-import></label>
+<p class="tiny-note">Choose the downloaded official file (up to 24 MB). Saved history belongs to this browser. Source acquisition time is unknown for a local file; the import time is recorded. Clearing site data removes imports. A new file creates a version you can select below. Bundled dates remain available if storage is unavailable.</p>
+<fieldset data-fed-datasets><legend>Dataset version</legend></fieldset>
+<button type="button" class="reset" data-fed-export disabled>Export selected raw CSV</button>
+<p data-fed-import-status role="status" aria-live="polite"></p>
+</details>
+</div>
+<div data-fed-results aria-live="polite" aria-busy="true"></div>
+<div class="card"><h2>What this source describes</h2><p>Historical estimates of an off-the-run nominal Treasury curve. Zero and instantaneous forward rates are continuously compounded; par rates use nominal semiannual coupons. Today’s file is a revised historical vintage. Exact historical availability times are unknown. Model-derived prices use the selected snapshot.</p><p>The Lab restricts historical discounting to the published maturity range, beginning at one year. A coupon payment sooner than that prevents a complete historical price. The payment table identifies each affected amount.</p><p><a href="https://www.federalreserve.gov/data/nominal-yield-curve.htm">Fed source and publication policy ↗</a> · <a href="https://www.federalreserve.gov/pubs/feds/2006/200628/index.html">Curve methodology ↗</a> · <a href="/tools/treasury-history">Treasury par observations ↗</a></p></div>
+</section>
+{% endblock %}

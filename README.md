@@ -62,19 +62,24 @@ The image does not configure a periodic health check; configure probes through
 the hosting platform if needed. Python, Node.js, and a virtual environment are
 not required on the Docker client machine. Internet access is
 needed to download the base image and dependencies during the build; the website
-works offline afterward. Dependency versions follow `pyproject.toml` and are not
-locked, so a fresh build can pick up newer compatible releases.
+works offline afterward. Dependency versions follow the files in `requirements/`.
+A fresh build can pick up newer releases within their declared version ranges.
 
-The Dockerfile uses pip 26.2 or newer and its
-[`--only-deps` option](https://pip.pypa.io/en/stable/user_guide/#installing-only-dependencies)
-to install the dependencies of `.[web,build]` before copying README and source. The
-`build` extra in `pyproject.toml` declares the tools needed for the later
-application build without isolation. An empty README satisfies the metadata-only
-dependency step; the real README is copied before building the application wheel
-so its package description is preserved. Source and README changes reuse the
-dependency layer; only the application package is rebuilt. Changing
-`pyproject.toml` invalidates that layer. To refresh allowed dependency versions
-explicitly, rebuild with `docker build --no-cache`.
+The dependency lists live in `requirements/base.txt`, `web.txt`, `dev.txt`, and
+`build.txt`. Setuptools reads these files through `pyproject.toml`, so existing
+commands such as `pip install -e '.[web,dev]'` use the same declarations.
+Use PEP 508 requirement lines in those files, with optional comments and blank
+lines. Setuptools reads each group directly from its file. `MANIFEST.in` includes
+these files in source distributions for the supported setuptools versions.
+
+Docker copies the base, web, and build requirement files first and installs them
+in a cached layer. It copies `pyproject.toml`, the development requirements,
+README, and application source afterward. Edits to package data, project metadata,
+test settings, development dependencies, or source therefore reuse the installed
+runtime dependencies. Changes to the base, web, or build requirement files
+invalidate that layer. Keep the build tools in `requirements/build.txt` compatible
+with `[build-system].requires`. To refresh allowed versions explicitly, rebuild
+with `docker build --no-cache`.
 
 From the checkout root, build and run using the **currently selected Docker
 context**:
@@ -138,7 +143,7 @@ The Dockerfile supports both the legacy builder and BuildKit.
 
 ## Lessons
 
-The course has seven lessons in one reading order. Each has a worked calculation and a focused experiment, with the core derivation in the article and one changed-input question.
+The course has seven core lessons followed by two discount-curve lessons in one reading order. Each has a worked calculation and a focused experiment, with the core derivation in the article and one changed-input question.
 
 | Page | Financial question |
 |---|---|
@@ -149,6 +154,9 @@ The course has seven lessons in one reading order. Each has a worked calculation
 | `/lessons/settlement-and-accrued-interest` | What do you actually pay between coupon dates? Reconcile clean, accrued, and dirty prices. |
 | `/lessons/reinvestment-and-cash` | What do you earn by holding to maturity? Select approach to par or coupon reinvestment. |
 | `/lessons/holding-period-returns` | What do you earn if you sell early? Combine proceeds, coupons, and costs. |
+| `/lessons/discount-factors` | How do you price payments at different maturities? Recover a factor from a calibration bond. |
+| `/lessons/curve-roll-down` | Why can a bond change price on an unchanged curve? Reconcile remaining payments and coupon cash. |
+| `/tools/discount-curves` | Inspect discount factors, payment values, and fitted Fed history. |
 | `/tools/treasury-bills` | Translate bank discount quotes into price, period return, and coupon-equivalent yield. |
 | `/tools/bond-risk` | Compare other bonds and dated risk, inspect numerical checks, and save inputs. |
 | `/tools/bond-return` | Inspect complete cash/position ledgers and keep, sell, or combine positions. |
@@ -159,7 +167,7 @@ The core uses a continuing $100-face, 4% semiannual note. An annual-coupon examp
 On desktop windows at least 1200 pixels wide, lessons place the experiment on the
 left and the explanation on the right. Each side scrolls independently, so the
 chart stays in place while you read. The experiment receives most of the width.
-Hover over the lesson position in the header to choose from the same seven-lesson reading order shown on the homepage and sidebar.
+Hover over the lesson position in the header to choose from the same nine-lesson reading order shown on the homepage and sidebar.
 The counter pads both numbers to two digits, showing **Lesson 05 of 07** on desktop and **05 of 07** on phones.
 
 Click to keep the picker open, or use Enter/Space
@@ -350,8 +358,9 @@ Notebook 01 remain available as reference artifacts. The [project
 plan](fixed_income_lab_plan.md) evaluates the existing implementation and defines
 milestones for learning, educational lessons, and a historical research workbench.
 M1 duration/convexity, M2 return accounting, and M3 historical observations are
-implemented. Their teaching material is consolidated into seven core lessons. Discount curves (M4) are
-next, followed by the first two-strategy research release. Saved research studies
+implemented. Seven core lessons are followed by M4 discount-factor and aging lessons.
+M4 synthetic valuation and the fitted Fed history explorer are available. Historical
+coupon-bond valuation retains an open short-maturity coverage gate ahead of M5. Saved research studies
 and historical strategy returns remain planned.
 The website roadmap now shows milestone availability without week-based promises.
 Application resources resolve relative to the package, not the working
@@ -505,3 +514,60 @@ Optional JavaScript helper checks:
 ```bash
 node --test tests/history_dates.test.cjs tests/history_months.test.cjs
 ```
+
+
+## Discount Curve Explorer (M4)
+
+Open `/tools/discount-curves`. Synthetic mode recovers D(2) from a two-year
+6% calibration bond, values the $100-face 4% semiannual note, and ages its
+payments on an unchanged curve. Curve nodes use exact coupon-period years,
+linear interpolation in log discount factors, D(0)=1, and positive factors.
+Negative rates may imply factors above one. Extrapolation is rejected.
+
+Fed history starts with the exact October 29–30, 2026 rows, plus isolated source
+validation dates. Use **Download Fed CSV**, save the official file, and choose
+**Import Fed CSV**. Select the saved dataset version, choose dates, and press
+**Compare dates**. Imports are bounded to 24 MB and 26,000 dated rows. The
+verified acquisition contains 17,058 rows and 16,668,595 bytes. Missing values
+remain missing. Local imports record their import time and raw SHA-256 identity;
+the original source acquisition time is unknown. Imports retain exact raw bytes
+and normalized rows in browser IndexedDB. Identical bytes reuse a version;
+revised bytes create another version. Export selected raw CSV transfers the
+original file to another browser. An open result keeps its dataset identity.
+
+The Fed file response inspected during implementation omitted a cross-origin
+permission header, so acquisition uses a download link and file import. Python
+normalization and calculations are stateless. Failed imports preserve saved
+versions and results. Browser storage failure leaves the bundled example usable.
+No external connection is required to reopen imported dates while the local or
+installed application server is available.
+
+Source zero and instantaneous forward rates are continuously compounded, par
+rates nominal semiannual, and taus measured in years. Source yields/betas are
+percent; normalized yields/betas and API rates are decimals. Curve valuation uses
+Actual/365 Fixed as a Lab convention, while coupon accrual retains Actual/Actual
+coupon-period accrual and after-payment settlement. The existing YTM pricer has
+its own simple first-fractional-period convention. Match time and discount
+conventions when comparing their prices.
+
+Historical prices require every nonzero payment to fall in the row's supported
+range, conservatively beginning at one year and ending at its published maximum.
+Unsupported payments remain in the table with an unavailable PV and total price.
+Zero-coupon principal can be priced within that range. Source dates whose fitted
+parameters fail published-yield reproduction beyond rounding precision are also
+blocked for pricing, with published observations still visible. The pinned full
+file contains 16 such dates. See `notes/m4_validation.md` for the source audit,
+short-end sensitivity table, and the open M5 gate.
+
+| Interface | Behavior |
+|---|---|
+| `GET /api/curves/bundled` | Versioned exact-row excerpt, source evidence and date coverage |
+| `POST /api/curves/normalize` | Raw official CSV body, `text/csv`; returns SHA-256 snapshot and normalized rows |
+| `POST /api/curves/synthetic` | `calibration_price` in dollars and `horizon` in half-year steps from 0 to 2 |
+| `POST /api/curves/compare` | Two selected rows and dates, snapshot identity, valuation date choice, 2/10-year maturity, decimal coupon rate and 0/1-month age |
+
+Python calculations live in `filab.curves`; the Fed adapter is `filab.data.fed`.
+Snapshots use version 1 and retain all 99 source numeric columns. Each normalized
+row carries `date` and a `values` array in the returned `columns` order. Browser
+rows are validated again for each comparison. Imported datasets belong to their
+browser profile and are removed when that site's data is cleared.

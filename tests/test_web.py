@@ -200,7 +200,7 @@ def test_currency_is_not_mistaken_for_inline_math():
 
 def test_lesson_sequence_and_optional_implementation():
     home = client.get('/').text
-    assert '7 available lessons' in home
+    assert f'{len(LESSONS)} available lessons' in home
     assert home.count('class="lesson-card"') == len(LESSONS)
     for index, lesson in enumerate(LESSONS):
         page = client.get('/lessons/' + lesson['slug']).text

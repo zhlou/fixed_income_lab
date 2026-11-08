@@ -2,6 +2,9 @@
 **
 !Dockerfile
 !.dockerignore
+!requirements/
+!requirements/*.txt
+!MANIFEST.in
 !pyproject.toml
 !README.md
 !src/

@@ -132,3 +132,13 @@ workflow and its limits are recorded in notes/m3_validation.md.
 ## November 8, 2026 curriculum consolidation
 
 The seven-lesson rewrite reuses the conventions and published reference benchmarks recorded above. A separate finite cash-flow calculation checked the new $100-face presentation, the reversed price/YTM example, settlement at $97.88297569974827 clean plus $1 accrued, and the 182-day bill at $97.47222222222223. Prices, decimal rates, and normalized risk measures agreed with the Python APIs to absolute 1e-10, well below displayed cents. Sources remain Treasury Appendix B and the earlier benchmark records. See [the curriculum review](lesson_content_review.md#curriculum-tightening--november-8-2026) for the complete teaching and browser verification record.
+
+
+## M4 curve extension — November 8, 2026
+
+The existing regular and dated YTM conventions are retained. Curve PVs have their
+own explicit time and discount conventions. [M4 validation](m4_validation.md)
+records the independent synthetic arithmetic, full Fed source reproduction audit,
+and short-maturity support decision. Historical coupon-note valuation retains
+an open coverage gate; supported zero-coupon principal and synthetic scenarios
+can be valued.

@@ -8,16 +8,15 @@ WORKDIR /app
 
 RUN python -m pip install --no-cache-dir "pip>=26.2"
 
-COPY pyproject.toml ./
+COPY requirements/base.txt requirements/web.txt requirements/build.txt ./requirements/
 
-# Setuptools needs these placeholders to read dependency metadata.
-RUN mkdir src \
-    && touch README.md \
-    && python -m pip install --no-cache-dir --only-deps ".[web,build]" \
+RUN python -m pip install --no-cache-dir \
+        -r requirements/base.txt -r requirements/web.txt -r requirements/build.txt \
     && groupadd --system filab \
     && useradd --system --gid filab --create-home filab
 
-COPY README.md ./
+COPY pyproject.toml MANIFEST.in README.md ./
+COPY requirements/dev.txt ./requirements/
 COPY src/ ./src/
 
 RUN python -m pip install --no-cache-dir --no-deps --no-build-isolation .

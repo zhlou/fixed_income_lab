@@ -28,6 +28,14 @@ LESSONS = [
          headline="What do you earn if you sell early?",
          description="Combine sale proceeds, coupons, and costs to reconcile an investment return.",
          tag="Investment return", file="holding-period-returns.md", milestone="M2", experiment="sale", prerequisite="reinvestment-and-cash"),
+    dict(slug="discount-factors", title="Price each payment",
+         headline="How do you price payments at different maturities?",
+         description="Recover a discount factor from a coupon bond and trace it into another price.",
+         tag="Discount factors", file="discount-factors.md", milestone="M4", experiment="curve-pricing", prerequisite="holding-period-returns"),
+    dict(slug="curve-roll-down", title="Age a bond on a curve",
+         headline="Why can a bond change price on an unchanged curve?",
+         description="Move the same payments closer, reconcile coupon cash, and derive an implied forward rate.",
+         tag="Time and the curve", file="curve-roll-down.md", milestone="M4", experiment="curve-aging", prerequisite="discount-factors"),
 ]
 
 MILESTONES = [
@@ -35,8 +43,8 @@ MILESTONES = [
     ('M1', 'Duration & convexity', 'Available'),
     ('M2', 'Returns & cash accounting', 'Available'),
     ('M3', 'Historical observations', 'Available'),
-    ('M4', 'Discount curves', 'Next'),
-    ('M5', 'First strategy study', 'Planned'),
+    ('M4', 'Discount curves · historical short end open', 'Available'),
+    ('M5', 'First strategy study · coverage gate open', 'Next'),
     ('M6', 'Robustness & curve risk', 'Planned'),
     ('M7', 'Daily research workbench', 'Planned'),
 ]

@@ -17,7 +17,7 @@ $$
 
 The two-year yield rose **5 bp** and the ten-year rose **2 bp**, so the spread changed by $2-5=\mathbf{-3}$ bp. A positive spread places the ten-year above the two-year. A negative spread means this part of the curve is **inverted**. Widening means the difference increases, which can happen with either rising or falling yields.
 
-These are published par observations. A particular bond has its own coupon, maturity, price, and YTM. To measure an investor's return, follow the purchase price, ending value, and payments received. To value individual future payments from a curve, we will need discount factors in M4.
+These are published par observations. A particular bond has its own coupon, maturity, price, and YTM. To measure an investor's return, follow the purchase price, ending value, and payments received. To value individual future payments from a curve, use the [discount-factor lesson](/lessons/discount-factors) and [Discount Curve Explorer](/tools/discount-curves).
 
 The chart uses log maturity spacing to keep short maturities readable. Its table gives the actual rates. The [Treasury History Viewer](/tools/treasury-history) includes axis choices, missing-observation examples, a hypothetical revision, and saved datasets.
 
