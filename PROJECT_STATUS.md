@@ -531,6 +531,7 @@ in `src/filab/risk/`. The [README](README.md) documents these interfaces.
 - Keep the desktop page within the viewport and contain positioned formula
   accessibility content inside its panel, preventing blank outer-page scrolling.
   Add Overview, Previous, Next, and the lesson position to the top bar.
+- Display the lesson counter with two digits for both numbers, such as **05 of 07**, on desktop and mobile.
 - Teach each relationship once and reuse it through the reading order. Pricing and YTM share one experiment with reversible input direction.
 - Show discrete choices as visible radio option cards, rather than dropdowns.
 - Order payment frequencies **Annual → Semiannual → Quarterly**, followed

@@ -53,8 +53,8 @@
       {% if previous %}<a href="/lessons/{{ previous.slug }}" aria-label="Previous lesson: {{ previous.title }}" title="{{ previous.title }}">← <span>Previous</span></a>{% else %}<span class="nav-unavailable" aria-disabled="true" aria-label="Previous lesson unavailable">← <span>Previous</span></span>{% endif %}
       <div class="lesson-picker">
         <button type="button" id="lesson-picker-toggle" class="lesson-picker-toggle" aria-controls="lesson-picker-panel" aria-expanded="false" aria-label="Choose lesson, current lesson {{ lesson_number }} of {{ lessons|length }}">
-          <span class="lesson-picker-label">Lesson {{ '%02d'|format(lesson_number) }} of {{ lessons|length }}</span>
-          <span class="lesson-picker-compact" aria-hidden="true">{{ '%02d'|format(lesson_number) }} / {{ lessons|length }}</span>
+          <span class="lesson-picker-label">Lesson {{ '%02d'|format(lesson_number) }} of {{ '%02d'|format(lessons|length) }}</span>
+          <span class="lesson-picker-compact" aria-hidden="true">{{ '%02d'|format(lesson_number) }} of {{ '%02d'|format(lessons|length) }}</span>
           <span aria-hidden="true">▾</span>
         </button>
         <div id="lesson-picker-panel" class="lesson-picker-panel" hidden>
