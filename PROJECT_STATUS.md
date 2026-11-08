@@ -6,10 +6,11 @@
 
 **Foundations implementation and independent reference validation are complete
 for the regular-coupon educational model** (original Phase 1, now M0).
-The local website has **thirteen interactive lessons**. **M1 risk and M2 return
-accounting are implemented and validated**, including the Risk Explorer and
-Bond Return Calculator. **M3 historical observations is next.** No M3–M7 data,
-curve, or historical strategy research module is implemented.
+The local website has **seventeen interactive lessons**. **M1 risk, M2 return
+accounting, and M3 historical observations are implemented and validated**,
+including the Risk Explorer, Bond Return Calculator, and Treasury History Viewer.
+**M4 discount curves is next.** Curve valuation and historical strategy research
+remain planned.
 
 The revised plan prioritizes the user's intended daily use: **researching bond
 strategies and historical returns**. It brings return accounting forward, targets
@@ -20,6 +21,43 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### History placement in the lesson picker — November 7, 2026
+
+The popup now shows Foundations → Risk → Returns → History across four columns
+on wide screens, so History no longer wraps beneath Foundations. At 681–1000
+pixels it uses two columns; phones retain one column in curriculum order.
+
+All 17 lesson-picker tests passed. Browser checks at 1440, 900, 390, and 320
+pixels confirmed the group positions and picker width. Keyboard activation
+reached the final History lesson at 320 pixels; no console errors were observed.
+The temporary verification server was stopped afterward.
+
+### M3 historical observations — November 7, 2026
+
+Delivered four lessons on par observations, missing data, information timing, and
+vintages, with `/tools/treasury-history`. The bundled exact Treasury February
+2025 XML response reproduces the 21 → 26 bp spread example offline. A separate
+Python data layer preserves raw bytes, hashes, acquisition timestamps, original
+percentage strings, decimal rates, and immutable normalized snapshots. Explicit
+annual range refreshes activate only after all selected years validate. Older
+versions remain readable; a refresh never silently switches an open comparison.
+
+All **480 tests pass** on Python 3.12.16. Checks include source benchmarks, missing
+versus zero, sample intersections, duplicates/revisions, failed and interrupted
+refreshes, concurrent writers, API parity, and navigation. The installed wheel
+served the sample and bundled assets with networking rejected. Browser checks
+covered all four lessons at 1440 and 390 pixels, formulas, keyboard controls,
+missing/outside-coverage dates, stale-input notices, reset, and a live 2025 refresh.
+No JavaScript or formula errors were observed. Live 1990 and 2003 imports each
+validated 250 rows; the 2025 import validated 249. Temporary verification data
+stays outside the repository. The verification server was stopped after checks.
+
+The [M3 validation record](notes/m3_validation.md) documents evidence, limits,
+and the Fed fitted-curve feasibility assessment. The short end remains an M4
+gate: allow M4 20–32 focused hours and M5 24–40 conditional hours, with remaining
+M4–M7 at 72–116 provisional hours. The [M3 learning journal](notes/m3_learning_journal.md)
+remains unanswered, alongside M1/M2 learner checkpoints.
 
 ### README changes preserve the Docker dependency cache — November 7, 2026
 
@@ -299,6 +337,10 @@ learner reflection is still pending. See [the review record](notes/lesson_conten
 | 11. Pull-to-par & maturity | `/lessons/pull-to-par` | Fixed-YTM discount/premium convergence and final redemption |
 | 12. Reinvestment & cash | `/lessons/reinvestment-and-cash` | Zero-interest/explicit cash and the two-period ledger |
 | 13. Holding-period return & early sale | `/lessons/holding-period-returns` | Integrated early sale, costs, and keeping versus selling |
+| 14. Par yields & security quotes | `/lessons/par-yields-and-quotes` | Published curve and 2s10s spread comparison |
+| 15. Missing dates & tenors | `/lessons/missing-observations` | Exact missing dates, absent tenors, and sample intersection |
+| 16. Observation, publication & retrieval | `/lessons/observation-and-publication` | Observation dates and acquisition evidence |
+| 17. Revisions & vintages | `/lessons/revisions-and-vintages` | Published observations versus a hypothetical revision |
 
 Each lesson has an overview card, sidebar entry, and previous/next navigation.
 Python examples are optional and collapsed. Original notes and Notebook 01
@@ -353,7 +395,7 @@ in `src/filab/risk/`. The [README](README.md) documents these interfaces.
 
 ## Validation and model limits
 
-The latest M2 test run on November 3, 2026 passed **424 tests**. Coverage includes focused lesson boundaries, returns,
+The latest M3 test run on November 7, 2026 passed **480 tests**. Coverage includes historical data/snapshot checks, focused lesson boundaries, returns,
 cash/position accounting, published horizon scenarios, and the existing pricing
 identities, yield round trips, dated settlement, coupon boundaries, leap
 years, bill conventions, API validation, and lesson navigation.
@@ -396,8 +438,8 @@ must lie on the regular maturity-anchored coupon grid.
 
 Stub coupons, holiday adjustments, ex-coupon rules, market settlement lags,
 and auction-specific intermediate rounding are outside this model. The bill
-investment-year basis is an explicit input. Historical market data and
-discount-curve valuation have not yet been added.
+investment-year basis is an explicit input. Historical Treasury par observations are now available; discount-curve valuation
+remains in M4.
 
 ## Running the project
 
@@ -453,11 +495,9 @@ python -m pytest -q
 
 ## Next milestone
 
-Build **M3: Historical observations** from an official source, with a pinned
-fixture, raw observations, acquisition metadata, missing-value policy, and rate
-types. Verify historical discount-curve feasibility before committing to M4/M5
-delivery dates. Complete the learner's M1 and M2 reflection independently of
-that implementation; no software run answers the learning journals.
+Build **M4: Discount curves**, beginning with the Fed source/short-end feasibility
+gate described in [M3 validation](notes/m3_validation.md). Complete the learner's
+M1, M2, and M3 reflection independently; software checks do not answer the journals.
 
 ## Revised roadmap and planning audit
 
@@ -466,18 +506,19 @@ that implementation; no software run answers the learning journals.
 | M0 Foundations | Existing six lessons and pricing | Software/reference checks complete; learner checkpoint unverified |
 | M1 Interest-rate risk | Duration, convexity, risk explorer | Software validated; learner checkpoint pending |
 | M2 Return accounting | Deterministic cash/position ledger and return calculator | Software validated; learner checkpoint pending |
-| M3 Historical observations | Versioned data and curve history viewer | Next |
-| M4 Discount curves | Curve valuation and validated historical adapter | Planned |
+| M3 Historical observations | Versioned data and curve history viewer | Software validated; learner checkpoint pending |
+| M4 Discount curves | Curve valuation and validated historical adapter | Next; short-end feasibility gate open |
 | M5 Strategy research | Two synthetic Treasury strategies, saved runs, exports | Planned; first historical research release |
 | M6 Robustness | Horizon analysis, curve scenarios, key-rate risk | Planned |
 | M7 Daily use | Research desk, reproducibility, backup/recovery | Planned |
 
 The roadmap has distinct learning, educational-site, and workbench acceptance
 criteria. M1 comparison inputs and M2 return ledgers/input snapshots are implemented;
-saved historical studies, feeds, and research modules remain future work. The 108–170 hour
+M3 observations/snapshots are delivered; saved historical research studies and
+strategy modules remain future work. The 108–170 hour
 budget in the plan was the provisional pre-M1 estimate, not recorded time spent.
-The post-M2 review retains the remaining component budgets, totaling 84–132
-focused hours, provisionally until M3 establishes source/curve feasibility.
+The post-M3 review allows 72–116 focused hours for M4–M7, provisionally until
+the Fed adapter and short-end feasibility gate are validated.
 
 The [original plan](notes/fixed_income_lab_plan_original_2026-11-01.md) is preserved
 with its detailed credit curriculum and advanced research topics. These remain

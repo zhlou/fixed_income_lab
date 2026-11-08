@@ -21,6 +21,7 @@ from filab.pricing import coupon_schedule, settled_bond_valuation, settled_yield
 from filab.pricing.settlement import SettlementError
 
 from filab.risk.explorer import compare_bonds
+from .history_api import router as history_router
 from .curriculum import LESSONS, ROADMAP
 from .returns_api import router as returns_router
 from .return_lessons import RETURN_LESSONS, lesson_spec, router as return_lesson_router
@@ -51,6 +52,7 @@ def optional_code(tokens, idx, options, env):
 markdown.renderer.rules["fence"] = optional_code
 templates = Jinja2Templates(directory=str(HERE / "templates"))
 app = FastAPI(title="Fixed-Income Lab", version="0.1.0")
+app.include_router(history_router)
 app.include_router(returns_router)
 app.include_router(return_lesson_router)
 app.mount("/static", StaticFiles(directory=str(HERE / "static")), name="static")
@@ -389,4 +391,11 @@ def risk_tool(request: Request):
 def return_tool(request: Request):
     return templates.TemplateResponse(request=request, name='returns.html', context={
         'lessons': LESSONS, 'active': 'bond-return', 'page_title': 'Bond Return Calculator',
+    })
+
+
+@app.get('/tools/treasury-history')
+def history_tool(request: Request):
+    return templates.TemplateResponse(request=request, name='history.html', context={
+        'lessons': LESSONS, 'active': 'treasury-history', 'page_title': 'Treasury History Viewer',
     })

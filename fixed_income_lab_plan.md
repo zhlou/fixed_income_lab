@@ -1,12 +1,12 @@
 # Fixed-Income Lab — Learning, Education, and Research Workbench
 
-**Revised:** November 5, 2026 (America/Chicago)
+**Revised:** November 7, 2026 (America/Chicago)
 
 **Primary daily use:** Research bond strategies and historical returns.
 
-**Current release:** Thirteen lessons, regular-bond pricing, bill quotations, M1 risk tools, and M2 return accounting.
+**Current release:** Seventeen lessons, regular-bond pricing, M1 risk tools, M2 return accounting, and M3 versioned Treasury observations.
 
-**Next release:** M3 historical observations and provenance.
+**Next release:** M4 discount curves and the historical-adapter feasibility gate.
 
 ## 1. Direction and assessment
 
@@ -84,6 +84,24 @@ scenarios validate the accounting. The full suite now has 424 passing cases. See
 [the M2 journal](notes/m2_learning_journal.md). M3–M7 are still planned. M2 adds
 neither market data nor historical strategies; curved-term-structure roll-down
 remains in M4.
+
+### M3 delivery update — November 7, 2026
+
+M3 adds four lessons and `/tools/treasury-history`, using an exact pinned February
+2025 official Treasury response with 19 rows. The two-year/ten-year spread example
+reproduces 21 → 26 bp. Explicit year-range refreshes support 1990 through the current
+year, with raw bytes, UTC acquisition times, rate types/units, content hashes,
+immutable normalized snapshots, and atomic publication after range validation.
+Missing dates and tenors remain absent; open comparisons stay on their snapshot.
+The installed package works offline with the bundled example. All 480 tests pass.
+See [M3 validation](notes/m3_validation.md); [learner evidence](notes/m3_learning_journal.md)
+remains pending.
+
+The Fed source review identifies short-end support as an unresolved M4 gate.
+Re-estimate M4 at 20–32 focused hours (including 4–8 for that initial gate), keep
+M5 at 24–40 conditional hours, and defer delivery dates until curve validation.
+M4–M7 now total 72–116 provisional hours. These are planning judgments, not a
+record of learning time or a successful historical-adapter implementation.
 
 ### Three separate measures of success
 
@@ -183,8 +201,8 @@ learning pace and data issues may extend it. Useful releases arrive along the wa
 | M0 Foundations | Existing | Cash flows, prices, yields, accrual | Six lessons and calculators | Software complete; learner checkpoint unverified |
 | M1 Interest-rate risk | M0 | Sensitivity and approximation error | Delivered; learner checkpoint pending | Original estimate: 12–18 h |
 | M2 Returns and cash accounting | M0; M1 for risk comparisons | Reconcile a holding-period return | Delivered; learner checkpoint pending | Original estimate: 12–20 h |
-| M3 Historical observations | M0; independent of M2 | Understand dataset meaning | Historical curve viewer and versioned data | 16–24 h |
-| M4 Discount curves | M1, M3 | Par, spot, forward, and YTM distinctions | Curve valuation and historical adapter | 16–24 h |
+| M3 Historical observations | M0; independent of M2 | Understand dataset meaning | Delivered; learner checkpoint pending | Original estimate: 16–24 h |
+| M4 Discount curves | M1, M3 | Par, spot, forward, and YTM distinctions | Curve valuation and historical adapter | 20–32 h, including feasibility gate |
 | M5 First strategy study | M1–M4 | Explain historical strategy returns | Two-strategy backtest, saved runs, exports | 24–40 h |
 | M6 Robustness and curve risk | M5 | Test stability of a finding | Horizon analysis and key-rate scenarios | 16–24 h |
 | M7 Daily-use release | M5–M6 | Reproduce and communicate research | Reliable research desk and acceptance study | 12–20 h |
@@ -406,7 +424,7 @@ calculations. API rates are decimals; controls use percentages. Display cents,
 commit purchase prices in one-cent increments, and keep intermediate precision.
 Preserve option cards, semiannual defaults, units, and accessibility.
 
-`pricing/`, `risk/`, `analytics/`, and `web/` now exist. Add the remaining modules when needed,
+`pricing/`, `risk/`, `analytics/`, `data/`, and `web/` now exist. Add the remaining modules when needed,
 not empty architecture in advance.
 
 | Layer | Responsibility | Milestone |
@@ -482,13 +500,14 @@ optimization until a concrete research need justifies the scope.
    shock row, and export/reload a comparison. Software does not answer these prompts.
 2. Complete the M2 learner journal: independently reconcile the coupon-date and
    two-period examples, explain an early-sale return, and export/reload inputs.
-3. Start M3 with an official source, pinned fixture, and provenance panel; assess
-   M4's data feasibility before promising a historical backtest date.
+3. Complete the M3 learner journal; begin M4 with pinned Fed data, documented
+   units, published-output reproduction, and short-end support checks.
 4. Keep saved comparison inputs distinct
    from future immutable historical research runs.
 
-M2 implementation adds holding-period returns. Market data, historical strategy
-results, and saved research studies remain future work.
+M2 supplies holding-period accounting; M3 supplies versioned par observations.
+Discount-curve valuation, historical strategy results, and saved research studies
+remain future work.
 
 **Post-M2 estimate review:** The original remaining M3–M7 component budgets sum
 to **84–132 focused hours**. M2 has resolved the core event-ordering and cash

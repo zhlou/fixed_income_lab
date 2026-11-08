@@ -162,7 +162,7 @@ def test_m2_pages_have_separate_lessons_formulas_navigation_and_local_assets():
         assert f'href="/lessons/{previous}"><small>← PREVIOUS LESSON</small>' in text
     assert 'href="/lessons/coupons-and-return" class="next-lesson"' in client.get('/lessons/convexity').text
     home=client.get('/').text
-    assert '13 available lessons' in home
+    assert '17 available lessons' in home
     assert 'Open Bond Return Calculator' in home
     tool=client.get('/tools/bond-return')
     assert tool.status_code==200 and 'data-ledger-export' in tool.text

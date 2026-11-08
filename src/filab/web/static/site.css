@@ -44,7 +44,7 @@
 .lesson-picker-toggle{display:flex;align-items:center;gap:7px;padding:7px 10px;border:1px solid var(--line);border-radius:4px;background:white;color:#365b42;font:inherit;white-space:nowrap}
 .lesson-picker-toggle:hover,.lesson-picker-toggle[aria-expanded="true"]{background:#edf3e2;border-color:#8ba17d}
 .lesson-picker-compact{display:none}
-.lesson-picker-panel{position:absolute;top:100%;right:20px;width:min(900px,calc(100vw - 40px));max-height:calc(100dvh - 84px);overflow-y:auto;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;padding:20px;background:white;border:1px solid var(--line);border-radius:0 0 7px 7px;box-shadow:0 12px 28px #0d251d25;white-space:normal}
+.lesson-picker-panel{position:absolute;top:100%;right:20px;width:min(1120px,calc(100vw - 40px));max-height:calc(100dvh - 84px);overflow-y:auto;overscroll-behavior:contain;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;padding:20px;background:white;border:1px solid var(--line);border-radius:0 0 7px 7px;box-shadow:0 12px 28px #0d251d25;white-space:normal}
 .lesson-picker-panel[hidden]{display:none}
 .lesson-picker-group{min-width:0}
 .lesson-picker-group h2{margin:0 10px 10px;font:600 12px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#607465;letter-spacing:0}
@@ -100,6 +100,7 @@
 }
 @media(min-width:1600px){.lesson-page .workspace{grid-template-columns:220px minmax(0,1fr)}}
 @media(max-width:1199px){.reading-pane{max-width:900px}.lesson-page main{max-width:1200px}}
+@media(min-width:681px) and (max-width:1000px){.lesson-picker-panel{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:680px){
   .lesson-page .topbar{height:62px;gap:12px}
   .lesson-page .sidebar{top:62px}
@@ -217,3 +218,34 @@
   .return-form-actions{position:sticky;bottom:0}
 }
 @media(max-width:680px){.return-toolbar{padding:10px 12px;gap:4px 12px}.return-state{flex:1}.return-preset-buttons .button{flex:1 1 43%;min-height:40px}.return-calculator .chart-tooltip{white-space:pre-wrap}}
+
+/* M3: source observations remain readable in narrow lesson panels. */
+.history-workspace { display:grid; gap:20px; min-width:0; }
+.history-controls, .history-revision, .history-provenance { padding:24px; }
+.history-controls h2, .history-results h2 { font-size:24px; }
+.history-controls details { margin-top:20px; border-top:1px solid var(--line, #ddd); padding-top:16px; }
+.history-controls summary, .history-provenance summary { cursor:pointer; font-weight:600; }
+.history-dates { display:flex; flex-wrap:wrap; gap:16px; margin:16px 0; }
+.history-dates label { display:grid; gap:6px; flex:1 1 180px; min-width:0; }
+.history-dates input { font:inherit; padding:10px; border:1px solid #aaa; border-radius:6px; width:100%; min-width:0; background:#fff; color:#203b32; }
+.history-actions { display:flex; flex-wrap:wrap; gap:12px; align-items:center; }
+.history-results { display:grid; gap:20px; min-width:0; }
+.history-stale { opacity:.5; }
+.history-option { display:flex; gap:12px; align-items:flex-start; padding:12px; border:1px solid #bbb; border-radius:6px; margin:8px 0; }
+.history-option:has(input:checked) { background:#e8f0eb; border-color:#356b58; }
+.history-option input { margin-top:5px; }
+.history-workspace fieldset { border:0; padding:0; margin:16px 0; min-width:0; }
+.history-revision label { display:block; padding:10px 0; }
+.history-hash { overflow-wrap:anywhere; font-family:monospace; font-size:12px; }
+.history-provenance { overflow-wrap:anywhere; }
+.history-workspace .chart svg { display:block; width:100%; height:auto; }
+.history-workspace .chart { min-height:0; }
+.history-workspace .metrics { grid-template-columns:repeat(3,minmax(0,1fr)); }
+.history-workspace .metric strong { font-size:clamp(20px,3vw,32px); }
+.history-workspace[data-focus="observation-and-publication"] .history-provenance { order:-1; }
+.history-workspace[data-focus="observation-and-publication"] .chart-card { display:none; }
+@media(max-width:600px) {
+  .history-controls, .history-revision, .history-provenance { padding:16px; }
+  .history-workspace .metrics { grid-template-columns:1fr; }
+  .history-workspace .table-scroll { max-width:100%; }
+}

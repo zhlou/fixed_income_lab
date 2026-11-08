@@ -151,6 +151,11 @@ with BuildKit; it does not require builder-specific features.
 | `/lessons/reinvestment-and-cash` | Explicit cash growth and the two-period ledger |
 | `/lessons/holding-period-returns` | Integrated early-sale return, costs, and keeping versus selling |
 | `/tools/bond-return` | One/two-position return calculator with input and ledger exports |
+| `/lessons/par-yields-and-quotes` | Constant-maturity observations and spread arithmetic |
+| `/lessons/missing-observations` | Missing dates/tenors and common samples |
+| `/lessons/observation-and-publication` | Observation, publication, and retrieval timing |
+| `/lessons/revisions-and-vintages` | Immutable evidence and hypothetical revisions |
+| `/tools/treasury-history` | Cached historical curves, explicit refresh, and source evidence |
 
 The six foundations lessons are **Bond Basics → Present Value and Bond Pricing
 → Bond Pricing Lab → Yield to Maturity → Settlement and Accrued Interest
@@ -162,7 +167,7 @@ M1 adds three lessons: **Cash-flow timing & duration → Modified duration & DV0
 a worked example, reflection questions, and a transfer exercise with a collapsed
 answer. The shared Risk Explorer is also available outside the lesson sequence.
 M2 adds **Coupons, accrual & return → Pull-to-par & maturity → Reinvestment
-& cash → Holding-period return & early sale**, bringing the total to thirteen lessons.
+& cash → Holding-period return & early sale**, bringing the M0–M2 total to thirteen lessons.
 The first page introduces a simple return; the final page combines the pieces
 with exit-yield changes and trading costs. Existing lesson URLs are preserved.
 Their focused experiments share the same return ledger, which processes every
@@ -171,9 +176,11 @@ payment before measuring wealth. The complete calculator has its own tool page.
 On desktop windows at least 1200 pixels wide, lessons place the experiment on the
 left and the explanation on the right. Each side scrolls independently, so the
 chart stays in place while you read. The experiment receives most of the width.
-Hover over **Lesson 08 of 13 ▾** in the header to jump to any lesson, grouped under
-Foundations, Risk, and Returns. Click to keep the picker open, or use Enter/Space
-and Tab by keyboard. Escape closes it. On phones, tap the compact **08 / 13 ▾**
+Hover over **Lesson 08 of 17 ▾** in the header to jump to any lesson, grouped under
+Foundations, Risk, Returns, and History. Wide screens show those four groups
+left to right; medium screens use two columns and phones use one.
+Click to keep the picker open, or use Enter/Space
+and Tab by keyboard. Escape closes it. On phones, tap the compact **08 / 17 ▾**
 button to open a scrollable lesson list. **Course** opens the full navigation.
 Narrower windows stack the sections with links between them. The top bar also
 provides Overview, Previous, and Next; previous/next links sit at the end of the explanation.
@@ -246,7 +253,7 @@ Each of the two returned `bonds` contains `risk`, `cashflows`, `convergence`,
 `inputs`. **Import comparison** validates the complete snapshot through
 `POST /api/risk-study` before restoring inputs and recalculating. Incompatible
 files leave the comparison unchanged. This saves assumptions, not frozen outputs
-or historical research runs. Inputs are local; there is no cloud account or feed.
+or historical research runs. These scenario inputs are local and independent of the M3 historical-data feed.
 
 ## Bond Return Calculator (M2)
 
@@ -357,6 +364,7 @@ src/filab/risk/             Yield derivatives and comparison scenarios
 src/filab/analytics/        Cash/position event ledger and holding-period returns
 src/filab/web/curriculum.py Published lessons and milestone registry
 src/filab/web/app.py        Lesson routes and numerical API
+src/filab/data/             Treasury source adapter, snapshots, bundled fixture
 src/filab/web/content/      Website lesson Markdown
 src/filab/web/templates/    Shared page templates
 src/filab/web/static/       CSS, JavaScript, SVG and vendored KaTeX
@@ -369,10 +377,10 @@ The website Markdown is the source for website lessons. Original notes and
 Notebook 01 remain available as reference artifacts. The [project
 plan](fixed_income_lab_plan.md) evaluates the existing implementation and defines
 milestones for learning, educational lessons, and a historical research workbench.
-M1 duration/convexity and M2 return accounting are implemented. The next milestone
-is historical observations (M3), followed by discount curves and a small two-strategy
-research release.
-Historical research, saved studies, and data feeds are planned, not available yet.
+M1 duration/convexity, M2 return accounting, and M3 historical observations are
+implemented. M3 adds four lessons for seventeen total. Discount curves (M4) are
+next, followed by the first two-strategy research release. Saved research studies
+and historical strategy returns remain planned.
 The website roadmap now shows milestone availability without week-based promises.
 Application resources resolve relative to the package, not the working
 directory. After moving a checkout, recreate its virtual environment or
@@ -393,10 +401,12 @@ YTM checks include price/yield round trips, independent one-period and
 zero-coupon formulas, zero and negative yields, payment frequencies, and
 invalid prices. Dated pricing, accrued interest, and bill quotation checks use published
 Treasury examples. See [Phase 1 validation](notes/phase_1_validation.md) for
-sources, tolerances, and model limits. M0–M2 software is complete; learner
+sources, tolerances, and model limits. M0–M3 software is complete; learner
 reflection remains separate. See [M1 validation](notes/m1_validation.md),
-[M2 validation](notes/m2_validation.md), and the intentionally unanswered
-[M1](notes/m1_learning_journal.md) and [M2](notes/m2_learning_journal.md) journals.
+[M2 validation](notes/m2_validation.md), [M3 validation](notes/m3_validation.md),
+and the intentionally unanswered
+[M1](notes/m1_learning_journal.md), [M2](notes/m2_learning_journal.md), and
+[M3](notes/m3_learning_journal.md) journals.
 
 ## Original Python and notebook workflow
 
@@ -419,3 +429,86 @@ are installed under this user's `~/.local/`; Bash PATH setup is in
 KaTeX 0.16.22 is vendored under `src/filab/web/static/vendor/katex/`,
 including its MIT license and fonts. JavaScript handles presentation;
 financial calculations run on the local Python server.
+
+## Treasury history (M3)
+
+Open `/tools/treasury-history` to compare nominal constant-maturity **par yields**
+on two exact dates. A fresh installation opens the bundled February 2025 sample,
+including the 21 bp → 26 bp two-year/ten-year spread example, without networking.
+Lessons 14–17 explain rate types, missing observations, information timing, and
+vintages. The source observations are annual percentages; numerical API rates
+are decimals and differences have explicit basis-point units.
+
+Use **Load or refresh selected years** for an inclusive range from 1990 through
+the current year. The default is the last completed calendar year. Only that
+button fetches Treasury's annual XML feed. A current year is covered only through
+the retrieval date. Coverage means the requested period, not a guarantee of a
+row on every date. Missing dates and tenors remain absent, and the UI never
+silently selects a nearby date. The chart's lines only connect published nodes.
+
+The refresh runs in the background with progress and duplicate-submission
+protection. All selected years must parse and validate before a single atomic
+catalog transaction activates the candidate. A failed or interrupted refresh
+leaves the previous snapshot active; raw responses already acquired are retained.
+Previously cached years outside the selected range remain in the candidate.
+Identical normalized values and coverage reuse a snapshot even when raw feed
+metadata changes. Different values or coverage create a new immutable version.
+Choose old versions with the saved-dataset radio cards. Completing a refresh
+does not switch your open comparison; use **Open refreshed snapshot** explicitly.
+
+The runtime store defaults to `~/.local/share/fixed-income-lab/`. Override it by
+setting `FILAB_DATA_DIR` to an absolute writable directory before starting the
+server. It contains `raw/<sha256>.xml` exact response files and
+`catalog.sqlite3` with immutable normalized snapshot JSON, acquisition metadata,
+and the active pointer. Raw files include generation timestamps exactly as
+received; these are not treated as historical release times. Snapshot IDs use
+SHA-256 over normalized numerical observations, coverage, and normalizer version.
+Every snapshot retains the original source percentages and source references.
+Successful duplicate retrievals are logged separately without rewriting snapshots.
+Download a selected normalized snapshot from the viewer; for a complete backup,
+stop the server and copy the entire runtime store, including its raw directory.
+The pinned fixture remains packaged and readable even if that directory is absent
+or read-only. No runtime database belongs in Git.
+
+The local refresh-job status is transient and intended for the default single
+Uvicorn process. If the server restarts, reopen saved datasets and retry the
+refresh. Completed snapshots persist; unfinished candidates never activate.
+A POSIX file lock also prevents concurrent cache writers on macOS and Linux.
+There is no scheduled polling, account, or market-data credential.
+
+For Docker persistence, use an engine-host named volume (also valid with the
+remote `deepl` context). Docker initializes a new volume with the image's
+unprivileged user's home permissions:
+
+```bash
+docker volume create fixed-income-lab-data
+docker run --detach --name fixed-income-lab \
+  --publish 127.0.0.1:8000:8000 \
+  --env FILAB_DATA_DIR=/home/filab/.local/share/fixed-income-lab \
+  --mount source=fixed-income-lab-data,target=/home/filab \
+  fixed-income-lab:local
+```
+
+Use this command when creating the container, with the existing container stopped
+and removed as described above. A host bind mount must be writable by the
+container's `filab` user. The volume is optional for the bundled offline example;
+without persistence, removing a container discards its downloaded history.
+
+Read interfaces:
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/history/snapshots` | Active and bundled IDs, saved coverage, latest observations, recent acquisitions |
+| `GET /api/history/snapshots/{snapshot_id}` | Complete immutable normalized dataset and provenance |
+| `GET /api/history/compare?snapshot_id=…&first=YYYY-MM-DD&second=YYYY-MM-DD` | Exact-date curves, tenor changes, spreads, common sample, missing counts, source metadata |
+| `POST /api/history/refresh` | Start an explicit refresh with integer `start_year` and `end_year`; returns a job ID |
+| `GET /api/history/refresh/{job_id}` | Running/complete/failed status, progress, completed snapshot ID |
+
+Comparison requests require a snapshot ID. Missing observations return JSON null;
+`date_states` distinguishes `published`, `no_published_row`, and
+`outside_coverage`. The optional `hypothetical_revision=true` comparison flag
+adds 10 bp to the second date's ten-year rate in memory for lesson 17 and labels
+the response `hypothetical`; it never writes to the source snapshot. Neither
+these observations nor the spread comparison provide security prices or returns.
+Exact historical publication times remain unknown. See
+[M3 validation and the M4 feasibility assessment](notes/m3_validation.md).

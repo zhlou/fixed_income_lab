@@ -1,0 +1,30 @@
+<section class="history-workspace" data-history data-focus="{{ active }}" data-pinned="{{ 'true' if lesson is defined else 'false' }}">
+<div class="card history-controls">
+<div class="card-overline">HISTORICAL OBSERVATIONS · NOMINAL PAR YIELDS</div>
+<h2>Compare two published curves.</h2>
+<p>Annual par yields at constant maturities. No particular bond, price, or return is implied.</p>
+{% if lesson is defined %}<p class="convention">This lesson uses the pinned February 2025 sample. <a href="/tools/treasury-history">Open the full history viewer</a> to load other years.</p>{% endif %}
+<form data-compare-form>
+<div class="history-dates"><label>First observation date<input name="first" type="date" value="2025-02-14" required></label><label>Second observation date<input name="second" type="date" value="2025-02-18" required></label></div>
+<div class="history-actions"><button class="button primary" type="submit">Compare dates</button><button class="reset" type="button" data-reset-history>↺ Reset example</button></div>
+</form>
+{% if active == 'missing-observations' %}<button class="reset" type="button" data-missing-date>Try February 17 · no published row</button>{% endif %}
+<p class="error" role="alert" data-history-error></p>
+{% if lesson is not defined %}
+<p class="tiny-note" data-cache-summary></p>
+<details class="history-snapshots"><summary>Choose a saved dataset</summary><fieldset data-snapshot-options><legend>Snapshot · an open comparison keeps this version</legend></fieldset><a data-snapshot-download download="treasury-snapshot.json">Download this snapshot (JSON)</a></details>
+<details><summary>Load or refresh selected years</summary>
+<p>Only this action contacts Treasury. A failed refresh keeps your saved data. New observations become a new snapshot; your comparison stays on its selected version.</p>
+<form data-refresh-form><div class="history-dates"><label>First year<input name="start_year" type="number" min="1990" required></label><label>Last year<input name="end_year" type="number" min="1990" required></label></div><button class="button primary" type="submit">Load / refresh</button></form>
+<p role="status" aria-live="polite" data-refresh-status></p><button type="button" class="reset" data-use-refreshed hidden>Open refreshed snapshot</button>
+</details>
+{% endif %}
+</div>
+{% if active == 'revisions-and-vintages' %}<div class="card history-revision"><h3>A hypothetical revision</h3><p>Suppose a later retrieval changes the February 18 ten-year yield from 4.55% to 4.65%. Toggle the assumption, then inspect the comparison. Saved source observations remain intact.</p><fieldset><legend>Example version</legend><label class="history-option"><input type="radio" name="revision" value="observed" checked> Published sample</label><label class="history-option"><input type="radio" name="revision" value="hypothetical"> Hypothetical revised ten-year yield</label></fieldset><p data-revision-result role="status"></p></div>{% endif %}
+<div class="history-results" aria-busy="true">
+<div class="metrics" aria-live="polite"><div class="metric"><span>First · 10y − 2y</span><strong data-spread-first>—</strong></div><div class="metric"><span>Second · 10y − 2y</span><strong data-spread-second>—</strong></div><div class="metric primary-metric"><span>Spread change</span><strong data-spread-change>—</strong></div></div>
+<div class="card chart-card"><h2>Par curves on your exact dates</h2><div class="chart" data-history-chart></div><p class="tiny-note">Dots are published tenors. Lines guide the eye and break at missing values; they do not supply additional rates. The table contains every plotted value.</p></div>
+<div class="card table-card"><h2>Tenor changes</h2><p data-date-states role="status"></p><div class="table-scroll" tabindex="0" aria-label="Par yields and changes by tenor" data-history-table></div><p data-sample-note class="tiny-note"></p></div>
+<details class="card history-provenance" open><summary>Coverage, timing & source evidence</summary><div data-history-provenance></div></details>
+</div>
+</section>

@@ -55,6 +55,24 @@ LESSONS.extend([
          prerequisite="reinvestment-and-cash",
          prediction="A discount bond will redeem at face value. Does that guarantee a positive return if you sell early?"),
 ])
+LESSONS.extend([
+    dict(slug="par-yields-and-quotes", title="Par yields & security quotes", headline="What does this yield describe?",
+         description="Read a constant-maturity par curve and compare the two-year and ten-year observations.",
+         tag="M3 · Understand the observation", duration="25 min", file="par-yields-and-quotes.md", milestone="M3",
+         prerequisite="yield-to-maturity", prediction="If the ten-year par yield rises, do you know the return of a bond you bought last year?"),
+    dict(slug="missing-observations", title="Missing dates & tenors", headline="A blank is information.",
+         description="Distinguish missing dates, missing tenors, and dates outside your dataset. Define a common sample.",
+         tag="M3 · Check the sample", duration="25 min", file="missing-observations.md", milestone="M3",
+         prerequisite="par-yields-and-quotes", prediction="Can you calculate a yield change when the first observation is missing?"),
+    dict(slug="observation-and-publication", title="Observation, publication & retrieval", headline="When could you have known?",
+         description="Separate the market observation date from release timing and your own retrieval timestamp.",
+         tag="M3 · Information timing", duration="25 min", file="observation-and-publication.md", milestone="M3",
+         prerequisite="missing-observations", prediction="Does a February 18 observation prove that it was available at the start of that day?"),
+    dict(slug="revisions-and-vintages", title="Revisions & vintages", headline="Keep the version you used.",
+         description="Compare a published sample with a hypothetical revision and understand immutable snapshots.",
+         tag="M3 · Reproduce the evidence", duration="25 min", file="revisions-and-vintages.md", milestone="M3",
+         prerequisite="observation-and-publication", prediction="If a refreshed source changes an old value, should an old comparison change too?"),
+])
 for lesson in LESSONS:
     lesson.setdefault('milestone', 'M0')
 
@@ -62,8 +80,8 @@ MILESTONES = [
     ('M0', 'Bond foundations', 'Available'),
     ('M1', 'Duration & convexity', 'Available'),
     ('M2', 'Returns & cash accounting', 'Available'),
-    ('M3', 'Historical observations', 'Next'),
-    ('M4', 'Discount curves', 'Planned'),
+    ('M3', 'Historical observations', 'Available'),
+    ('M4', 'Discount curves', 'Next'),
     ('M5', 'First strategy study', 'Planned'),
     ('M6', 'Robustness & curve risk', 'Planned'),
     ('M7', 'Daily research workbench', 'Planned'),

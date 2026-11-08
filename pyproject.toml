@@ -42,3 +42,5 @@ testpaths = ["tests"]
 
 [tool.setuptools.package-data]
 "filab.web" = ["templates/*.html", "content/*.md", "static/*", "static/vendor/katex/*", "static/vendor/katex/fonts/*"]
+
+"filab.data" = ["fixtures/*.xml", "fixtures/*.json"]

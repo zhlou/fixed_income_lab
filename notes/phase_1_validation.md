@@ -90,3 +90,11 @@ integrated early-sale return in that order. The pricing model and published
 reference benchmarks above are unchanged. Independently recomputed simple-return
 and fixed-yield zero-coupon teaching examples, regression tolerances, and
 desktop/mobile checks are recorded in [M2 validation](m2_validation.md).
+
+
+## M3 observation benchmarks — November 7, 2026
+
+The official Treasury February 2025 source response, its hash and retrieval time,
+published 2y/10y benchmark values, basis-point tolerances, and missing-value
+checks are recorded in [M3 validation](m3_validation.md). Existing Phase 1 pricing
+benchmarks and dated-model conventions remain unchanged.

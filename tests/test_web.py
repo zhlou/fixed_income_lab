@@ -37,7 +37,7 @@ def test_lesson_picker_destinations_and_current_lesson(lesson_number, lesson):
     assert 'aria-controls="lesson-picker-panel" aria-expanded="false"' in page
     assert f'current lesson {lesson_number} of {len(LESSONS)}' in page
     panel = re.search(r'<div id="lesson-picker-panel"[^>]* hidden>(.*?)</div>', page, re.S).group(1)
-    assert re.findall(r'<h2[^>]*>(.*?)</h2>', panel) == ['Foundations', 'Risk', 'Returns']
+    assert re.findall(r'<h2[^>]*>(.*?)</h2>', panel) == ['Foundations', 'Risk', 'Returns', 'History']
     links = re.findall(r'<a href="(/lessons/[^"]+)"([^>]*)>(.*?)</a>', panel, re.S)
     assert [href for href, _, _ in links] == ['/lessons/' + item['slug'] for item in LESSONS]
     assert [href for href, attrs, _ in links if 'aria-current="page"' in attrs] == ['/lessons/' + lesson['slug']]
@@ -203,11 +203,11 @@ def test_currency_is_not_mistaken_for_inline_math():
 
 def test_lesson_sequence_and_optional_implementation():
     home = client.get('/').text
-    assert '13 available lessons' in home
-    assert home.count('class="lesson-card"') == 13
+    assert '17 available lessons' in home
+    assert home.count('class="lesson-card"') == 17
     for slug in ('bond-basics', 'present-value', 'bond-pricing-lab', 'yield-to-maturity', 'settlement-and-accrued-interest', 'treasury-bill-yields'):
         page = client.get('/lessons/' + slug).text
-        assert page.count('class="lesson-link ') == 13
+        assert page.count('class="lesson-link ') == 17
         assert 'href="/lessons/cash-flows-and-pricing"' not in page
     second = client.get('/lessons/present-value').text
     assert 'Present value &amp; bond pricing' in second
