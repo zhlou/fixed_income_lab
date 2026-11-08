@@ -3,10 +3,9 @@
 <div class="card history-controls">
 <div class="card-overline">HISTORICAL OBSERVATIONS · NOMINAL PAR YIELDS</div>
 <h2>Compare two published curves.</h2>
-<p>Annual par yields at constant maturities. No particular bond, price, or return is implied.</p>
-{% if lesson is defined %}<p class="convention">The worked example is pinned to {{ history_example.period }}. Explore other months in the calendar. Reset example restores the lesson's original observations. <a href="/tools/treasury-history">Open the Treasury History Viewer</a> for saved datasets, export/import, and year downloads.</p>{% endif %}
+<p>Annual Treasury par yields · historical observations.</p>
 <form data-compare-form>
-{% if active == 'par-yields-and-quotes' %}
+{% if lesson is not defined %}
 {{ choices('history-example', 'history_sample', 'Published example', [('recent', 'Recent example', history_example.dates_label), ('series-introduction', 'Series introduction', history_reference.dates_label)], '', selected='recent') }}
 {% endif %}
 <div class="history-dates">
@@ -21,11 +20,11 @@
 <p class="tiny-note" id="history-date-format">Type YYYY-MM-DD or open the calendar. Missing dates remain selectable.</p>
 <div class="history-actions"><button class="button primary" type="submit">Compare dates</button><button class="reset" type="button" data-reset-history>↺ Reset example</button></div>
 </form>
-{% if active == 'par-yields-and-quotes' %}<button class="reset" type="button" data-missing-date>Try {{ history_example.missing_label }} · no published row</button>{% endif %}
+{% if lesson is not defined %}<button class="reset" type="button" data-missing-date>Try {{ history_example.missing_label }} · no published row</button>{% endif %}
 <p class="tiny-note" data-example-status aria-live="polite"></p>
 {% if lesson is defined %}<p class="convention" data-lesson-example role="status">Worked example · {{ history_example.dates_label }}. The lesson starts with pinned observations.</p>{% endif %}
 <p class="error" role="alert" data-history-error></p>
-<p class="tiny-note">Your browser downloads additional Treasury history when you change calendar months. Saved history belongs to this browser. Failed downloads show No data. The current month is checked at most hourly{% if lesson is defined %} when exploring beyond the pinned example{% endif %}. Compare dates to update the curves.</p>
+{% if lesson is not defined %}<p class="tiny-note">Opening an uncached month downloads Treasury data into this browser. Failed downloads show No data. Compare dates to update the displayed result.</p>{% endif %}
 <p class="tiny-note" data-month-status role="status"></p><button type="button" class="reset" data-retry-month hidden>Retry month</button>
 {% if lesson is not defined %}
 <p class="tiny-note" data-cache-summary></p>
@@ -37,13 +36,15 @@
 </details>
 {% endif %}
 </div>
-{% if active == 'revisions-and-vintages' %}<div class="card history-revision"><h3>A hypothetical revision</h3><p data-revision-description aria-live="polite">Compare dates to inspect a hypothetical 10 bp increase in the second date's ten-year yield. Saved source observations remain intact.</p><fieldset><legend>Example version</legend><label class="history-option"><input type="radio" name="revision" value="observed" checked> Published sample</label><label class="history-option"><input type="radio" name="revision" value="hypothetical"> Hypothetical revised ten-year yield</label></fieldset><p data-revision-result role="status"></p></div>{% endif %}
+{% if lesson is not defined %}<details class="card history-revision"><summary>Try a hypothetical revision</summary><h3>A hypothetical revision</h3><p data-revision-description aria-live="polite">Compare dates to inspect a hypothetical 10 bp increase in the second date's ten-year yield. Saved source observations remain intact.</p><fieldset><legend>Example version</legend><label class="history-option"><input type="radio" name="revision" value="observed" checked> Published sample</label><label class="history-option"><input type="radio" name="revision" value="hypothetical"> Hypothetical revised ten-year yield</label></fieldset><p data-revision-result role="status"></p></details>{% endif %}
 <div class="history-results" aria-busy="true">
 <div class="metrics" aria-live="polite"><div class="metric"><span>First · 10y − 2y</span><strong data-spread-first>—</strong></div><div class="metric"><span>Second · 10y − 2y</span><strong data-spread-second>—</strong></div><div class="metric primary-metric"><span>Spread change</span><strong data-spread-change>—</strong></div></div>
 <div class="card chart-card"><h2>Par curves on your exact dates</h2>
-{{ choices('history-maturity-scale', 'maturity_scale', 'Maturity axis', [('log', 'Log', 'Equal maturity ratios'), ('linear', 'Linear', 'Equal additional years')], 'Only horizontal spacing changes. Yields and spread calculations stay the same.', selected='log') }}
+{% if lesson is not defined %}{{ choices('history-maturity-scale', 'maturity_scale', 'Maturity axis', [('log', 'Log', 'Equal maturity ratios'), ('linear', 'Linear', 'Equal additional years')], 'Only horizontal spacing changes. Yields and spread calculations stay the same.', selected='log') }}
+{% endif %}
 <div class="chart" data-history-chart></div><p class="tiny-note">Dots are published tenors. Lines guide the eye and break at missing values; they do not supply additional rates. The table contains every plotted value.</p></div>
-<div class="card table-card"><h2>Tenor changes</h2><p data-date-states role="status"></p><div class="table-scroll" tabindex="0" aria-label="Par yields and changes by tenor" data-history-table></div><p data-sample-note class="tiny-note"></p></div>
-<details class="card history-provenance" open><summary>Coverage, timing & source evidence</summary><div data-history-provenance></div></details>
+<div class="card table-card"><h2>Tenor changes</h2><p data-date-states role="status"></p><div class="table-scroll" tabindex="0" aria-label="Par yields and changes by tenor" data-history-table></div><p data-sample-note class="tiny-note" {% if lesson is defined %}hidden{% endif %}></p></div>
+<details class="card history-provenance"><summary>Coverage, timing & source evidence</summary><div data-history-provenance></div></details>
 </div>
+{% if lesson is defined %}<p><a href="/tools/treasury-history">More dates, data examples, and saved datasets ↗</a></p>{% endif %}
 </section>

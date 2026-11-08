@@ -1,11 +1,11 @@
 # M2 learning journal
 
 **Learner checkpoint: pending.** These prompts are intentionally unanswered.
-Use the four M2 lessons and the [Bond Return Calculator](http://127.0.0.1:8000/tools/bond-return).
+Use lessons 5–7 and their focused experiments and the [Bond Return Calculator](http://127.0.0.1:8000/tools/bond-return).
 Save your own prediction before opening a revealed explanation.
-Prompts follow the lesson order revised November 5, 2026; they remain unanswered.
+Prompts retain their original sequence. The November 8 curriculum maps coupon ownership to lesson 5, time/reinvestment to lesson 6, and early sale to lesson 7.
 
-## 1. Simple return and one coupon (lesson 10)
+## 1. Simple return and one coupon (lesson 5)
 
 - Date:
 - Prediction for buying November 14 and valuing the bond still held November 16:
@@ -16,7 +16,7 @@ Prompts follow the lesson order revised November 5, 2026; they remain unanswered
 - Explain who receives the coupon on an opening-date purchase:
 - Explain the ordering of a coupon-date sale:
 
-## 2. Time and the last payment (lesson 11)
+## 2. Time and the last payment (lesson 6, Approach to par)
 
 - Date:
 - Prediction for discount versus premium price convergence at fixed YTM:
@@ -24,7 +24,7 @@ Prompts follow the lesson order revised November 5, 2026; they remain unanswered
 - Explain how changing purchase YTM changes cost without changing payments:
 - Why curved-term-structure roll-down still needs M4:
 
-## 3. Reinvestment and the two-period example (lesson 12)
+## 3. Reinvestment and the two-period example (lesson 6, Coupon reinvestment)
 
 - Date:
 - Hand-calculated annual-coupon purchase price:
@@ -35,7 +35,7 @@ Prompts follow the lesson order revised November 5, 2026; they remain unanswered
 - Exported input filename:
 - Evidence that importing reproduces my scenario:
 
-## 4. Reconcile the whole investment and early sale (lesson 13)
+## 4. Reconcile the whole investment and early sale (lesson 7)
 
 - Date:
 - Prediction for the six-month early-sale case:

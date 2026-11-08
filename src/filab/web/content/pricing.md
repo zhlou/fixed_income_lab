@@ -13,19 +13,19 @@ from filab.pricing import (
     price_coupon_bond,
 )
 
-# $20 at 0.5, 1.0, and 1.5 years; $1,020 at 2.0 years.
+# $2 at 0.5, 1.0, and 1.5 years; $102 at 2.0 years.
 payments = fixed_coupon_cashflows(
-    face_value=1000, coupon_rate=0.04, maturity_years=2
+    face_value=100, coupon_rate=0.04, maturity_years=2
 )
 
 zero_price = price_zero_coupon(
-    face_value=1000, ytm=0.05, maturity_years=2
+    face_value=100, ytm=0.05, maturity_years=2
 )
 coupon_price = price_coupon_bond(
-    face_value=1000, coupon_rate=0.04, ytm=0.05, maturity_years=2
+    face_value=100, coupon_rate=0.04, ytm=0.05, maturity_years=2
 )
-print(f"Zero-coupon price: ${zero_price:.2f}")  # $905.95
-print(f"Coupon-bond price: ${coupon_price:.2f}")  # $981.19
+print(f"Zero-coupon price: ${zero_price:.2f}")  # $90.60
+print(f"Coupon-bond price: ${coupon_price:.2f}")  # $98.12
 ```
 
 Rates are annual decimals; the default frequency is semiannual. A 5% YTM

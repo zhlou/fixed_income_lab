@@ -3,6 +3,8 @@
 Software and lesson publication do not establish learner completion. Fill this
 in personally; keep predictions before viewing the answers.
 
+The November 8 curriculum teaches curve/spread interpretation in lesson 2. Use the standalone History Viewer for comparable-observation, source timing, revision, and export exercises below.
+
 ## Par observations
 
 - Prediction: How will the 2s10s spread change from November 5 to 6, 2026?
@@ -11,7 +13,7 @@ in personally; keep predictions before viewing the answers.
 - Explanation: Why is this not the return of a particular Treasury security?
 - Transfer: Compare November 4 and 5. Can the spread widen while both yields decline?
 
-## Comparable observations (within lesson 14)
+## Comparable observations (History Viewer)
 
 - Prediction: In the Series introduction example, what should the 1.5-month change show from February 14 to 18, 2025?
 - Observed result and explanation:

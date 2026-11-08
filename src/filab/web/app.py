@@ -27,7 +27,7 @@ from .history_api import router as history_router
 from .history_limits import HistoryBodyLimit
 from .curriculum import LESSONS, ROADMAP
 from .returns_api import router as returns_router
-from .return_lessons import RETURN_LESSONS, lesson_spec, router as return_lesson_router
+from .return_lessons import lesson_spec, router as return_lesson_router
 
 HERE = Path(__file__).resolve().parent
 HISTORY_EXAMPLE = pinned_snapshot()["example"]
@@ -44,6 +44,15 @@ def reveal_answer(renderer, tokens, idx, options, env):
 
 
 markdown.use(container_plugin, 'answer', render=reveal_answer)
+
+
+def reveal_calculation(renderer, tokens, idx, options, env):
+    if tokens[idx].nesting == 1:
+        return '<details class="calculation"><summary>Inspect the calculation and conventions</summary>\n'
+    return '</details>\n'
+
+
+markdown.use(container_plugin, 'calculation', render=reveal_calculation)
 default_fence = markdown.renderer.rules["fence"]
 
 
@@ -143,6 +152,21 @@ def home(request: Request):
     })
 
 
+def teaching_return_specs(experiment):
+    """Focused views over the existing return lesson APIs."""
+    slugs = {"maturity": ["pull-to-par", "reinvestment-and-cash"],
+             "sale": ["holding-period-returns"]}.get(experiment, [])
+    specs = [lesson_spec(slug) for slug in slugs]
+    for spec in specs:
+        if spec['slug'] == 'reinvestment-and-cash':
+            spec['controls'] = [field for field in spec['controls'] if field['name'] == 'cash_rate']
+            spec['fixed'] = '$100 face · 4% annual coupons · 5% annual YTM. November 15, 2025 to November 15, 2027. Cash grows at an annual effective rate on Actual/365 Fixed. No fees.'
+        elif spec['slug'] == 'holding-period-returns':
+            spec['controls'] = [field for field in spec['controls'] if field['name'] != 'end_treatment']
+        spec['instruction'] = ''
+    return specs
+
+
 @app.get("/lessons/{slug}")
 def lesson(request: Request, slug: str):
     if slug == "cash-flows-and-pricing":
@@ -156,7 +180,7 @@ def lesson(request: Request, slug: str):
         "lessons": LESSONS, "lesson": item, "lesson_number": index + 1,
         "active": slug, "page_title": item["title"], "body": markdown.render(content),
         "history_example": HISTORY_EXAMPLE, "history_reference": HISTORY_REFERENCE,
-        "return_experiment": lesson_spec(slug) if slug in RETURN_LESSONS else None,
+        "return_experiments": teaching_return_specs(item["experiment"]),
         "implementation": markdown.render((HERE / "content" / "pricing.md").read_text(), {"expand_code": True}) if slug == "present-value" else None,
         "previous": LESSONS[index - 1] if index > 0 else None,
         "next": LESSONS[index + 1] if index + 1 < len(LESSONS) else None,
@@ -190,7 +214,10 @@ def valuation(data: BondInputs):
                               present_value=(coupon + principal) * factor))
     principal_pv = fsum(flow["principal"] * flow["discount_factor"] for flow in cashflows)
     coupon_pv = fsum(flow["coupon"] * flow["discount_factor"] for flow in cashflows)
-    return dict(price=price, principal_pv=principal_pv, coupon_pv=coupon_pv,
+    return dict(price=price, ytm=data.ytm,
+                coupon_rate=data.coupon_rate if data.instrument == 'coupon' else 0,
+                current_yield=data.face_value * data.coupon_rate / price if data.instrument == 'coupon' else 0,
+                principal_pv=principal_pv, coupon_pv=coupon_pv,
                 total_received=fsum(flow["amount"] for flow in cashflows),
                 total_coupons=fsum(flow["coupon"] for flow in cashflows),
                 payment_coupon=cashflows[0]["coupon"],
@@ -209,9 +236,14 @@ def implied_yield(data: YieldInputs):
     try:
         ytm = yield_to_maturity(price=data.price, **args)
         cashflows = []
-        for flow in flows:
+        for index, flow in enumerate(flows):
             factor = (1 + ytm / data.frequency) ** (-data.frequency * flow.time_years)
+            coupon = data.face_value * data.coupon_rate / data.frequency
+            principal = data.face_value if index == len(flows) - 1 else 0
             cashflows.append(dict(time_years=flow.time_years, amount=flow.amount,
+                                  coupon=coupon, principal=principal,
+                                  coupon_present_value=coupon * factor,
+                                  principal_present_value=principal * factor,
                                   discount_factor=factor, present_value=flow.amount * factor))
         repriced = price_coupon_bond(ytm=ytm, **args)
     except (ValueError, OverflowError, ZeroDivisionError) as exc:
@@ -389,6 +421,14 @@ def risk(data: RiskInputs):
 def risk_study(study: RiskStudy):
     result = calculate_risk(study.inputs)
     return dict(study=study.model_dump(mode='json'), result=result)
+
+
+@app.get('/tools/treasury-bills')
+def bill_calculator(request: Request):
+    return templates.TemplateResponse(request=request, name='bills.html', context={
+        'lessons': LESSONS, 'active': 'treasury-bills', 'page_title': 'Treasury Bill Calculator',
+        'body': markdown.render((HERE / 'content' / 'bills.md').read_text()),
+    })
 
 
 @app.get('/tools/bond-risk')

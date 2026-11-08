@@ -1,0 +1,25 @@
+{% from 'controls.html' import control, date_control, choices %}
+
+<section class="workspace" data-settlement><form class="controls card" novalidate>
+<div class="card-overline">A DATED SEMIANNUAL BOND</div><h2>Set the settlement.</h2>
+{{ choices('settlement-mode', 'mode', 'Calculate', [('price', 'Prices from YTM', ''), ('yield', 'YTM from price', '')], '') }}
+{{ date_control('settlement_date', 'Settlement date', '2026-08-15') }}
+<details><summary>Bond terms</summary>
+{{ date_control('issue_date', 'Issue / accrual start date', '2025-11-15') }}
+{{ date_control('maturity_date', 'Maturity date', '2028-11-15') }}
+{{ control('settlement-coupon', 'Annual coupon', 4, 0, 12, 0.5, '%', input_name='coupon_rate') }}
+</details>
+{{ control('settlement-ytm', 'Annual nominal YTM', 5, -2, 20, 0.25, '%', input_name='ytm') }}
+{{ control('settlement-price', 'Purchase price', '98.00', 0.01, 300, 0.01, '$', input_name='price') }}
+{{ choices('price_type', 'price_type', 'Entered price is', [('clean', 'Clean', 'excludes accrued interest'), ('dirty', 'Dirty', 'full settlement amount')], '') }}
+<div class="convention">$100 face · semiannual coupons.<br>Actual/Actual coupon-period accrual.<br>First fractional period: simple discounting.<br>Regular dates; no holiday adjustments.<br>Settlement on a coupon date is after payment.</div>
+<button type="button" class="reset">↺ Reset inputs</button><p class="error" role="alert" data-error></p></form>
+<div class="results"><div class="metrics" aria-live="polite" aria-atomic="true">
+<div class="metric primary-metric"><span>Dirty price · amount paid</span><strong data-settlement-metric="dirty_price">—</strong><small>Clean price + accrued interest</small></div>
+<div class="metric"><span>Clean price</span><strong data-settlement-metric="clean_price">—</strong><small>Excludes accrued interest</small></div>
+<div class="metric"><span>Accrued interest</span><strong data-settlement-metric="accrued_interest">—</strong><small>Compensates for elapsed coupon time</small></div></div>
+<div class="card table-card settlement-summary"><p data-settlement-summary aria-live="polite"></p><div data-accrual-table class="table-scroll" tabindex="0" aria-label="Actual coupon period day counts"></div></div>
+<details class="card chart-data"><summary>Discounted payments</summary><div data-table class="table-scroll" tabindex="0" aria-label="Dated payment present values"></div></details>
+<details class="card chart-data"><summary>Price path at fixed YTM</summary><div class="card chart-card"><div class="card-overline">HOLD YTM FIXED · LET TIME PASS</div><h2>Watch clean and dirty prices approach maturity.</h2><div data-chart class="chart"></div><div class="insight">Dirty price drops when a coupon is paid. That drop is accompanied by cash received. The last point is the day before maturity: clean price approaches $100; dirty price includes the final coupon. This chart is not total return.</div></div>
+<div data-path-table class="table-scroll" tabindex="0" aria-label="Clean and dirty price path"></div></details>
+</div></section>

@@ -1,7 +1,5 @@
 'use strict';
-(() => {
-  const root = $('[data-return-lesson]');
-  if (!root) return;
+$$('[data-return-lesson]').forEach(root => {
   const spec = JSON.parse($('[data-return-lesson-spec]', root).textContent);
   const form = $('form', root), state = $('[data-return-state]', root), fullLink = $('[data-full-calculator]', root);
   const {results, narrow, showView, fitChart} = bindReturnWorkspace(root);
@@ -57,12 +55,6 @@
     table($('[data-lesson-table]',root),focus.columns.map(column=>column[0]),
       focus.rows.map(row=>row.map((value,index)=>format(value,focus.columns[index][1]))));
     $('[data-lesson-totals]',root).textContent = `Net profit ${dollars(r.net_profit)}; holding-period return ${percent(r.total_return,6)}. This return covers the whole selected period and is not annualized. Cash and profit reconcile within display rounding.`;
-    const names = {opening:'Opening capital',purchase:'Purchase',purchase_fee:'Purchase cost',coupon:'Coupon',
-      redemption:'Redemption',sale:'Sale',sale_fee:'Sale cost',cash_interest:'Cash interest',valuation:'Valuation'};
-    table($('[data-lesson-ledger]',root),['Date','Event','Cash Δ','Cash balance','Face held','Bond value','Wealth'],
-      r.ledger.map(e=>[e.date,names[e.event],dollars(e.cash_change),dollars(e.cash_balance),
-        e.face_balance === null ? '—' : dollars(e.face_balance),e.bond_value === null ? '—' : dollars(e.bond_value),
-        e.wealth === null ? '—' : dollars(e.wealth)]));
     const study = {schema_version:1,kind:'filab-bond-return',conventions:data.conventions,inputs:data.inputs};
     fullLink.href = '/tools/bond-return#scenario=' + encodeURIComponent(JSON.stringify(study));
     fullLink.removeAttribute('aria-disabled');
@@ -78,4 +70,4 @@
     restore(spec.examples.find(example=>example.id===activeExample).controls);invalidate();update();calculate();
     results.scrollTop=0;showView('results',narrow.matches);if(!narrow.matches)button.focus({preventScroll:true});
   }));
-})();
+});

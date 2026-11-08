@@ -91,7 +91,7 @@
     });
     root.querySelector('[data-retry-month]')?.addEventListener('click',()=>queueMonth(latestMonth,true));
     const chartContainer=root.querySelector('[data-history-chart]');
-    const drawChart=()=>{if(lastResult)chart(chartContainer,lastResult,root.querySelector('[name="maturity_scale"]:checked').value);};
+    const drawChart=()=>{if(lastResult)chart(chartContainer,lastResult,root.querySelector('[name="maturity_scale"]:checked')?.value || 'log');};
     root.querySelectorAll('[name="maturity_scale"]').forEach(input=>input.addEventListener('change',drawChart));
     let chartWidth=0;
     new ResizeObserver(entries=>{const width=Math.round(entries[0].contentRect.width);if(width>0&&width!==chartWidth){chartWidth=width;drawChart();}}).observe(chartContainer);
@@ -182,13 +182,13 @@
     }
     form.addEventListener('submit',e=>{e.preventDefault();if(form.reportValidity())compareDates(true);});
     form.addEventListener('input',invalidate);
-    root.querySelector('[data-reset-history]').addEventListener('click',()=>{monthLoader?.cancel();monthStatus('');form.reset();root.querySelector('[name="maturity_scale"][value="log"]').checked=true;selected=lesson?bundled:catalog.viewer_snapshot_id;datePicker.sync();refreshAvailability();root.querySelector('[value="observed"]')?.click();showSnapshots();compareDates();});
+    root.querySelector('[data-reset-history]').addEventListener('click',()=>{monthLoader?.cancel();monthStatus('');form.reset();const log=root.querySelector('[name="maturity_scale"][value="log"]');if(log)log.checked=true;selected=lesson?bundled:catalog.viewer_snapshot_id;datePicker.sync();refreshAvailability();root.querySelector('[value="observed"]')?.click();showSnapshots();compareDates();});
     root.querySelector('[data-missing-date]')?.addEventListener('click',()=>{monthLoader.cancel();monthStatus('');selected=bundled;form.elements.first.value=catalog.example_defaults.missing_date;form.elements.second.value=catalog.example_defaults.second;const recent=root.querySelector('[name="history_sample"][value="recent"]');if(recent)recent.checked=true;datePicker.sync();refreshAvailability();compareDates();});
     const samples=root.querySelectorAll('[name="history_sample"]');
     samples.forEach(input=>{input.disabled=true;input.addEventListener('change',()=>{
       monthLoader.cancel();monthStatus('');
       const reference=input.value==='series-introduction', defaults=reference?catalog.reference_defaults:catalog.example_defaults;
-      selected=reference?catalog.reference_snapshot_id:bundled;
+      selected=reference?catalog.reference_snapshot_id:bundled;showSnapshots();
       form.elements.first.value=defaults.first;form.elements.second.value=defaults.second;
       datePicker.sync();refreshAvailability();compareDates();
     });});

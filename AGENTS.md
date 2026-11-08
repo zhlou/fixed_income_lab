@@ -17,9 +17,13 @@ For learning questions, explain the intuition and conventions before introducing
 
 ## Lesson and Curriculum Design
 
-Give distinct financial concepts their own lesson pages, with overview cards, sidebar entries, and previous/next navigation. Include intuition, defined symbols, a derivation, a reproducible numerical example, an interactive experiment, misconceptions, and reflection questions. Keep Python examples optional and collapsed.
+Organize lessons around a financial question and a result the reader can inspect. Teach each relationship once, then reuse it with a short recall or link. A related definition, convention, or operational detail belongs beside the calculation or in tool help. Add a page when its question requires a distinct calculation or interpretation. Drive cards, lesson picker, prerequisites, and previous/next navigation from the curriculum registry's reading order. Delivery milestones can span that order.
 
-Explain why a convention or formula changes, including its boundary behavior. Connect charts to cash flows and numerical tables. Label hypothetical scenarios, empirical observations, identities, and forecasts separately. Never present immediate price changes as holding-period returns.
+Keep intuition, defined symbols and units, and the core derivation inline. Use a reproducible worked example and one changed-input question with a collapsed answer. Introduce terminology where needed. Reuse the $100-face, 4% semiannual note unless another instrument or frequency teaches a specific relationship. Python stays optional and collapsed. Remove repeated goals, prediction banners, glossary material, misconceptions, and reflection lists.
+
+Give each lesson an explicit, bounded experiment assignment. Match prose, chart, table, and Reset inputs. Show assumptions affecting interpretation beside the result. Keep diagnostics, data management, specialized conventions, and complete ledgers in the standalone tools. Delete duplicate prose. Budget about 5,000 visible article words for the seven-lesson core, including tables and math and excluding closed answers/calculations and Python. Measure copy separately from learning time and review visible experiment instructions as well.
+
+Explain why a convention or formula changes, including its boundary behavior where it matters to the calculation. Connect charts to cash flows and numerical tables. Label hypothetical scenarios, empirical observations, identities, and forecasts separately. Never present immediate price changes as holding-period returns.
 
 ## Financial Conventions and Research
 

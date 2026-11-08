@@ -242,8 +242,6 @@
 .history-workspace .chart { min-height:0; }
 .history-workspace .metrics { grid-template-columns:repeat(3,minmax(0,1fr)); }
 .history-workspace .metric strong { font-size:clamp(20px,3vw,32px); }
-.history-workspace[data-focus="observation-and-publication"] .history-provenance { order:-1; }
-.history-workspace[data-focus="observation-and-publication"] .chart-card { display:none; }
 @media(max-width:600px) {
   .history-controls, .history-revision, .history-provenance { padding:16px; }
   .history-workspace .metrics { grid-template-columns:1fr; }
@@ -295,3 +293,23 @@
 .home-actions{display:flex;flex-wrap:wrap;gap:12px}.home-actions .button{white-space:normal}.home-chart h2{font-size:24px;line-height:1.3}.home-chart .card-action{margin-top:16px}.home-tools{margin-bottom:42px;scroll-margin-top:24px}.tool-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.tool-grid .lesson-card{min-width:0}.tool-grid .lesson-card p{min-height:0}.home-lesson-group{margin-bottom:32px}.home-lesson-group>h3{font-size:20px;margin:20px 0 14px}.lesson-card h4{font-size:20px;line-height:1.3;margin:0 0 12px}.sidebar nav{min-height:0;overflow-y:auto}.sidebar .sidebar-caption{flex-shrink:0}
 @media(max-width:1000px){.tool-grid{grid-template-columns:1fr}.tool-grid .lesson-card p{max-width:none}}
 @media(max-width:680px){.home-hero h1{font-size:40px}.home-chart h2{font-size:22px}.roadmap-row{grid-template-columns:23px minmax(0,1fr) 65px}.roadmap-weeks{display:none}.roadmap-status{display:block;font-size:10px}.home-actions{align-items:flex-start;flex-direction:column}}
+
+/* The course follows one reading order across delivery milestones. */
+.lesson-picker-panel{grid-template-columns:1fr;max-width:440px}
+.lesson-cases{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.lesson-cases [aria-pressed="true"]{background:#356b58;color:white}
+.calculation{border:1px solid var(--line);border-radius:5px;padding:12px;margin:20px 0}
+.calculation>summary{cursor:pointer;font-weight:600}
+[data-case]{min-height:0}
+@media(min-width:1200px){
+  .return-lesson .experiment-scroll>[data-case]:not([hidden]){display:flex;flex:1;min-height:0}
+  .return-lesson [data-case]>.return-calculator{width:100%}
+}
+@media(min-width:1200px){
+  .return-lesson .experiment-scroll{flex-direction:column}
+  .lesson-cases{flex-shrink:0}
+}
+.lesson-cases .button{font:inherit;border:1px solid #aabda4;border-radius:4px;padding:8px 12px;cursor:pointer}
+[data-core-experiment] .metric strong{font-size:clamp(20px,2.4vw,32px)}
+.history-workspace[data-pinned="true"]{display:flex;flex-direction:column;gap:16px}
+.history-workspace[data-pinned="true"] .history-results{order:-1}

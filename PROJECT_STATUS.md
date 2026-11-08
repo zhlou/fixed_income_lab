@@ -6,7 +6,7 @@
 
 **Foundations implementation and independent reference validation are complete
 for the regular-coupon educational model** (original Phase 1, now M0).
-The website has **sixteen interactive lessons**. **M1 risk, M2 return
+The website has **seven core interactive lessons plus a standalone Treasury Bill Calculator**. **M1 risk, M2 return
 accounting, and M3 historical observations are implemented and validated**,
 including the Risk Explorer, Bond Return Calculator, and Treasury History Viewer.
 **M4 discount curves is next.** Curve valuation and historical strategy research
@@ -22,6 +22,20 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### Seven-lesson curriculum — November 8, 2026
+
+Consolidated all sixteen lesson articles into seven financial questions. The curve moves to lesson 2. Price and YTM share the first lesson, payment weights/duration/DV01 share lesson 3, and settlement owns coupon accrual. Maturity and reinvestment share one page with two bounded experiments. The final lesson reconciles early sale and costs. Treasury bill quotations have a standalone calculator and short worked reference.
+
+Visible article copy fell from **17,468 to 2,920 words**, an **83.3% reduction**, using rendered text including math/table content and excluding closed answers, calculations, and Python. The historical sequence advertised 415 minutes; time estimates have been removed pending a measured walkthrough. Core derivations remain inline. Prediction banners and repeated glossary/review sections were removed. Retired canonical articles and course routes were removed, while original notes, notebooks, API profiles, saved input formats, and browser data remain supported.
+
+The registry explicitly assigns experiments, and all navigation follows its reading order. The History Viewer now owns the February missing-tenor example, hypothetical revision, axis choices, and dataset operations. The new curve lesson places results above date controls. The maturity page gives Approach to par and Coupon reinvestment their own selectable workspaces. Valid return inputs transfer to the full calculator.
+
+Updated the teaching guidance, current curriculum and M4–M7 roadmap, README interfaces, and journal references. M4 plans two questions, M5 one complete strategy study, M6 two robustness/risk questions, and M7 a guided Research Desk workflow. The existing historical-adapter feasibility checks still govern historical valuation.
+
+Validation passed **516 Python tests** and **7 JavaScript helper tests**. Independent cash-flow sums reproduced prices, risk sensitivities, accrued interest, bill conversion, reinvestment, and sale returns to absolute 1e-10. Browser checks covered every lesson at 1440×900, 390×900, and 320×900, plus keyboard and tool layouts at 1200×600 and 390×844. Verified formulas, collapsed answers, resets, both pricing directions, cent rounding, invalid input, stale-response protection, coupon-date settlement, maturity example switching, return-scenario transfer, and offline historical/revision examples. No uncaught browser errors or horizontal page overflow were observed. Temporary servers were stopped after verification. See the appended [lesson review](notes/lesson_content_review.md).
+
+This records source application verification. Deployment is a separate action. The measured copy reduction does not establish learner mastery or a measured completion time.
 
 ### Shared-site preparation and browser-owned history — November 8, 2026
 
@@ -471,28 +485,18 @@ learner reflection is still pending. See [the review record](notes/lesson_conten
 
 ### Lessons and experiments
 
-| Lesson | URL | Available experiments |
+| Lesson | URL | Focus |
 |---|---|---|
-| 1. Bond Basics | `/lessons/bond-basics` | Coupon and principal cash-flow timelines |
-| 2. Present Value & Bond Pricing | `/lessons/present-value` | Discounted payments, compounding conventions, and reinvestment comparisons |
-| 3. Bond Pricing Lab | `/lessons/bond-pricing-lab` | Maturity, coupon, and payment-timing comparisons; exact yield-shock repricing |
-| 4. Yield to Maturity | `/lessons/yield-to-maturity` | Solve yield from price; compare coupon rate, current yield, and YTM |
-| 5. Settlement & Accrued Interest | `/lessons/settlement-and-accrued-interest` | Actual settlement dates, clean/dirty prices, dated YTM solving, and pull-to-par |
-| 6. Treasury Bill Yields | `/lessons/treasury-bill-yields` | Discount quotations, investment yields, and the half-year convention change |
-| 7. Cash-flow timing & duration | `/lessons/macaulay-duration` | Present-value weights, zero/coupon comparisons, Macaulay duration |
-| 8. Modified duration & DV01 | `/lessons/modified-duration-dv01` | Yield sensitivity, face scaling, dated numerical checks |
-| 9. Convexity & approximation error | `/lessons/convexity` | Exact vs first/second-order repricing and signed shock errors |
-| 10. Coupons, accrual & return | `/lessons/coupons-and-return` | Simple return and dirty-price accounting across a coupon date |
-| 11. Pull-to-par & maturity | `/lessons/pull-to-par` | Fixed-YTM discount/premium convergence and final redemption |
-| 12. Reinvestment & cash | `/lessons/reinvestment-and-cash` | Zero-interest/explicit cash and the two-period ledger |
-| 13. Holding-period return & early sale | `/lessons/holding-period-returns` | Integrated early sale, costs, and keeping versus selling |
-| 14. Par yields & security quotes | `/lessons/par-yields-and-quotes` | Published curves, 2s10s, and comparable observations |
-| 15. Observation, publication & retrieval | `/lessons/observation-and-publication` | Observation dates and acquisition evidence |
-| 16. Revisions & vintages | `/lessons/revisions-and-vintages` | Published observations versus a hypothetical revision |
+| 1. Payments, price & yield | `/lessons/present-value` | Four payments, price from yield, and yield from price |
+| 2. Read a Treasury curve | `/lessons/par-yields-and-quotes` | Two curves and their 2s10s spread change |
+| 3. Duration & dollar risk | `/lessons/modified-duration-dv01` | Payment weights, sensitivity, and face scaling |
+| 4. Convexity & error | `/lessons/convexity` | Exact repricing and approximation error |
+| 5. Settlement & coupon ownership | `/lessons/settlement-and-accrued-interest` | Clean plus accrual equals dirty, payment-date ownership |
+| 6. Hold to maturity | `/lessons/reinvestment-and-cash` | Approach to par and annual-coupon reinvestment |
+| 7. Sell before maturity | `/lessons/holding-period-returns` | Sale proceeds, coupon cash, and costs |
+| Treasury Bill Calculator | `/tools/treasury-bills` | Discount price and investment-yield conventions |
 
-Each lesson has an overview card, sidebar entry, and previous/next navigation.
-Python examples are optional and collapsed. Original notes and Notebook 01
-remain preserved; website Markdown is the source for lesson content.
+Cards, sidebar, lesson picker, and previous/next links follow this reading order. Each registry entry assigns its own focused experiment. Tools hold complete ledgers, dated risk, diagnostics, source evidence, and data-management workflows. Python remains optional. Original notes and Notebook 01 retain their historical role.
 
 ### Financial calculations
 
@@ -527,7 +531,7 @@ in `src/filab/risk/`. The [README](README.md) documents these interfaces.
 - Keep the desktop page within the viewport and contain positioned formula
   accessibility content inside its panel, preventing blank outer-page scrolling.
   Add Overview, Previous, Next, and the lesson position to the top bar.
-- Give distinct financial concepts their own lessons; YTM is a separate page.
+- Teach each relationship once and reuse it through the reading order. Pricing and YTM share one experiment with reversible input direction.
 - Show discrete choices as visible radio option cards, rather than dropdowns.
 - Order payment frequencies **Annual → Semiannual → Quarterly**, followed
   by Monthly where available. Semiannual remains the default selection.
@@ -538,12 +542,12 @@ in `src/filab/risk/`. The [README](README.md) documents these interfaces.
   principal; contrast coupon rate with YTM before deriving sensitivity.
 - Explain why the Treasury bill yield formula changes at half a year:
   six months is one period in the semiannual coupon-bond benchmark.
-  Lesson 6 includes the two growth formulas, a numerical comparison,
+  The standalone Treasury Bill Calculator includes both growth formulas, a numerical comparison,
   an explanation beside the chart, and a dotted half-year marker.
 
 ## Validation and model limits
 
-The latest M3 test run on November 7, 2026 passed **486 tests**. Coverage includes historical data/snapshot checks, focused lesson boundaries, returns,
+The November 8 curriculum verification passed **516 Python tests** and **7 JavaScript helper tests**. Coverage includes historical data/snapshot checks, focused lesson boundaries, returns,
 cash/position accounting, published horizon scenarios, and the existing pricing
 identities, yield round trips, dated settlement, coupon boundaries, leap
 years, bill conventions, API validation, and lesson navigation.
@@ -633,8 +637,7 @@ python -m pytest -q
 - `/tools/bond-risk`, `/api/risk`, and `/api/risk-study`: two-bond comparisons,
   exact shocks, approximation errors, PV weights, bump diagnostics, and versioned
   complete-input export/import. Invalid or stale inputs cannot be exported.
-- Three separate lessons with prediction prompts, worked examples, derivations,
-  collapsed transfer answers, and reflection questions.
+- Two consolidated lessons connect payment timing, duration/DV01, and convexity/error, with inline derivations and collapsed exercise answers.
 - Shared control templates and a curriculum registry; milestone-based website
   roadmap replaces the 12-week promise.
 - [Validation record](notes/m1_validation.md) and an unanswered
@@ -651,7 +654,7 @@ M1, M2, and M3 reflection independently; software checks do not answer the journ
 
 | Milestone | Deliverable | Status |
 |---|---|---|
-| M0 Foundations | Existing six lessons and pricing | Software/reference checks complete; learner checkpoint unverified |
+| M0 Foundations | Payments/price/YTM, settlement, and bill calculator | Software/reference checks complete; learner checkpoint unverified |
 | M1 Interest-rate risk | Duration, convexity, risk explorer | Software validated; learner checkpoint pending |
 | M2 Return accounting | Deterministic cash/position ledger and return calculator | Software validated; learner checkpoint pending |
 | M3 Historical observations | Versioned data and curve history viewer | Software validated; learner checkpoint pending |

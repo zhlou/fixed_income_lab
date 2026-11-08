@@ -4,20 +4,21 @@
   <div>
     <h1>Explore how<br><em>bonds work.</em></h1>
     <p class="hero-description">Follow a bond’s payments, see how its price responds to interest rates, and calculate what an investor earns. Start with a lesson or open a tool to explore a question of your own.</p>
-    <div class="home-actions"><a href="/lessons/bond-basics" class="button primary">Start with bond basics →</a><a href="#tools" class="button">Explore the tools ↓</a></div>
+    <div class="home-actions"><a href="/lessons/present-value" class="button primary">Start with a bond’s payments →</a><a href="#tools" class="button">Explore the tools ↓</a></div>
     <p class="hero-meta">{{ lessons|length }} available lessons</p>
   </div>
   <div class="home-chart card" data-home-chart>
     <h2>How do 10-year and 20-year bond prices respond to the same yield change?</h2>
     <div class="chart" id="home-chart" aria-live="polite"><p class="loading">Calculating prices…</p></div>
     <p class="tiny-note">Both hypothetical bonds pay a 4% annual coupon in two semiannual payments. Prices are per $100 of face value.</p>
-    <a class="card-action" href="/lessons/bond-pricing-lab">Try the bond pricing experiment →</a>
+    <a class="card-action" href="/lessons/modified-duration-dv01">Try the bond pricing experiment →</a>
   </div>
 </section>
 <section id="tools" class="home-tools" aria-labelledby="tools-heading">
   <div class="section-heading"><h2 id="tools-heading">Explore the tools</h2></div>
   <div class="tool-grid">
     {% for slug, title, description in [
+      ('treasury-bills', 'Treasury Bill Calculator', 'Turn a discount quote into a price, period return, and investment yield.'),
       ('bond-risk', 'Bond Risk Explorer', 'Compare how much two bonds change in price when their yields move by the same amount.'),
       ('bond-return', 'Bond Return Calculator', 'Choose purchase and ending dates, then see how the bond’s value, coupon payments, cash interest, and fees contribute to the return.'),
       ('treasury-history', 'Treasury History Viewer', 'Compare published U.S. Treasury par yields on two dates and see which maturities have observations on both.')
@@ -28,16 +29,11 @@
 </section>
 <section aria-labelledby="lessons-heading">
   <div class="section-heading"><h2 id="lessons-heading">Browse the lessons</h2></div>
-  {% for milestone, title in [('M0', 'Foundations'), ('M1', 'Interest-rate risk'), ('M2', 'Bond returns'), ('M3', 'Treasury history')] %}
-  <section class="home-lesson-group" aria-labelledby="group-{{ milestone }}">
-    <h3 id="group-{{ milestone }}">{{ title }}</h3>
-    <div class="lesson-grid">
-      {% for item in lessons %}{% if item.milestone == milestone %}
-      <a href="/lessons/{{ item.slug }}" class="lesson-card"><div class="lesson-card-top"><span class="lesson-time">{{ item.duration }}</span></div><h4>{{ item.title }}</h4><p>{{ item.headline }}</p><span class="card-action">Open lesson →</span></a>
-      {% endif %}{% endfor %}
-    </div>
-  </section>
+  <div class="lesson-grid">
+  {% for item in lessons %}
+    <a href="/lessons/{{ item.slug }}" class="lesson-card"><h3>{{ loop.index }}. {{ item.title }}</h3><p>{{ item.headline }}</p><span class="card-action">Open lesson →</span></a>
   {% endfor %}
+  </div>
 </section>
 <section id="curriculum" class="curriculum" aria-labelledby="curriculum-heading">
   <div class="section-heading"><h2 id="curriculum-heading">Curriculum roadmap</h2></div>

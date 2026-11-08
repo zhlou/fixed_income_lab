@@ -141,7 +141,7 @@ function bindCalculator(root,url,getPayload,render,updateState=()=>{}){
     const invalid=$$('input[type="number"],input[type="date"]',form).find(input=>!input.disabled&&(!input.checkValidity()||input.value===''));
     if(invalid){root.setAttribute('aria-busy','false');showErrors(root,{detail:[{loc:['body',invalid.name],msg:invalid.validationMessage||'Enter a valid number.'}]});return;}
     root.setAttribute('aria-busy','true');
-    try{const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(getPayload()),signal:controller.signal});const result=await response.json();if(id!==sequence)return;if(!response.ok){showErrors(root,result);return;}render(result);}
+    try{const response=await fetch(typeof url==='function'?url():url,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(getPayload()),signal:controller.signal});const result=await response.json();if(id!==sequence)return;if(!response.ok){showErrors(root,result);return;}render(result);}
     catch(error){if(error.name!=='AbortError'&&id===sequence)showErrors(root,{message:'Cannot reach the Python server. Check that it is running, then change an input to retry.'});}
     finally{if(id===sequence)root.setAttribute('aria-busy','false');}
   }
@@ -151,46 +151,6 @@ function bindCalculator(root,url,getPayload,render,updateState=()=>{}){
   form.addEventListener('submit',event=>{event.preventDefault();clearTimeout(timer);calculate();});form.addEventListener('input',schedule);form.addEventListener('change',schedule);
   const reset=$('.reset',root);if(reset&&!reset.hasAttribute('data-custom-reset'))reset.addEventListener('click',()=>{form.reset();updateState();clearTimeout(timer);calculate();});
   calculate();return calculate;
-}
-const valuationRoot=$('[data-valuation]');
-if(valuationRoot){const basics=valuationRoot.dataset.lesson==='bond-basics';
-  const update=()=>{const zero=choiceValue('instrument',valuationRoot)==='zero';const coupon=$('[data-control="coupon_rate"]',valuationRoot);$$('input',coupon).forEach(input=>input.disabled=zero);
-    const frequency=Number(choiceValue('frequency',valuationRoot)), maturity=$('[name="maturity_years"]',valuationRoot), range=$('[data-pair="maturity_years"]',valuationRoot);
-    maturity.min=zero?'0':String(1/frequency);maturity.step=zero?'any':String(1/frequency);range.min=maturity.min;range.step=zero?'0.25':maturity.step;
-    $('#maturity_years-hint',valuationRoot).textContent=zero?'Zero-coupon payments support fractional years.':'Coupon bonds require whole coupon periods.';
-  };
-  bindCalculator(valuationRoot,'/api/valuation',()=>{const input=readForm($('form',valuationRoot));input.coupon_rate=(input.coupon_rate??0)/100;input.ytm=(input.ytm??5)/100;return input;},data=>{
-    $('[data-metric="main"]',valuationRoot).textContent=money(basics?data.payment_coupon:data.price);
-    $('[data-metric="coupon"]',valuationRoot).textContent=money(basics?data.total_coupons:data.coupon_pv);
-    $('[data-metric="principal"]',valuationRoot).textContent=money(basics?data.cashflows.at(-1).principal:data.principal_pv);
-    if(!basics)$('[data-price-label]',valuationRoot).textContent=`${data.classification} · dollars per selected face value`;
-    $('[data-count]',valuationRoot).textContent=`${data.cashflows.length} payment${data.cashflows.length===1?'':'s'}`;
-    drawTimeline($('[data-chart]',valuationRoot),data.cashflows,basics);
-    const headers=basics?['Year','Coupon','Principal','Total payment']:['Year','Payment','Discount factor','Present value'];
-    const rows=data.cashflows.map(f=>basics?[f.time_years.toFixed(2),money(f.coupon),money(f.principal),money(f.amount)]:[f.time_years.toFixed(2),money(f.amount),f.discount_factor.toFixed(6),money(f.present_value)]);
-    table($('[data-table]',valuationRoot),headers,rows,basics?['Total',money(data.total_coupons),money(data.cashflows.at(-1).principal),money(data.total_received)]:['Total',money(data.total_received),'—',money(data.price)]);
-  },update);
-}
-const rateRoot=$('[data-rates]');if(rateRoot)bindCalculator(rateRoot,'/api/rates',()=>{const data=readForm($('form',rateRoot));data.rate/=100;return data;},data=>{$$('[data-rate]',rateRoot).forEach(node=>{const key=node.dataset.rate;node.textContent=key.endsWith('_rate')?percent(data[key],4):money(data[key]);});});
-const yieldRoot=$('[data-yield]');if(yieldRoot){
-  bindCalculator(yieldRoot,'/api/yield',()=>{
-    const data=readForm($('form',yieldRoot));
-    data.coupon_rate/=100;return data;
-  },data=>{
-    $$('[data-yield-metric]',yieldRoot).forEach(node=>node.textContent=percent(data[node.dataset.yieldMetric],4));
-    $('[data-yield-check]',yieldRoot).textContent=`Entered price: ${money(data.price)}. Repriced at the implied yield: ${money(data.repriced)}. Difference: ${money(Math.abs(data.residual))}.`;
-    table($('[data-table]',yieldRoot),['Year','Payment','Discount factor','Present value'],
-      data.cashflows.map(flow=>[flow.time_years.toFixed(2),money(flow.amount),flow.discount_factor.toFixed(6),money(flow.present_value)]),
-      ['Total',money(data.cashflows.reduce((sum,flow)=>sum+flow.amount,0)),'—',money(data.repriced)]);
-    const classification=Math.abs(data.price-100)<1e-8?'At par':data.price<100?'Below par':'Above par';
-    $('[data-yield-insight]',yieldRoot).textContent=`${classification}: coupon rate ${percent(data.coupon_rate)}, current yield ${percent(data.current_yield)}, YTM ${percent(data.ytm)}. Current yield excludes the gain or loss between purchase price and principal repayment. YTM is not a guaranteed holding-period return.`;
-  },()=>{
-    const frequency=Number(choiceValue('frequency',yieldRoot));
-    for(const input of $$('[name="maturity_years"],[data-pair="yield-maturity"]',yieldRoot)){
-      input.min=String(1/frequency);input.step=String(1/frequency);
-    }
-  });
-  bindCentPrice(yieldRoot,'yield-price');
 }
 function bindCentPrice(root,id){
   const priceInput=$('[name="price"]',root),priceSlider=$(`[data-pair="${id}"]`,root);
@@ -236,41 +196,6 @@ const billRoot=$('[data-bills]');if(billRoot){
     $('[data-bill-insight]',billRoot).textContent=`${data.method}. Holding-period return covers ${data.days_to_maturity} days. The annualized yields are quotation conventions, not additional cash payments.`;
     drawLines($('[data-chart]',billRoot),{title:'Discount and coupon-equivalent yield by bill maturity',x_label:'Days to maturity',y_label:'Annualized yield',percent_x:false,x_unit:'days',percent_y:true,reference_x:data.year_days/2,curves:data.curves});
   });
-}
-const experimentRoot=$('[data-experiment]');if(experimentRoot){let mode='maturity';const form=$('form',experimentRoot);
-  const defaults={maturity:{coupon_rate:4,maturity_years:20},coupon:{coupon_rate:6,maturity_years:10},sensitivity:{coupon_rate:0,maturity_years:10}};
-  const instructions={maturity:'Change maturity. The annual coupon stays at 4%.',coupon:'Change the coupon. Maturity stays at 10 years.',sensitivity:'Switch payment type. Maturity stays at 10 years.'};
-  function update(){
-    for(const name of ['coupon_rate','maturity_years']){
-      const disabled=(name==='coupon_rate'&&mode!=='coupon')||(name==='maturity_years'&&mode!=='maturity');
-      $$('input',$(`[data-control="${name}"]`,form)).forEach(input=>input.disabled=disabled);
-    }
-    $('[data-timing-control]',form).hidden=mode!=='sensitivity';
-    disableChoice('payment_type',mode!=='sensitivity',form);
-    if(mode==='sensitivity'){
-      const coupon=choiceValue('payment_type',form)==='zero'?0:4;
-      $('[name="coupon_rate"]',form).value=coupon;$('[data-pair="coupon_rate"]',form).value=coupon;
-    }
-    $('[data-variable-instruction]',form).textContent=instructions[mode];
-  }
-  const calculate=bindCalculator(experimentRoot,'/api/experiments',()=>{
-    const data=readForm(form);
-    return {mode,ytm:data.ytm/100,coupon_rate:mode==='coupon'?data.coupon_rate/100:0.04,
-      maturity_years:mode==='maturity'?data.maturity_years:10,payment_type:mode==='sensitivity'?data.payment_type:'zero'};
-  },data=>{
-    $('[data-chart-title]',experimentRoot).textContent=data.title;drawLines($('[data-chart]',experimentRoot),data);
-    table($('[data-table]',experimentRoot),data.headers,data.rows);
-    const allRows=data.curves[0].points.map((p,i)=>[percent(p.x),...data.curves.map(c=>c.points[i].y.toFixed(4))]);
-    table($('[data-plot-table]',experimentRoot),['YTM',...data.curves.map(c=>c.label)],allRows);
-    $('[data-insight]',experimentRoot).textContent=data.insight;
-    $('[data-timeline-label]',experimentRoot).textContent=data.timeline_label;
-    drawTimeline($('[data-selected-timeline]',experimentRoot),data.timeline.cashflows,true,true);
-  },update);
-  function setMode(next,reset=false){mode=next;for(const [name,value] of Object.entries(defaults[mode])){$(`[name="${name}"]`,form).value=value;$(`[data-pair="${name}"]`,form).value=value;}
-    setChoice('payment_type','zero',form);if(reset){$('[name="ytm"]',form).value=5;$('[data-pair="ytm"]',form).value=5;}
-    $$('[data-mode]',experimentRoot).forEach(button=>{const selected=button.dataset.mode===mode;button.classList.toggle('selected',selected);button.setAttribute('aria-pressed',String(selected));});update();calculate();}
-  $$('[data-mode]',experimentRoot).forEach(button=>button.addEventListener('click',()=>setMode(button.dataset.mode)));
-  $('.reset',form).addEventListener('click',()=>setMode(mode,true));
 }
 const homeChart=$('[data-home-chart]');if(homeChart)fetch('/api/experiments',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({mode:'maturity'})}).then(response=>{if(!response.ok)throw Error();return response.json();}).then(data=>drawLines($('#home-chart'),data,true)).catch(()=>$('#home-chart').replaceChildren(element('p','The experiment could not load. Please try again.','loading')));
 const navToggle=$('#nav-toggle');if(navToggle){

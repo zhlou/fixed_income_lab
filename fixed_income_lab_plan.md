@@ -4,7 +4,7 @@
 
 **Primary daily use:** Research bond strategies and historical returns.
 
-**Current release:** Sixteen lessons, regular-bond pricing, M1 risk tools, M2 return accounting, and M3 versioned Treasury observations.
+**Current release:** Seven core lessons and a standalone Treasury Bill Calculator, regular-bond pricing, M1 risk tools, M2 return accounting, and M3 versioned Treasury observations.
 
 **Next release:** M4 discount curves and the historical-adapter feasibility gate.
 
@@ -174,28 +174,15 @@ branches, not prerequisites for this research-first product.
 
 ## 3. Learn while building
 
-Use **predict → derive → experiment → validate → explain → reuse** for each concept.
-Coding is optional for the learner; understanding cash flows and conventions is not.
+The core reading order, revised November 8, 2026, is payments/price/YTM → Treasury curve → duration/DV01 → convexity/error → settlement/coupon ownership → hold to maturity/reinvestment → sell early. Treasury bill quotes have a standalone calculator and concise reference. Page count follows the questions worth teaching.
 
-Each distinct lesson gets its own page, overview card, sidebar entry, and navigation:
+Open with a reproducible financial result, explain its intuition, and derive the relationship with symbols and units introduced as needed. Reuse the $100-face, 4% semiannual note. The annual-coupon reinvestment example isolates two exact 365-day periods. End each lesson with one changed-input question and a collapsed explanation. Python remains optional.
 
-1. A financial question, prerequisites, and intuition before equations.
-2. Defined symbols/units, a derivation, and a reproducible worked example.
-3. A prediction prompt before moving controls; tables and charts tied to cash flows.
-4. A controlled experiment and a boundary case or counterexample.
-5. Misconceptions, assumptions, reflection, and a transfer exercise with new inputs.
-6. An optional revealed answer and a link to the reusable tool; Python stays collapsed.
+Teach each idea in one primary home and refer back briefly. Remove repeated glossary entries, prediction banners, goals, misconceptions, reflection lists, and tool instructions. Keep core derivations inline. Place longer calculations, conventions, diagnostic checks, provenance, and file operations at the point where a tool user needs them. Match written inputs, charts, tables, and Reset. Use explicit experiment assignments in the registry, independently of delivery milestones.
 
-Keep a lightweight learning journal, initially Markdown: question, prediction,
-result, explanation, remaining uncertainty, and dated revisit. Revisit an earlier
-exercise without its answer at the next milestone. Add saved learning progress
-only when useful; do not build a learning-management platform first. The assistant
-can give feedback but must not write a personal reflection as if the learner did it.
+The editorial budget is roughly 5,000 visible article words across the core, counting math/table text and excluding closed answers, calculations, and Python. Review experiment instructions separately. Card duration estimates require a measured walkthrough before publication. Record reductions in the lesson review, alongside numerical and browser checks.
 
-Use one continuing case: explain 2-year and 10-year hypothetical bond prices,
-measure sensitivity, follow cash receipts, and eventually compare defined rolling
-strategies over history. The education site should stand alone for another learner,
-while the journal records the original learner's progress.
+Keep personal predictions and reflections in the existing journals. An assistant can give feedback while the learner supplies their own answers. Original notes, notebooks, archived plans, and earlier validation evidence retain their historical role.
 
 ## 4. Milestones and dependencies
 
@@ -206,7 +193,7 @@ learning pace and data issues may extend it. Useful releases arrive along the wa
 
 | Milestone | Dependency | Learning outcome | Reusable deliverable | Estimate |
 |---|---|---|---|---|
-| M0 Foundations | Existing | Cash flows, prices, yields, accrual | Six lessons and calculators | Software complete; learner checkpoint unverified |
+| M0 Foundations | Existing | Cash flows, prices, yields, accrual | Seven-question core and calculators across M0–M3 | Software complete; learner checkpoint unverified |
 | M1 Interest-rate risk | M0 | Sensitivity and approximation error | Delivered; learner checkpoint pending | Original estimate: 12–18 h |
 | M2 Returns and cash accounting | M0; M1 for risk comparisons | Reconcile a holding-period return | Delivered; learner checkpoint pending | Original estimate: 12–20 h |
 | M3 Historical observations | M0; independent of M2 | Understand dataset meaning | Delivered; learner checkpoint pending | Original estimate: 16–24 h |
@@ -221,8 +208,7 @@ TIPS, credit, macro dashboards, and advanced modeling are not prerequisites.
 
 ### M1 — Duration, convexity, and exact repricing
 
-**Lessons:** cash-flow timing/Macaulay duration; modified duration/DV01;
-convexity/approximation error. Give these distinct financial concepts their own pages.
+**Lessons:** Which bond loses more when yields rise? → When does duration give a poor estimate? Combine payment weights, Macaulay duration, modified duration, and DV01 in the first question. Use the same ten-year bond to judge convexity against exact repricing in the second. Dated risk and bump diagnostics belong to the Risk Explorer.
 
 Derive analytical duration/convexity for regular periods and compare central
 finite differences of the same pricer. Define DV01 sign, dollar sensitivity,
@@ -243,24 +229,9 @@ shocks weaken a duration-only approximation.
 
 ### M2 — Holding-period returns before backtesting
 
-**Lessons, revised November 5, 2026:** coupons/accrual and simple return →
-pull-to-par and maturity → reinvestment and cash → holding-period return and
-early sale. Introduce return as profit per dollar invested on the first page,
-then build from one coupon to redemption and cash growth before the integrated
-early-sale case. Portfolio aggregation is an optional full-calculator extension.
-Complete curved-term-structure roll-down in M4.
+**Lessons, revised November 8, 2026:** hold to maturity/reinvestment → sell early. Settlement/coupon ownership is taught once in lesson 5. Lesson 6 follows the discount bond to redemption and then changes cash growth in the annual-coupon example. Lesson 7 combines sale price, coupon, and fees. Pull-to-par and reinvestment are selectable experiments on one page. The sale experiment changes exit yield and cost, with marking and complete ledgers available in the full calculator.
 
-**Teaching interface:** each lesson now limits its controls and examples to its
-own question. Lesson 10 varies dates around a coupon and coupon size; 11 varies
-coupon, purchase yield, and maturity/pre-maturity horizon with YTM fixed through
-time; 12 varies cash rate, coupon, and cash/reporting horizon; 13 varies exit
-yield, trading costs, and keeping versus selling. Each has a focused chart and
-numerical table. Early-sale repricing belongs in the final lesson rather than
-being repeated in pull-to-par. Keep stable lesson URLs and the full
-calculator at `/tools/bond-return`; transfer current lesson inputs there for
-portfolio, quotation, date, or saved-file experiments. Financial calculations
-remain shared. Fixed assumptions must be visible rather than disguised as
-editable or unexplained hidden settings.
+Keep `/tools/bond-return` as the complete workflow and transfer valid lesson scenarios into it. Existing return API profiles and saved input formats support earlier callers. Lesson routes may be consolidated. Show fixed assumptions and keep financial calculations in Python. Complete curved-term-structure roll-down in M4.
 
 Build an event ledger for purchases, coupons, redemption, sales, cash, and
 valuation. Start with one bond and deterministic yield paths, then aggregate
@@ -281,20 +252,15 @@ a shorter-horizon realized return.
 
 ### M3 — Historical data with provenance
 
-**Lessons:** par observations versus security quotes, including a short comparable-
-observations checkpoint; observation/publication/retrieval time; revisions/vintages.
-Lesson 14 contains missing-tenor, missing-date, and common-sample checks rather
-than giving data-quality categories a separate full lesson. The M3 sequence now
-ends at lesson 16.
+**Lesson:** How do you read a Treasury yield curve? Show two curves, the 2s10s spread, and its change. A source note explains observation dates, unknown exact publication times, and why a saved comparison pins a dataset. Axis choices, missing observations, the February series introduction, hypothetical revisions, refreshes, and exports belong to the History Viewer. Revisit information timing when M5 defines a trading decision.
 
 The default pinned example is November 5/6, 2026, using November 1–7 coverage
 (five published dates). Retain February 2025 as the historical series-introduction
-example within lesson 14. A partial month must not mark future dates as known
+example in the standalone viewer. A partial month must not mark future dates as known
 nonpublication days. Lesson inputs and prose must agree with the named sample.
 
 The standalone viewer additionally bundles October 2026 plus November through
-November 7 (26 published rows). Client calendar navigation loads months through
-the local server; cached complete months are reused, and the current month is
+November 7 (26 published rows). Client calendar navigation downloads Treasury months directly in the browser; cached complete months are reused, and the current month is
 checked at most hourly. Preserve period-level source evidence when merging
 months within a year. Update calendar availability on acquisition, but require
 Compare to replace the displayed financial result. Lessons start from pinned
@@ -331,8 +297,7 @@ security price nor necessarily the YTM of a particular bond.
 
 ### M4 — Discount curves and historical valuation
 
-**Lessons:** discount factors/spot rates; synthetic bootstrapping; forwards;
-interpolation/model risk; roll-down along an unchanged curve.
+**Two lessons:** How do you price payments at different maturities? → Why can a bond change price on an unchanged curve? Derive discount factors from a small synthetic example, recover the next factor from a coupon bond, and reprice it. Then age one bond, derive a forward from adjacent discount factors, and distinguish that implied rate from a forecast. Put interpolation, source conventions, and short-end coverage in the curve tool and validation notes. Historical valuation depends on the feasibility gate below.
 
 Implement discount-factor cash-flow valuation and recover a known synthetic curve
 from consistent instruments. Start with linear interpolation in log discount
@@ -364,8 +329,7 @@ aging bond can change price on an unchanged curve.
 
 ### M5 — A small historical strategy laboratory
 
-**Lessons:** defining a strategy; rolling versus holding; wealth/drawdown;
-costs; synthetic backtests and their limitations.
+**One end-to-end study:** compare monthly renewed two-year and ten-year synthetic Treasury exposures. Follow one rebalance through sale, replacement, coupons, and costs, then interpret wealth and drawdown. Introduce availability, vintage, common dates, and synthetic prices at the decision each affects. Link source evidence and operating instructions from the relevant controls.
 
 Connect M2's ledger to M4's historical curves for the two strategies in Section 2.
 Define coupon setting, regular dates, sale of aged bonds, replacement purchases,
@@ -391,8 +355,7 @@ limitations, and one alternative explanation.
 
 ### M6 — Robustness, horizons, and nonparallel risk
 
-**Lessons:** horizon dependence; duration-matched comparisons; twists/key-rate
-duration; regime selection/overfitting; empirical versus causal claims.
+**Two questions:** Does the result survive a different holding horizon or sample? → Can duration-matched portfolios respond differently to a curve twist? Change one assumption at a time and inspect exact results. Teach overlapping windows, selection bias, and key-rate exposure through these experiments.
 
 Add rolling 1-, 3-, and 5-year returns where coverage permits. Explain dependence
 among overlapping windows. Compare predefined periods, rebalance frequencies,
@@ -414,7 +377,7 @@ the best future strategy and why equal duration is incomplete risk matching.
 ### M7 — A dependable research desk
 
 Provide **Learn**, **Experiments**, and **Research desk** entry points over the
-same calculations. Keep stable lesson URLs. Add saved studies, run comparison,
+same calculations. Teach reopening, reproducing, and exporting a study through a guided Research Desk workflow. Add saved studies, run comparison,
 explicit refresh, freshness/coverage status, journal, local backup/restore, and
 portable exports. Pin old runs to their inputs; create linked new runs on refresh.
 
@@ -491,8 +454,7 @@ Every milestone delivers:
 
 - **Calculation:** explicit conventions, independent example, identities,
   meaningful boundaries/invalid-input checks, API parity where exposed.
-- **Education:** lessons, worked example, experiment, misconceptions,
-  reflection, and transfer exercise.
+- **Education:** a concrete financial question, one primary explanation with its core derivation, a reproducible example, a focused experiment, and one changed-input question. Add pages only for distinct calculations or interpretations. Measure visible copy and check for repetition.
 - **Tool:** reusable workflow connected to the lesson and saved inputs where useful.
 - **Validation:** sources, expected outputs, tolerances, and actual checks recorded.
   Preserve `notes/phase_1_validation.md`; add milestone-specific validation notes.
@@ -507,6 +469,8 @@ remainder to reflection. Adjust to the learner; do not let UI polishing replace
 the financial question.
 
 ## 8. Extensions after the research core
+
+Before adding a course page, specify a financial question and an example whose answer changes a valuation, comparison, or interpretation. Introduce broader terminology as needed. The archived roadmap retains the expanded topic inventory.
 
 | Track | Prerequisites | Result and boundary |
 |---|---|---|
@@ -529,6 +493,8 @@ tax accounting, derivatives, machine-learning trading, and general-purpose
 optimization until a concrete research need justifies the scope.
 
 ## 9. Immediate implementation backlog
+
+The curriculum tightening is delivered in the source application. Continue with the two M4 questions above and their source/short-end feasibility checks. Use the revised editorial rules for every future lesson. The learner completes the journal work independently.
 
 1. Complete the M1 learner journal: predict, inspect payment weights, reconcile a
    shock row, and export/reload a comparison. Software does not answer these prompts.

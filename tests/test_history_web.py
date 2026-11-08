@@ -38,32 +38,28 @@ def test_hypothetical_revision_is_labeled_and_never_persists(client):
     assert client.get('/api/history/compare',params=params).json()['spread_change_bp'] == -3
 
 
-@pytest.mark.parametrize('slug', ['par-yields-and-quotes','observation-and-publication','revisions-and-vintages'])
-def test_m3_lessons_have_experiments_and_learning_structure(client,slug):
-    page=client.get('/lessons/'+slug)
+def test_curve_lesson_and_full_history_viewer(client):
+    page=client.get('/lessons/par-yields-and-quotes')
     assert page.status_code==200
-    for text in ['data-history', 'data-pinned="true"', 'PREDICT BEFORE', 'class="math block"','Reflect and transfer','class="exercise-answer"','/static/history.js']:
+    for text in ['data-history', 'data-pinned="true"', 'class="math block"', 'class="exercise-answer"', '/static/history.js']:
         assert text in page.text
-    assert 'data-valuation data-lesson' not in page.text
     assert 'data-refresh-form' not in page.text
-    assert 'cdn.' not in page.text
+    assert 'name="history_sample"' not in page.text
+    assert 'name="maturity_scale"' not in page.text
     tool=client.get('/tools/treasury-history').text
-    assert 'data-refresh-form' in tool and 'data-snapshot-options' in tool
+    for text in ['data-refresh-form', 'data-snapshot-options', 'name="history_sample"', 'name="maturity_scale"', 'name="revision"', 'data-missing-date']:
+        assert text in tool
 
 
-def test_merged_lesson_contains_missing_data_and_updated_navigation(client):
-    page = client.get('/lessons/par-yields-and-quotes').text
-    assert '<h2>Which observations can we compare?</h2>' in page
-    assert 'data-missing-date' in page
-    assert 'Missing tenor on a published date' in page
-    assert 'No published row within coverage' in page
-    assert 'Outside cached coverage' in page
-    assert '1.5-month' in page and '4.41%' in page
-    assert 'href="/lessons/observation-and-publication" class="next-lesson"' in page
-    timing = client.get('/lessons/observation-and-publication').text
-    assert 'LESSON 15' in timing
-    assert 'href="/lessons/par-yields-and-quotes"><small>← PREVIOUS LESSON' in timing
-    assert 'LESSON 16' in client.get('/lessons/revisions-and-vintages').text
+def test_retired_lessons_are_removed_from_the_course(client):
+    for slug in ['bond-basics','bond-pricing-lab','yield-to-maturity','treasury-bill-yields',
+                 'macaulay-duration','coupons-and-return','pull-to-par',
+                 'observation-and-publication','revisions-and-vintages']:
+        assert client.get('/lessons/'+slug).status_code==404
+        assert f'href="/lessons/{slug}"' not in client.get('/').text
+    page=client.get('/lessons/par-yields-and-quotes').text
+    assert 'LESSON 02' in page
+    assert 'href="/lessons/modified-duration-dv01" class="next-lesson"' in page
 
 
 @pytest.mark.parametrize('sample,coverage,count,published,missing', [
@@ -97,32 +93,24 @@ def test_history_dates_have_named_calendar_buttons_and_live_status(client):
     assert '/static/history_dates.js' in page
 
 
-def test_recent_dates_and_reference_selector_match_lesson_numbers(client):
+def test_recent_dates_match_the_worked_spread_example(client):
     catalog=client.get('/api/history/snapshots').json()
     assert catalog['example_defaults']['first']=='2026-11-05'
     assert catalog['example_defaults']['second']=='2026-11-06'
     assert catalog['reference_defaults']['first']=='2025-02-14'
-    for slug in ('par-yields-and-quotes','observation-and-publication','revisions-and-vintages'):
-        text=client.get('/lessons/'+slug).text
-        assert 'value="2026-11-05"' in text and 'value="2026-11-06"' in text
-    lesson=client.get('/lessons/par-yields-and-quotes').text
-    assert 'name="history_sample"' in lesson
-    assert 'Try November 7' in lesson
-    assert '38 bp' in lesson and '35 bp' in lesson
-    assert '1.5-month' in lesson and '4.41%' in lesson
-    revision=client.get('/lessons/revisions-and-vintages').text
-    assert '4.96%' in revision and '+7 bp' in revision
+    page=client.get('/lessons/par-yields-and-quotes').text
+    assert 'value="2026-11-05"' in page and 'value="2026-11-06"' in page
+    assert '38 basis points' in page and '35 bp' in page
+    assert 'name="history_sample"' in client.get('/tools/treasury-history').text
 
 
-def test_lessons_and_standalone_viewer_have_automatic_month_controls(client):
-    tool=client.get('/tools/treasury-history').text
-    assert 'data-month-status' in tool and 'data-retry-month' in tool
-    assert '/static/history_months.js' in tool
-    for slug in ('par-yields-and-quotes','observation-and-publication','revisions-and-vintages'):
-        page=client.get('/lessons/'+slug).text
+def test_curve_lesson_and_viewer_have_automatic_month_controls(client):
+    for path in ['/tools/treasury-history','/lessons/par-yields-and-quotes']:
+        page=client.get(path).text
         assert 'data-month-status' in page and 'data-retry-month' in page
-        assert 'data-lesson-example' in page and 'data-pinned="true"' in page
-        assert 'Reset example restores' in page
+        assert '/static/history_months.js' in page
+    page=client.get('/lessons/par-yields-and-quotes').text
+    assert 'data-lesson-example' in page and 'data-pinned="true"' in page
 
 
 def test_revision_description_uses_the_selected_observation_and_python_shift(client):
@@ -166,7 +154,7 @@ def test_revision_proposal_distinguishes_missing_tenor_and_genuine_zero(client,m
 def test_local_assets_have_content_versions_and_serve_offline(client):
     from hashlib import sha256
     import re
-    page=client.get('/lessons/revisions-and-vintages').text
+    page=client.get('/lessons/par-yields-and-quotes').text
     assets=re.findall(r'(?:src|href)="(/static/([^/]+\.(?:js|css))\?v=([a-f0-9]{16}))"',page)
     assert any(name=='history.js' for _,name,_ in assets)
     for url,name,version in assets:

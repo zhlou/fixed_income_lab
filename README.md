@@ -1,9 +1,9 @@
 # Fixed-Income Lab
 
 Interactive lessons and tools for understanding bond payments, prices,
-interest-rate risk, returns, and published Treasury yields. Start with Bond
-basics or open the Bond Risk Explorer, Bond Return Calculator, or Treasury
-History Viewer. Sixteen lessons connect explanations to worked examples and
+interest-rate risk, returns, and published Treasury yields. Start with a bond’s
+payments or open the Treasury Bill Calculator, Bond Risk Explorer, Bond Return
+Calculator, or Treasury History Viewer. Seven core lessons connect explanations to worked examples and
 experiments. Python examples are optional.
 
 A hosted installation gives visitors one shared website. Inputs and downloaded
@@ -138,52 +138,31 @@ The Dockerfile supports both the legacy builder and BuildKit.
 
 ## Lessons
 
-| Page | What to explore |
-|---|---|
-| `/lessons/bond-basics` | Coupon and principal cash-flow timelines |
-| `/lessons/present-value` | Present value and bond pricing: discounting, rate conventions, and reinvestment |
-| `/lessons/bond-pricing-lab` | Maturity, coupon, and payment-timing comparisons |
-| `/lessons/yield-to-maturity` | Price-to-YTM solving and coupon/current-yield comparisons |
-| `/lessons/settlement-and-accrued-interest` | Dated pricing, accrued interest, clean/dirty YTM, and pull-to-par |
-| `/lessons/treasury-bill-yields` | Bank discount and coupon-equivalent yield conventions |
-| `/lessons/macaulay-duration` | Present-value weights and average payment time |
-| `/lessons/modified-duration-dv01` | Percentage sensitivity, dollar duration, and DV01 |
-| `/lessons/convexity` | Exact repricing, curvature, and approximation error |
-| `/tools/bond-risk` | Reusable two-bond risk comparison with JSON export/import |
-| `/lessons/coupons-and-return` | Simple period return and dirty-price accounting across a coupon date |
-| `/lessons/pull-to-par` | Fixed-YTM price convergence and final redemption |
-| `/lessons/reinvestment-and-cash` | Explicit cash growth and the two-period ledger |
-| `/lessons/holding-period-returns` | Integrated early-sale return, costs, and keeping versus selling |
-| `/tools/bond-return` | One/two-position return calculator with input and ledger exports |
-| `/lessons/par-yields-and-quotes` | Constant-maturity observations, spreads, and comparable samples |
-| `/lessons/observation-and-publication` | Observation, publication, and retrieval timing |
-| `/lessons/revisions-and-vintages` | Immutable evidence and hypothetical revisions |
-| `/tools/treasury-history` | Cached historical curves, explicit refresh, and source evidence |
+The course has seven lessons in one reading order. Each has a worked calculation and a focused experiment, with the core derivation in the article and one changed-input question.
 
-The six foundations lessons are **Bond Basics → Present Value and Bond Pricing
-→ Bond Pricing Lab → Yield to Maturity → Settlement and Accrued Interest
-→ Treasury Bill Yields**. Lesson 2 includes optional Python examples in a collapsed
-“Under the hood” section. Implementation is supplementary, not a separate
-required lesson. The former implementation page redirects to that section.
-M1 adds three lessons: **Cash-flow timing & duration → Modified duration & DV01
-→ Convexity & approximation error**. Each has prediction prompts, a derivation,
-a worked example, reflection questions, and a transfer exercise with a collapsed
-answer. The shared Risk Explorer is also available outside the lesson sequence.
-M2 adds **Coupons, accrual & return → Pull-to-par & maturity → Reinvestment
-& cash → Holding-period return & early sale**, bringing the M0–M2 total to thirteen lessons.
-The first page introduces a simple return; the final page combines the pieces
-with exit-yield changes and trading costs. Existing lesson URLs are preserved.
-Their focused experiments share the same return ledger, which processes every
-payment before measuring wealth. The complete calculator has its own tool page.
+| Page | Financial question |
+|---|---|
+| `/lessons/present-value` | What does this bond pay, and what is it worth? Switch between price from yield and yield from price. |
+| `/lessons/par-yields-and-quotes` | How do you read a Treasury yield curve? Reconcile two curves and their 2s10s spread change. |
+| `/lessons/modified-duration-dv01` | Which bond loses more when yields rise? Connect payment weights, duration, and dollar exposure. |
+| `/lessons/convexity` | When does duration give a poor estimate? Judge both approximations against exact repricing. |
+| `/lessons/settlement-and-accrued-interest` | What do you actually pay between coupon dates? Reconcile clean, accrued, and dirty prices. |
+| `/lessons/reinvestment-and-cash` | What do you earn by holding to maturity? Select approach to par or coupon reinvestment. |
+| `/lessons/holding-period-returns` | What do you earn if you sell early? Combine proceeds, coupons, and costs. |
+| `/tools/treasury-bills` | Translate bank discount quotes into price, period return, and coupon-equivalent yield. |
+| `/tools/bond-risk` | Compare other bonds and dated risk, inspect numerical checks, and save inputs. |
+| `/tools/bond-return` | Inspect complete cash/position ledgers and keep, sell, or combine positions. |
+| `/tools/treasury-history` | Explore history, source evidence, missing-data examples, hypothetical revisions, and saved datasets. |
+
+The core uses a continuing $100-face, 4% semiannual note. An annual-coupon example isolates reinvestment over two exact years. Python is optional and collapsed. Retired lesson URLs return 404. The former implementation URL redirects to the first lesson's optional Python section. Lesson time estimates were removed pending a measured walkthrough.
 
 On desktop windows at least 1200 pixels wide, lessons place the experiment on the
 left and the explanation on the right. Each side scrolls independently, so the
 chart stays in place while you read. The experiment receives most of the width.
-Hover over **Lesson 08 of 16 ▾** in the header to jump to any lesson, grouped under
-Foundations, Risk, Returns, and History. Wide screens show those four groups
-left to right; medium screens use two columns and phones use one.
+Hover over the lesson position in the header to choose from the same seven-lesson reading order shown on the homepage and sidebar.
+
 Click to keep the picker open, or use Enter/Space
-and Tab by keyboard. Escape closes it. On phones, tap the compact **08 / 16 ▾**
+and Tab by keyboard. Escape closes it. On phones, tap the compact lesson position
 button to open a scrollable lesson list. **Course** opens the full navigation.
 Narrower windows stack the sections with links between them. The top bar also
 provides Overview, Previous, and Next; previous/next links sit at the end of the explanation.
@@ -197,7 +176,7 @@ installation, not for using the lessons afterward.
 
 Browser controls display percentages; JSON endpoints accept decimal rates.
 `POST /api/valuation`, `POST /api/rates`, and `POST /api/experiments` expose
-the calculations. `POST /api/yield` solves for annual nominal YTM given
+the calculations. Valuation also returns `ytm`, `coupon_rate`, and `current_yield` for the displayed rate comparison. `POST /api/yield` solves for annual nominal YTM given
 `price`, `face_value`, `coupon_rate`, `maturity_years`, and `frequency`.
 Price and face value use the same dollar units; rates are decimals. It also
 returns current yield, the repriced bond, the pricing residual, and a
@@ -215,18 +194,9 @@ uses $100 face and semiannual coupons.
 Interactive API documentation is available at `/docs`.
 Prices use the selected face value; comparison charts use $100 face.
 
-The first four lessons assume regular periods immediately after a coupon payment.
-Coupon and compounding frequencies match, accrued interest is zero, and
-coupon maturities must contain a whole number of periods. The generic
-zero-coupon pricer also supports fractional periods. Lesson 5 adds actual settlement dates and accrued interest; Lesson 6 adds
-Treasury bill discount quotations. Market discount curves remain future work.
-Dated bonds use Actual/Actual coupon-period accrual and Treasury-style simple
-discounting over the first fractional period. Dates are unadjusted and issue
-must be on the regular maturity-anchored grid; stub coupons, holidays,
-ex-coupon rules, and market settlement lags are excluded. On a coupon date,
-settlement is after payment. Bill yields use the selected 365/366 basis and
-the coupon-equivalent quadratic beyond half a year. Input ranges are bounded
-for the website; original pricing interfaces remain available.
+The regular-period pricing and risk lessons assume valuation immediately after a coupon payment, with matching payment/compounding frequencies. The first lesson fixes semiannual frequency. General frequency and instrument choices remain available through the numerical APIs and the Risk Explorer.
+
+Lesson 5 adds actual settlement dates, clean/dirty prices, and accrued interest. Dated pricing uses Actual/Actual coupon-period accrual, simple first-fractional-period discounting, regular maturity-anchored schedules, and after-payment coupon-date settlement. Stub coupons, holidays, ex-coupon rules, and settlement lags are excluded. The bill calculator makes the 365/366 investment basis explicit and uses the coupon-equivalent quadratic beyond half a year.
 
 ## Bond Risk Explorer (M1)
 
@@ -268,15 +238,13 @@ Bond B to aggregate two positions with the same purchase/horizon dates and cash
 policy. Each position keeps its own coupon, maturity, face amount, and implied
 purchase yield when using quotes.
 
-M2 lessons use focused controls and related examples, with the remaining
-assumptions stated explicitly:
+Lessons 6–7 use focused views of the shared return ledger.
 
-| Lesson | Adjustable controls | Chart emphasis |
+| Experiment | Adjustable controls | Chart emphasis |
 |---|---|---|
-| 10. Coupons, accrual & return | Nearby purchase/valuation dates, coupon rate | Coupon-date transfer from bond value to cash |
-| 11. Pull-to-par & maturity | Coupon, purchase YTM, maturity or day-before-maturity horizon | Clean/dirty price convergence at fixed YTM and final redemption |
-| 12. Reinvestment & cash | Cash rate, coupon rate, reporting horizon | Extra wealth relative to cash at 0% |
-| 13. Holding-period return & early sale | Exit YTM, trading cost, mark/sell | Dirty price change versus investment return |
+| Lesson 6, Approach to par | Coupon, purchase YTM, maturity/day-before horizon | Clean/dirty price convergence and redemption |
+| Lesson 6, Coupon reinvestment | Annual effective cash rate | Extra wealth relative to 0% cash on the annual-coupon example |
+| Lesson 7, Sell early | Exit YTM and cost per trade | Price change and coupon-inclusive return |
 
 At desktop widths of 1200 pixels or more, the input column and results scroll
 independently. **View chart** remains beneath the controls. Short desktop windows
@@ -329,9 +297,9 @@ return, components, and residuals), `cash_comparison`, solved purchase yields,
 complete `inputs`, and a convention version. `/docs` describes every field.
 
 `POST /api/lesson-returns/{slug}` accepts an `example` identifier and a `controls`
-object for the four M2 lesson slugs. The lesson controls are listed in the table
+object for the four original M2 experiment profiles. Those API identifiers remain supported after lesson consolidation. The lesson controls are listed in the table
 above; Python supplies the fixed assumptions and calls the shared ledger.
-For example, lesson 13 at `/api/lesson-returns/holding-period-returns` accepts
+For example, lesson 7 uses `/api/lesson-returns/holding-period-returns` with
 `{"example":"yield-rise","controls":{"end_yield":0.07,"cost_bp":10}}`.
 Lesson dates are constrained to its teaching window; unrelated controls and
 examples are rejected. The response contains complete transferable `inputs`,
@@ -339,7 +307,7 @@ the shared `result`, and lesson-specific metrics, curves, and numerical rows.
 Rates remain decimal fractions. Existing full-calculator APIs and their bounds
 are preserved. For compatibility, the pull-to-par API still accepts its former
 `early-sale` example, `early_sale` horizon, and `end_yield`; the lesson page
-offers fixed-yield scenarios, with early exits taught in lesson 13.
+offers fixed-yield scenarios, with early exits taught in lesson 7.
 
 `POST /api/return-ledger` exposes the domain workflow: common `start_date` and
 `end_date`, `cash_rate`, `cost_bp`, `end_treatment`, optional `valuation_dates`,
@@ -381,7 +349,7 @@ Notebook 01 remain available as reference artifacts. The [project
 plan](fixed_income_lab_plan.md) evaluates the existing implementation and defines
 milestones for learning, educational lessons, and a historical research workbench.
 M1 duration/convexity, M2 return accounting, and M3 historical observations are
-implemented. M3 adds three lessons for sixteen total. Discount curves (M4) are
+implemented. Their teaching material is consolidated into seven core lessons. Discount curves (M4) are
 next, followed by the first two-strategy research release. Saved research studies
 and historical strategy returns remain planned.
 The website roadmap now shows milestone availability without week-based promises.
@@ -466,10 +434,10 @@ An archive or stateless request is limited to 32 MB, a source response to 4 MB,
 and a normalized snapshot to 15,000 rows. An archive contains at most 100 snapshots
 and 500 raw responses.
 
-Lessons start from pinned examples. **Reset example** restores the original dates,
+The curve lesson starts from a pinned example. **Reset example** restores the original dates,
 dataset, Log maturity axis, and published-observation setting. Log/Linear changes
 horizontal spacing only. Source publication times remain unknown, and the
-hypothetical +10 bp revision in lesson 16 is calculated separately in Python.
+hypothetical +10 bp revision in the standalone viewer is calculated separately in Python.
 Calendar buttons support keyboard navigation, typed Gregorian dates, and live
 availability labels. Missing dates remain selectable.
 

@@ -144,27 +144,17 @@ def test_explicit_paths_reject_future_fill_and_duplicate_dates():
         assert client.post('/api/return-ledger',json=payload).status_code==422
 
 
-def test_m2_pages_have_separate_lessons_formulas_navigation_and_local_assets():
-    slugs=['coupons-and-return','pull-to-par','reinvestment-and-cash','holding-period-returns']
-    for index,slug in enumerate(slugs):
-        response=client.get('/lessons/'+slug)
-        assert response.status_code==200
-        text=response.text
-        assert f'LESSON {index+10:02}' in text
-        assert 'data-return-lesson' in text
-        assert 'data-valuation data-lesson' not in text and 'data-risk-weights' not in text
-        assert 'PREDICT BEFORE' in text and 'Reflection checkpoint' in text
-        assert 'Transfer exercise' in text and 'class="math block"' in text
-        assert '<details class="exercise-answer"><summary>Reveal the explanation</summary>' in text
-        assert '::: answer' not in text
-        if index<3:
-            assert f'href="/lessons/{slugs[index+1]}" class="next-lesson"' in text
-        previous = slugs[index-1] if index else 'convexity'
-        assert f'href="/lessons/{previous}"><small>← PREVIOUS LESSON</small>' in text
-    assert 'href="/lessons/coupons-and-return" class="next-lesson"' in client.get('/lessons/convexity').text
-    home=client.get('/').text
-    assert f'{len(LESSONS)} available lessons' in home
-    assert 'Open Bond Return Calculator' in home
+def test_returns_use_bounded_views_and_keep_full_calculator():
+    for index,slug in enumerate(['reinvestment-and-cash','holding-period-returns'], start=6):
+        page=client.get('/lessons/'+slug)
+        assert page.status_code==200
+        assert f'LESSON {index:02}' in page.text
+        assert 'data-return-lesson' in page.text
+        assert 'class="math block"' in page.text and 'class="exercise-answer"' in page.text
+        assert 'data-lesson-ledger' not in page.text
+    maturity=client.get('/lessons/reinvestment-and-cash').text
+    assert 'data-lesson-case="pull-to-par"' in maturity
+    assert 'data-lesson-case="reinvestment-and-cash"' in maturity
     tool=client.get('/tools/bond-return')
     assert tool.status_code==200 and 'data-ledger-export' in tool.text
     assert client.get('/static/returns.js').status_code==200

@@ -1,7 +1,7 @@
 # M1 learning journal
 
 **Learner checkpoint: pending.** These prompts are intentionally unanswered.
-Use the lessons and [Risk Explorer](http://127.0.0.1:8000/tools/bond-risk), then
+Use lessons 3–4 and [Risk Explorer](http://127.0.0.1:8000/tools/bond-risk), then
 record your own reasoning. Save a comparison JSON alongside your research notes
 if you want to reproduce the inputs later.
 

@@ -14,9 +14,7 @@ from filab.web.curriculum import LESSONS
 client = TestClient(app)
 
 
-@pytest.mark.parametrize("path", ["/", "/lessons/bond-basics", "/lessons/present-value",
-                                  "/lessons/bond-pricing-lab", "/lessons/yield-to-maturity",
-                                  "/lessons/settlement-and-accrued-interest", "/lessons/treasury-bill-yields"])
+@pytest.mark.parametrize("path", ["/"] + ["/lessons/" + item["slug"] for item in LESSONS] + ["/tools/treasury-bills"])
 def test_pages_load_with_navigation(path):
     response = client.get(path)
     assert response.status_code == 200
@@ -37,7 +35,6 @@ def test_lesson_picker_destinations_and_current_lesson(lesson_number, lesson):
     assert 'aria-controls="lesson-picker-panel" aria-expanded="false"' in page
     assert f'current lesson {lesson_number} of {len(LESSONS)}' in page
     panel = re.search(r'<div id="lesson-picker-panel"[^>]* hidden>(.*?)</div>', page, re.S).group(1)
-    assert re.findall(r'<h2[^>]*>(.*?)</h2>', panel) == ['Foundations', 'Risk', 'Returns', 'History']
     links = re.findall(r'<a href="(/lessons/[^"]+)"([^>]*)>(.*?)</a>', panel, re.S)
     assert [href for href, _, _ in links] == ['/lessons/' + item['slug'] for item in LESSONS]
     assert [href for href, attrs, _ in links if 'aria-current="page"' in attrs] == ['/lessons/' + lesson['slug']]
@@ -203,19 +200,20 @@ def test_currency_is_not_mistaken_for_inline_math():
 
 def test_lesson_sequence_and_optional_implementation():
     home = client.get('/').text
-    assert f'{len(LESSONS)} available lessons' in home
+    assert '7 available lessons' in home
     assert home.count('class="lesson-card"') == len(LESSONS)
-    for slug in ('bond-basics', 'present-value', 'bond-pricing-lab', 'yield-to-maturity', 'settlement-and-accrued-interest', 'treasury-bill-yields'):
-        page = client.get('/lessons/' + slug).text
+    for index, lesson in enumerate(LESSONS):
+        page = client.get('/lessons/' + lesson['slug']).text
         assert page.count('class="lesson-link ') == len(LESSONS)
-        assert 'href="/lessons/cash-flows-and-pricing"' not in page
-    second = client.get('/lessons/present-value').text
-    assert 'Present value &amp; bond pricing' in second
-    assert 'href="/lessons/bond-pricing-lab" class="next-lesson"' in second
-    details = re.search(r'<details[^>]*id="under-the-hood"[^>]*>', second).group()
+        if index + 1 < len(LESSONS):
+            assert f'href="/lessons/{LESSONS[index+1]["slug"]}" class="next-lesson"' in page
+        if lesson['prerequisite']:
+            assert next(i for i, l in enumerate(LESSONS) if l['slug'] == lesson['prerequisite']) < index
+    first = client.get('/lessons/present-value').text
+    details = re.search(r'<details[^>]*id="under-the-hood"[^>]*>', first).group()
     assert ' open' not in details
-    assert 'Optional Python examples' in second
-    assert 'LESSON 03' in client.get('/lessons/bond-pricing-lab').text
+    assert 'Optional Python examples' in first
+    assert 'lesson-time' not in home
 
 
 def test_old_implementation_url_redirects_to_optional_section():
@@ -279,16 +277,16 @@ def test_yield_nonfinite_price_has_serializable_error():
     assert response.status_code == 422
 
 
-def test_yield_has_its_own_lesson_and_cent_price_input():
-    page = client.get('/lessons/yield-to-maturity').text
-    assert 'LESSON 04' in page
-    lab = client.get('/lessons/bond-pricing-lab').text
-    assert 'data-yield aria-labelledby' not in lab
-    assert 'href="/lessons/yield-to-maturity" class="next-lesson"' in lab
+def test_pricing_lesson_has_both_directions_and_cent_price_input():
+    page = client.get('/lessons/present-value').text
+    assert 'data-core-experiment="pricing"' in page
     assert 'value="98.12" min="0.01" max="300" step="0.01"' in page
-    assert 'data-yield aria-labelledby="yield-heading"' in page
-    assert 'Annual nominal YTM' in page and 'Current yield' in page
-    assert 'id="yield-price" name="price"' in page
+    assert 'id="core-price" name="price"' in page
+    assert 'value="price"' in page and 'value="yield"' in page
+    priced = client.post('/api/valuation', json={'face_value':100}).json()
+    solved = client.post('/api/yield', json={'price':priced['price']}).json()
+    assert priced['ytm'] == pytest.approx(solved['ytm'], abs=1e-12)
+    assert priced['current_yield'] == pytest.approx(solved['current_yield'], abs=1e-12)
 
 
 def test_settlement_default_prices_day_counts_and_path():
@@ -355,12 +353,12 @@ def test_bill_api_rejects_invalid_conventions(payload):
     assert client.post('/api/bills', json=payload).status_code == 422
 
 
-def test_phase_one_final_lessons_have_navigation_and_separate_experiments():
-    fifth = client.get('/lessons/settlement-and-accrued-interest').text
-    sixth = client.get('/lessons/treasury-bill-yields').text
-    assert 'LESSON 05' in fifth and 'data-settlement' in fifth
-    assert 'LESSON 06' in sixth and 'data-bills' in sixth
-    assert 'href="/lessons/treasury-bill-yields" class="next-lesson"' in fifth
-    assert 'name="settlement_date" type="date"' in fifth
-    assert 'data-valuation data-lesson' not in fifth + sixth
+def test_settlement_and_bill_tool_have_distinct_entrypoints():
+    settlement = client.get('/lessons/settlement-and-accrued-interest').text
+    bills = client.get('/tools/treasury-bills').text
+    assert 'data-settlement' in settlement and 'data-bills' in bills
+    assert 'href="/lessons/reinvestment-and-cash" class="next-lesson"' in settlement
+    assert 'name="settlement_date" type="date"' in settlement
+    assert 'href="/tools/treasury-bills"' in client.get('/lessons/present-value').text
+    assert 'data-core-experiment' not in bills
     assert 'Available' in client.get('/').text

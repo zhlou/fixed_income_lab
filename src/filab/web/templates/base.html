@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="/static/site.css?v={{ asset_versions['site.css'] }}">
   <script defer src="/static/vendor/katex/katex.min.js"></script>
   <script defer src="/static/app.js?v={{ asset_versions['app.js'] }}"></script>
+  <script defer src="/static/lesson_experiments.js?v={{ asset_versions['lesson_experiments.js'] }}"></script>
   <script defer src="/static/risk.js?v={{ asset_versions['risk.js'] }}"></script>
   <script defer src="/static/return_workspace.js?v={{ asset_versions['return_workspace.js'] }}"></script>
   <script defer src="/static/returns.js?v={{ asset_versions['returns.js'] }}"></script>
@@ -32,6 +33,7 @@
   {% endfor %}
   </nav>
   <div class="sidebar-caption">TOOLS</div>
+  <a class="overview-link" href="/tools/treasury-bills">Treasury Bill Calculator ↗</a>
   <a class="overview-link {{ 'active' if active == 'bond-risk' else '' }}" href="/tools/bond-risk" {% if active == 'bond-risk' %}aria-current="page"{% endif %}>Bond Risk Explorer ↗</a>
   <a class="overview-link {{ 'active' if active == 'bond-return' else '' }}" href="/tools/bond-return" {% if active == 'bond-return' %}aria-current="page"{% endif %}>Bond Return Calculator ↗</a>
   <a class="overview-link" href="/tools/treasury-history">Treasury History Viewer ↗</a>
@@ -56,13 +58,8 @@
           <span aria-hidden="true">▾</span>
         </button>
         <div id="lesson-picker-panel" class="lesson-picker-panel" hidden>
-          {% for milestone, title in [('M0', 'Foundations'), ('M1', 'Risk'), ('M2', 'Returns'), ('M3', 'History')] %}
-          <section class="lesson-picker-group" aria-labelledby="lesson-picker-{{ milestone }}">
-            <h2 id="lesson-picker-{{ milestone }}">{{ title }}</h2>
-            {% for item in lessons %}{% if item.milestone == milestone %}
-            <a href="/lessons/{{ item.slug }}" class="lesson-picker-link"{% if active == item.slug %} aria-current="page"{% endif %}><span class="nav-number">{{ '%02d'|format(loop.index) }}</span><span>{{ item.title }}</span></a>
-            {% endif %}{% endfor %}
-          </section>
+          {% for item in lessons %}
+          <a href="/lessons/{{ item.slug }}" class="lesson-picker-link"{% if active == item.slug %} aria-current="page"{% endif %}><span class="nav-number">{{ '%02d'|format(loop.index) }}</span><span>{{ item.title }}</span></a>
           {% endfor %}
         </div>
       </div>

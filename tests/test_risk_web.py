@@ -65,27 +65,17 @@ def test_incompatible_study_is_rejected(change):
     assert client.post('/api/risk-study',json=study).status_code==422
 
 
-def test_milestone_navigation_lessons_tool_and_local_assets():
-    slugs=['macaulay-duration','modified-duration-dv01','convexity']
-    for index,slug in enumerate(slugs):
+def test_focused_risk_lessons_and_full_explorer():
+    for index, slug in enumerate(['modified-duration-dv01', 'convexity'], start=3):
         page=client.get('/lessons/'+slug)
         assert page.status_code==200
-        text=page.text
-        assert f'LESSON {index+7:02}' in text
-        assert 'data-risk' in text and 'data-valuation data-lesson' not in text
-        assert 'Predict' in text or 'PREDICT' in text
-        assert 'Transfer exercise' in text
-        assert 'Reflection' in text or 'Interest-rate risk review' in text
-        assert 'math block' in text
-        if index<2:
-            assert f'href="/lessons/{slugs[index+1]}" class="next-lesson"' in text
-    assert 'href="/lessons/macaulay-duration" class="next-lesson"' in client.get('/lessons/treasury-bill-yields').text
-    home=client.get('/').text
-    assert '12-week' not in home and 'WEEKS 3' not in home
-    assert 'M7' in home and 'M1' in home
+        assert f'LESSON {index:02}' in page.text
+        assert 'data-core-experiment' in page.text and 'math block' in page.text
+        assert 'data-risk-export' not in page.text
+        assert '/tools/bond-risk' in page.text
     tool=client.get('/tools/bond-risk')
     assert tool.status_code==200 and 'data-risk-export' in tool.text
-    assert '/static/risk.js' in tool.text
+    assert 'data-risk-convergence' in tool.text
     assert client.get('/static/risk.js').status_code==200
 
 
@@ -100,7 +90,7 @@ def test_saved_study_requires_complete_inputs_and_explicit_version():
 
 
 def test_transfer_answers_are_collapsed_and_math_is_renderable():
-    for slug in ['macaulay-duration','modified-duration-dv01','convexity']:
+    for slug in ['modified-duration-dv01','convexity']:
         page=client.get('/lessons/'+slug).text
         assert '<details class="exercise-answer"><summary>Reveal the explanation</summary>' in page
         assert '<details class="exercise-answer" open' not in page

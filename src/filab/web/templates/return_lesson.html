@@ -7,13 +7,13 @@
 <p class="tiny-note return-state" data-return-state role="status">Calculating…</p>
 <a class="return-full-link" href="/tools/bond-return" data-full-calculator aria-disabled="true">Full calculator ↗</a>
 <p class="error" role="alert" data-error></p>
-</div><div class="return-view-switch" role="group" aria-label="Experiment view"><button type="button" data-return-view="inputs" aria-controls="return-inputs" aria-pressed="false">Edit inputs</button><button type="button" data-return-view="results" aria-controls="return-results" aria-pressed="true">Results & chart</button></div></div>
-<div class="workspace return-workspace"><form class="controls card return-form" id="return-inputs" aria-label="Controls for this lesson" novalidate>
+</div><div class="return-view-switch" role="group" aria-label="Experiment view"><button type="button" data-return-view="inputs" aria-controls="return-inputs-{{ experiment.slug }}" aria-pressed="false">Edit inputs</button><button type="button" data-return-view="results" aria-controls="return-results-{{ experiment.slug }}" aria-pressed="true">Results & chart</button></div></div>
+<div class="workspace return-workspace"><form class="controls card return-form" id="return-inputs-{{ experiment.slug }}" aria-label="Controls for this lesson" novalidate>
 <div class="return-input-scroll" tabindex="0" role="region" aria-label="Lesson experiment inputs">
-<div class="return-focused-fields"><div class="card-overline">HYPOTHETICAL EXPERIMENT</div><h2>{{ experiment.input_title }}</h2><p class="tiny-note return-instruction">{{ experiment.instruction }}</p>
+<div class="return-focused-fields"><div class="card-overline">HYPOTHETICAL EXPERIMENT</div><h2>{{ experiment.input_title }}</h2>
 {% for field in experiment.controls %}
 <div data-lesson-field="{{ field.name }}">
-{% set id = 'lesson-return-' + field.name %}
+{% set id = 'lesson-return-' + experiment.slug + '-' + field.name %}
 {% set value = experiment.initial[field.name] %}
 {% if field.kind == 'number' %}
 {{ control(id, field.label, (value * 100)|round(10) if field.rate else value, field.min, field.max, field.step, field.unit, field.hint, field.name) }}
@@ -27,9 +27,9 @@
 <div class="return-fixed"><strong>Held fixed in this lesson</strong><p>{{ experiment.fixed }}</p></div>
 <details class="return-conventions"><summary>Settlement conventions</summary><p class="tiny-note">Hypothetical scenarios. Actual/Actual coupon-period accrual; simple first fractional discount period. Coupon-date settlement is after payment. No stubs, holidays, ex-coupon rules, settlement lags, taxes, or external flows. Return covers the whole selected period, without annualization.</p></details>
 </div></div><div class="return-form-actions"><button type="button" class="reset">↺ Reset</button><button type="button" class="button" data-return-show-results>View chart →</button></div>
-</form><div class="results return-results" id="return-results" tabindex="0" role="region" aria-label="Lesson chart and financial results">
+</form><div class="results return-results" id="return-results-{{ experiment.slug }}" tabindex="0" role="region" aria-label="Lesson chart and financial results">
 <div class="metrics" data-lesson-metrics aria-live="polite" aria-atomic="true"></div>
 <div class="card chart-card"><div class="card-overline">{{ lesson.tag|upper }}</div><h2>{{ experiment.chart_title }}</h2><div class="chart" data-return-chart></div><p class="insight" data-lesson-insight></p></div>
 <div class="card table-card"><div class="card-overline">{{ experiment.table_title }}</div><div class="table-scroll" data-lesson-table tabindex="0" aria-label="Lesson numerical example"></div><p class="tiny-note" data-lesson-totals></p></div>
-<details class="card risk-details"><summary>Inspect the cash and position ledger</summary><p class="tiny-note">Valuation rows move no cash. Purchases and sales use dirty prices. On a payment date: grow existing cash, credit coupons, redeem principal, then sell or value the remaining bond.</p><div class="table-scroll" data-lesson-ledger tabindex="0" aria-label="Lesson cash and position event ledger"></div></details>
+
 </div></div></section>
