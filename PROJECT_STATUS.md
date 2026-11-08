@@ -6,7 +6,7 @@
 
 **Foundations implementation and independent reference validation are complete
 for the regular-coupon educational model** (original Phase 1, now M0).
-The local website has **seventeen interactive lessons**. **M1 risk, M2 return
+The local website has **sixteen interactive lessons**. **M1 risk, M2 return
 accounting, and M3 historical observations are implemented and validated**,
 including the Risk Explorer, Bond Return Calculator, and Treasury History Viewer.
 **M4 discount curves is next.** Curve valuation and historical strategy research
@@ -21,6 +21,123 @@ Software completion does not mean the learner has completed the reflection
 questions or demonstrated the learning checkpoints.
 
 ## Completed work
+
+### Month exploration inside history lessons — November 7, 2026
+
+Lessons 14–16 now share automatic month loading with the standalone viewer.
+They still start with pinned November examples; opening the pinned month and
+Reset do not contact Treasury. A notice distinguishes the worked example from
+custom dates or datasets. Reset restores November 5/6, the original snapshot,
+Log spacing, and the published-sample revision setting. The February example in
+lesson 14 remains selectable.
+
+Lesson 16 describes the selected second date's original and hypothetical ten-year
+yields using Python-generated scenario metadata. Missing observations cannot be
+revised, and no source data are changed. Versioned script and CSS URLs ensure a
+new deployment loads the matching browser assets. Validation and deployment
+results are recorded in [M3 validation](notes/m3_validation.md). All **516 Python
+cases and seven JavaScript cases** pass. Desktop/mobile, keyboard, offline error
+and retry, reset, and an installed image with networking disabled were checked.
+The update is live on `deepl.lan:8000`, including the lesson 16 October calendar
+and dynamic revision description. The predecessor container is retained stopped
+for rollback; no existing runtime cache was present. Temporary test servers were
+stopped.
+
+
+### Automatic Treasury month loading — November 7, 2026
+
+The viewer now ships October 2026 (21 rows) and available November observations
+(November 2–6, five rows), with acquired coverage through November 7. Both exact
+responses, hashes, and UTC acquisition metadata are bundled, and the requested
+months were persisted in the default runtime cache. The starter snapshot is
+`56ce7185a76d063379c1b920524836387e36330f75f3a1ff189765a47f41e2b0`.
+
+Opening or changing a calendar month in the standalone viewer triggers a local
+monthly load. Complete cached months are reused; current-month checks have a
+one-hour freshness window. Requests are debounced, serialized, deduplicated,
+and protected against stale UI updates. Errors retain prior data and offer
+Retry. New calendar availability does not replace the displayed comparison until
+Compare is pressed. Lessons retain their frozen examples and make no external
+requests. Annual refresh and immutable older snapshots remain available.
+
+All **509 Python cases and seven JavaScript cases** pass. Live month acquisition,
+offline errors and retry, desktop/mobile keyboard use, older datasets, and a
+clean installed wheel with networking disabled were verified. See
+[M3 validation](notes/m3_validation.md) for sources, tolerances, and recovery checks.
+
+
+### Recent Treasury example — November 7, 2026
+
+The default history viewer and M3 lesson dates are now November 5/6, 2026, using
+a newly acquired official November response frozen through November 7. It has
+five published rows (November 2–6) and reproduces the 2s10s spread narrowing from
+38 to 35 bp. Later dates in the month stay outside cached coverage. Lessons
+14–16, transfer arithmetic, and the hypothetical revision (+7 bp spread change)
+now match those recent observations.
+
+The February 2025 response remains a second bundled snapshot. Lesson 14 offers
+visible Recent example / Series introduction choices so the missing 1.5-month
+tenor is still demonstrated with real historical data. Its original snapshot ID
+and +5 bp result are preserved. Both samples work without a writable runtime
+cache. API catalog metadata supplies shared date defaults and sample labels;
+the viewer's coverage summary describes the currently selected dataset.
+
+All **486 Python tests** and **3 calendar helper tests** pass. Browser checks on
+all three lessons at 1440, 390, and 320 pixels covered recent defaults, historical
+sample selection, reset, the November 7 no-row case, complete/partial tenor
+counts, and the +7 bp hypothetical revision. No formula, console, or horizontal
+layout errors were observed. A clean installed wheel passed both frozen examples
+and their benchmarks offline without creating a runtime database. The temporary
+verification server was stopped. Sources, hashes, and checks are in [M3 validation](notes/m3_validation.md).
+
+At this earlier checkpoint, automatic month fetching was assessed only, at the user's request. Treasury
+supports monthly requests, but the current cache merges annual periods and stores
+source metadata by year. A robust month loader needs period-level provenance,
+request deduplication, loading/error states, and careful snapshot handling. Allow
+8–16 focused development hours provisionally; this is an estimate, not a delivery
+commitment. This estimate was superseded by the automatic-month implementation above.
+
+### Published-date calendars — November 7, 2026
+
+Both Treasury comparison date fields now have a snapshot-aware calendar showing
+● published rows, — dates without a row inside coverage, and ? dates outside
+cached coverage. Status labels update as a date is typed. Missing dates remain
+selectable, and a published row does not imply every tenor is present. The
+calendar reads only the selected immutable snapshot, including when switching
+between cached datasets; no Treasury refresh occurs while choosing dates.
+
+Calendar dialogs support keyboard day/week/month/year movement, explicit Tab
+focus cycling, Escape and backdrop dismissal, and focus restoration. Gregorian
+validation rejects impossible dates; month changes clamp to a real day. The
+viewer and all three M3 lessons use the shared controls.
+
+All **482 Python tests** and **3 Node calendar helper tests** pass. Browser checks
+covered 1440, 390, and 320-pixel widths plus 320×480, both date fields, keyboard
+navigation, missing-date selection, invalid typed dates, reset, and snapshot
+switching. No horizontal overflow or console errors were observed. A clean
+installed wheel served the calendars and +5 bp benchmark with sockets rejected.
+The temporary verification server was stopped. See [M3 validation](notes/m3_validation.md).
+
+### Log maturity axis and a focused M3 sequence — November 7, 2026
+
+After committing the M3 baseline as `01ac172`, refined the Treasury viewer to
+use a logarithmic maturity axis by default, with visible Log/Linear option cards.
+Only the horizontal spacing changes; yields, spreads, tabulated values, and
+missing-tenor gaps remain the same. The chart adapts its width and month/year
+ticks to the available space. Reset restores Log spacing.
+
+Folded the former missing-observations lesson into lesson 14 as “Which observations
+can we compare?”, retaining the 1.5-month example, February 17 experiment, and
+common-sample checkpoint. The standalone page is removed. The timing and
+vintage lessons are now 15 and 16. Navigation, overview, prerequisites, and the
+curriculum plan follow the three-lesson M3 sequence. Learner answers remain pending.
+
+The full suite passes **479 tests** after consolidating the lesson cases and
+adding merged-section and renumbering coverage. Browser checks at
+1440, 900, 390, and 320 pixels confirmed readable axes, no horizontal overflow,
+keyboard scale changes, unchanged rates/spreads, reset, and missing dates.
+A clean installed wheel passed the revised offline checks.
+The temporary server was stopped. See [M3 validation](notes/m3_validation.md).
 
 ### History placement in the lesson picker — November 7, 2026
 
@@ -337,10 +454,9 @@ learner reflection is still pending. See [the review record](notes/lesson_conten
 | 11. Pull-to-par & maturity | `/lessons/pull-to-par` | Fixed-YTM discount/premium convergence and final redemption |
 | 12. Reinvestment & cash | `/lessons/reinvestment-and-cash` | Zero-interest/explicit cash and the two-period ledger |
 | 13. Holding-period return & early sale | `/lessons/holding-period-returns` | Integrated early sale, costs, and keeping versus selling |
-| 14. Par yields & security quotes | `/lessons/par-yields-and-quotes` | Published curve and 2s10s spread comparison |
-| 15. Missing dates & tenors | `/lessons/missing-observations` | Exact missing dates, absent tenors, and sample intersection |
-| 16. Observation, publication & retrieval | `/lessons/observation-and-publication` | Observation dates and acquisition evidence |
-| 17. Revisions & vintages | `/lessons/revisions-and-vintages` | Published observations versus a hypothetical revision |
+| 14. Par yields & security quotes | `/lessons/par-yields-and-quotes` | Published curves, 2s10s, and comparable observations |
+| 15. Observation, publication & retrieval | `/lessons/observation-and-publication` | Observation dates and acquisition evidence |
+| 16. Revisions & vintages | `/lessons/revisions-and-vintages` | Published observations versus a hypothetical revision |
 
 Each lesson has an overview card, sidebar entry, and previous/next navigation.
 Python examples are optional and collapsed. Original notes and Notebook 01
@@ -395,7 +511,7 @@ in `src/filab/risk/`. The [README](README.md) documents these interfaces.
 
 ## Validation and model limits
 
-The latest M3 test run on November 7, 2026 passed **480 tests**. Coverage includes historical data/snapshot checks, focused lesson boundaries, returns,
+The latest M3 test run on November 7, 2026 passed **486 tests**. Coverage includes historical data/snapshot checks, focused lesson boundaries, returns,
 cash/position accounting, published horizon scenarios, and the existing pricing
 identities, yield round trips, dated settlement, coupon boundaries, leap
 years, bill conventions, API validation, and lesson navigation.

@@ -1,0 +1,13 @@
+{
+  "url": "https://home.treasury.gov/resource-center/data-chart-center/interest-rates/pages/xml?data=daily_treasury_yield_curve&field_tdr_date_value_month=202610",
+  "retrieved_at": "2026-11-08T02:13:36.102713Z",
+  "sha256": "85da7370e7dfa1e26145a4b05441df8dcf09a9e429f7dae773574d61394dd391",
+  "series": "daily_treasury_yield_curve",
+  "original_units": "percent per annum",
+  "normalized_units": "decimal per annum",
+  "publication_time": null,
+  "coverage": [
+    "2026-10-01",
+    "2026-10-31"
+  ]
+}

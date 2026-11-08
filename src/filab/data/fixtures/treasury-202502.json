@@ -5,5 +5,18 @@
   "series": "daily_treasury_yield_curve",
   "original_units": "percent per annum",
   "normalized_units": "decimal per annum",
-  "publication_time": null
+  "publication_time": null,
+  "coverage": [
+    "2025-02-01",
+    "2025-02-28"
+  ],
+  "example": {
+    "label": "Series introduction \u00b7 February 2025",
+    "period": "February 2025",
+    "first": "2025-02-14",
+    "second": "2025-02-18",
+    "missing_date": "2025-02-17",
+    "missing_label": "February 17",
+    "dates_label": "February 14\u201318, 2025"
+  }
 }

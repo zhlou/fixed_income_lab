@@ -203,11 +203,11 @@ def test_currency_is_not_mistaken_for_inline_math():
 
 def test_lesson_sequence_and_optional_implementation():
     home = client.get('/').text
-    assert '17 available lessons' in home
-    assert home.count('class="lesson-card"') == 17
+    assert f'{len(LESSONS)} available lessons' in home
+    assert home.count('class="lesson-card"') == len(LESSONS)
     for slug in ('bond-basics', 'present-value', 'bond-pricing-lab', 'yield-to-maturity', 'settlement-and-accrued-interest', 'treasury-bill-yields'):
         page = client.get('/lessons/' + slug).text
-        assert page.count('class="lesson-link ') == 17
+        assert page.count('class="lesson-link ') == len(LESSONS)
         assert 'href="/lessons/cash-flows-and-pricing"' not in page
     second = client.get('/lessons/present-value').text
     assert 'Present value &amp; bond pricing' in second

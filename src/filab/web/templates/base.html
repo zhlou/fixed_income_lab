@@ -6,14 +6,16 @@
   <meta name="description" content="Learn fixed-income mathematics through interactive experiments powered by Python.">
   <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/static/vendor/katex/katex.min.css">
-  <link rel="stylesheet" href="/static/site.css">
+  <link rel="stylesheet" href="/static/site.css?v={{ asset_versions['site.css'] }}">
   <script defer src="/static/vendor/katex/katex.min.js"></script>
-  <script defer src="/static/app.js"></script>
-  <script defer src="/static/risk.js"></script>
-  <script defer src="/static/return_workspace.js"></script>
-  <script defer src="/static/returns.js"></script>
-  <script defer src="/static/return_lessons.js"></script>
-  <script defer src="/static/history.js"></script>
+  <script defer src="/static/app.js?v={{ asset_versions['app.js'] }}"></script>
+  <script defer src="/static/risk.js?v={{ asset_versions['risk.js'] }}"></script>
+  <script defer src="/static/return_workspace.js?v={{ asset_versions['return_workspace.js'] }}"></script>
+  <script defer src="/static/returns.js?v={{ asset_versions['returns.js'] }}"></script>
+  <script defer src="/static/return_lessons.js?v={{ asset_versions['return_lessons.js'] }}"></script>
+  <script defer src="/static/history_dates.js?v={{ asset_versions['history_dates.js'] }}"></script>
+  <script defer src="/static/history_months.js?v={{ asset_versions['history_months.js'] }}"></script>
+  <script defer src="/static/history.js?v={{ asset_versions['history.js'] }}"></script>
 </head>
 <body class="{% block body_class %}{% endblock %}">
 <a class="skip-link" href="#main">Skip to lesson</a>

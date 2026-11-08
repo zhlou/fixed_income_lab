@@ -91,7 +91,10 @@ into the image and installed normally; no runtime bind mounts or volumes are
 needed. With a remote engine, bind-mount paths refer to the **engine's filesystem**,
 not this checkout on the client; see
 [Docker's bind-mount documentation](https://docs.docker.com/engine/storage/bind-mounts/).
-Rebuild the image and recreate the container after source changes. The engine
+Rebuild the image and recreate the container after source changes. First-party
+JavaScript and CSS URLs include content hashes, so changed assets are fetched
+after an upgrade. The hashes are computed at server startup; restart the local
+server after editing assets during development. The engine
 chooses its own native image architecture; there is no hard-coded macOS/ARM or
 Linux/x86 platform.
 
@@ -151,8 +154,7 @@ with BuildKit; it does not require builder-specific features.
 | `/lessons/reinvestment-and-cash` | Explicit cash growth and the two-period ledger |
 | `/lessons/holding-period-returns` | Integrated early-sale return, costs, and keeping versus selling |
 | `/tools/bond-return` | One/two-position return calculator with input and ledger exports |
-| `/lessons/par-yields-and-quotes` | Constant-maturity observations and spread arithmetic |
-| `/lessons/missing-observations` | Missing dates/tenors and common samples |
+| `/lessons/par-yields-and-quotes` | Constant-maturity observations, spreads, and comparable samples |
 | `/lessons/observation-and-publication` | Observation, publication, and retrieval timing |
 | `/lessons/revisions-and-vintages` | Immutable evidence and hypothetical revisions |
 | `/tools/treasury-history` | Cached historical curves, explicit refresh, and source evidence |
@@ -176,11 +178,11 @@ payment before measuring wealth. The complete calculator has its own tool page.
 On desktop windows at least 1200 pixels wide, lessons place the experiment on the
 left and the explanation on the right. Each side scrolls independently, so the
 chart stays in place while you read. The experiment receives most of the width.
-Hover over **Lesson 08 of 17 ▾** in the header to jump to any lesson, grouped under
+Hover over **Lesson 08 of 16 ▾** in the header to jump to any lesson, grouped under
 Foundations, Risk, Returns, and History. Wide screens show those four groups
 left to right; medium screens use two columns and phones use one.
 Click to keep the picker open, or use Enter/Space
-and Tab by keyboard. Escape closes it. On phones, tap the compact **08 / 17 ▾**
+and Tab by keyboard. Escape closes it. On phones, tap the compact **08 / 16 ▾**
 button to open a scrollable lesson list. **Course** opens the full navigation.
 Narrower windows stack the sections with links between them. The top bar also
 provides Overview, Previous, and Next; previous/next links sit at the end of the explanation.
@@ -378,7 +380,7 @@ Notebook 01 remain available as reference artifacts. The [project
 plan](fixed_income_lab_plan.md) evaluates the existing implementation and defines
 milestones for learning, educational lessons, and a historical research workbench.
 M1 duration/convexity, M2 return accounting, and M3 historical observations are
-implemented. M3 adds four lessons for seventeen total. Discount curves (M4) are
+implemented. M3 adds three lessons for sixteen total. Discount curves (M4) are
 next, followed by the first two-strategy research release. Saved research studies
 and historical strategy returns remain planned.
 The website roadmap now shows milestone availability without week-based promises.
@@ -433,18 +435,73 @@ financial calculations run on the local Python server.
 ## Treasury history (M3)
 
 Open `/tools/treasury-history` to compare nominal constant-maturity **par yields**
-on two exact dates. A fresh installation opens the bundled February 2025 sample,
-including the 21 bp → 26 bp two-year/ten-year spread example, without networking.
-Lessons 14–17 explain rate types, missing observations, information timing, and
-vintages. The source observations are annual percentages; numerical API rates
-are decimals and differences have explicit basis-point units.
+on two exact dates. A fresh installation opens bundled October–November 2026
+history: **21 October rows and five November rows (November 2–6)**, with
+coverage October 1 through November 7. The default
+November 5/6 comparison reproduces a 2s10s spread of **38 bp → 35 bp** (−3 bp).
+This starter dataset works offline. November 7 has no row; later dates remain
+outside coverage until acquired. Opening the page makes no Treasury request.
+
+A second bundled sample covers February 1–28, 2025, with 19 published dates.
+Lesson 14's **Series introduction** option uses February 14/18 to explain the
+missing 1.5-month tenor. Its original snapshot ID and +5 bp benchmark remain
+available. Lesson reset restores the frozen recent November example. The standalone
+viewer opens the active cached history and offers both lesson samples through
+its saved-dataset radio cards; reset restores the November dates on that history.
+Lessons 14–16 explain rate types and comparable observations, information timing,
+and vintages. Lesson 14 includes the missing-observations checkpoint. The source
+observations are annual percentages; numerical API rates are decimals and
+differences have explicit basis-point units.
 
 Use **Load or refresh selected years** for an inclusive range from 1990 through
-the current year. The default is the last completed calendar year. Only that
-button fetches Treasury's annual XML feed. A current year is covered only through
+the current year. The default is the last completed calendar year. That
+button fetches Treasury's annual XML feed and can check saved years for revisions. A current year is covered only through
 the retrieval date. Coverage means the requested period, not a guarantee of a
 row on every date. Missing dates and tenors remain absent, and the UI never
 silently selects a nearby date. The chart's lines only connect published nodes.
+
+Each date field has a calendar annotated from the **selected snapshot**:
+**● Published row**, **— No published row** inside its coverage, and **? Outside
+cached coverage**. Dates without data stay selectable. A published row may still
+lack individual tenors. You can also type a real date as `YYYY-MM-DD`; the status
+updates immediately, before you press Compare. Invalid dates such as February
+30 are rejected. In the viewer and lessons 14–16, **opening or changing the
+calendar month**, or typing a valid date, loads the selected month through a
+same-origin Python endpoint. The browser never calls Treasury directly.
+Requests are debounced and serialized; rapid navigation discards obsolete UI
+responses. Complete historical months are reused. The current month is checked
+at most hourly after successful acquisition; **Retry month** explicitly retries
+failures. Future months and dates before 1990 make no Treasury request.
+
+The calendar updates when data arrives. **Compare dates** explicitly calculates
+against the resulting snapshot; the previous curves and their source ID remain
+visible until then. Failed requests keep cached dates and show a retry option.
+Cached coverage never extends to days that were not acquired. Successful empty
+monthly feeds mean no published rows inside the acquired period; an invalid or
+failed response does not establish that coverage.
+
+Lessons 14–16 start from their pinned sample. Opening a lesson, opening its
+pinned month, and **Reset example** work offline without checking Treasury.
+Exploring other months enables the same automatic loader as the full viewer.
+A visible notice distinguishes exploration from the worked example in the text;
+Reset restores the original November dates, dataset, Log axis, and published
+revision setting. Lesson 14 also retains its separate February worked example.
+Lesson 16's hypothetical +10 bp description follows the selected second date and
+its actual ten-year yield; missing rows or tenors cannot be revised. The API
+supplies both original and hypothetical rates, keeping the arithmetic in Python.
+
+The calendar supports arrow keys for days, Home/End for the week, Page Up/Down
+for months, Shift + Page Up/Down for years, and Escape to close and return focus.
+Month changes clamp the day to the target month (January 31 → February 28, or 29
+in a leap year). On smaller screens the dialog scrolls vertically when needed.
+
+The maturity axis defaults to **Log**, with a visible **Linear** option. Log
+spacing gives the short tenors room: equal maturity ratios occupy equal
+horizontal distances (for example, 1→2 years and 5→10 years). Linear spacing
+shows equal additional years. The yield axis stays linear, and changing maturity
+spacing preserves every rate, spread, table value, and missing-data gap. Tick
+labels use familiar month/year maturities and adapt to screen width. Reset
+restores the example dates and Log spacing.
 
 The refresh runs in the background with progress and duplicate-submission
 protection. All selected years must parse and validate before a single atomic
@@ -460,15 +517,16 @@ The runtime store defaults to `~/.local/share/fixed-income-lab/`. Override it by
 setting `FILAB_DATA_DIR` to an absolute writable directory before starting the
 server. It contains `raw/<sha256>.xml` exact response files and
 `catalog.sqlite3` with immutable normalized snapshot JSON, acquisition metadata,
-and the active pointer. Raw files include generation timestamps exactly as
+the active pointer, and the latest successful normalized month checks. Raw files include generation timestamps exactly as
 received; these are not treated as historical release times. Snapshot IDs use
 SHA-256 over normalized numerical observations, coverage, and normalizer version.
 Every snapshot retains the original source percentages and source references.
 Successful duplicate retrievals are logged separately without rewriting snapshots.
 Download a selected normalized snapshot from the viewer; for a complete backup,
 stop the server and copy the entire runtime store, including its raw directory.
-The pinned fixture remains packaged and readable even if that directory is absent
-or read-only. No runtime database belongs in Git.
+Both pinned examples remain packaged and readable even if that directory is
+absent or read-only. Additional downloaded history belongs to the configured
+runtime cache; the bundled examples are not the entire Treasury archive. No runtime database belongs in Git.
 
 The local refresh-job status is transient and intended for the default single
 Uvicorn process. If the server restarts, reopen saved datasets and retry the
@@ -498,17 +556,32 @@ Read interfaces:
 
 | Endpoint | Purpose |
 |---|---|
-| `GET /api/history/snapshots` | Active and bundled IDs, saved coverage, latest observations, recent acquisitions |
+| `GET /api/history/snapshots` | Active/viewer/recent/reference IDs, example date defaults, labeled saved coverage, latest observations, recent acquisitions |
 | `GET /api/history/snapshots/{snapshot_id}` | Complete immutable normalized dataset and provenance |
+| `GET /api/history/snapshots/{snapshot_id}/dates` | Snapshot ID, coverage intervals, and sorted published row dates for the calendars |
 | `GET /api/history/compare?snapshot_id=…&first=YYYY-MM-DD&second=YYYY-MM-DD` | Exact-date curves, tenor changes, spreads, common sample, missing counts, source metadata |
+| `POST /api/history/month-load` | Load an integer `year`/`month` onto `base_snapshot_id`; optional `force` bypasses the cache; returns a job ID |
+| `GET /api/history/jobs/{job_id}` | Month job state, warning, cache-hit flag, and completed snapshot ID |
 | `POST /api/history/refresh` | Start an explicit refresh with integer `start_year` and `end_year`; returns a job ID |
 | `GET /api/history/refresh/{job_id}` | Running/complete/failed status, progress, completed snapshot ID |
 
 Comparison requests require a snapshot ID. Missing observations return JSON null;
 `date_states` distinguishes `published`, `no_published_row`, and
 `outside_coverage`. The optional `hypothetical_revision=true` comparison flag
-adds 10 bp to the second date's ten-year rate in memory for lesson 17 and labels
-the response `hypothetical`; it never writes to the source snapshot. Neither
+adds 10 bp to the second date's ten-year rate in memory for lesson 16 and labels
+the response `hypothetical`; it never writes to the source snapshot. Each
+comparison includes `revision_scenario` with its date, +10 bp assumption, original
+and proposed decimal rates/percentage strings, and whether it was applied. Neither
 these observations nor the spread comparison provide security prices or returns.
 Exact historical publication times remain unknown. See
 [M3 validation and the M4 feasibility assessment](notes/m3_validation.md).
+
+Optional calendar helper checks, using Node.js when available:
+
+```bash
+node --test tests/history_dates.test.cjs tests/history_months.test.cjs
+```
+
+Node.js is not required to run the website. These tests check strict Gregorian
+dates, leap years, month/year movement, availability states, request ordering,
+deduplication, cancellation, errors, and retries.

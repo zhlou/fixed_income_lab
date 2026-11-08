@@ -98,3 +98,23 @@ The official Treasury February 2025 source response, its hash and retrieval time
 published 2y/10y benchmark values, basis-point tolerances, and missing-value
 checks are recorded in [M3 validation](m3_validation.md). Existing Phase 1 pricing
 benchmarks and dated-model conventions remain unchanged.
+
+
+The current M3 default additionally validates the November 5/6, 2026 Treasury
+par observations (38→35 bp 2s10s spread). Its raw response hash, UTC retrieval
+time, partial-month coverage, and tolerances are in the recent-example section
+of [M3 validation](m3_validation.md); the original February benchmark is preserved.
+
+
+The October–November starter additionally checks October 30, 2026 par yields
+against Treasury's published table (2y 4.56%, 10y 4.94%, spread 38 bp). Changes to
+November 6 are −5/−8 bp and a −3 bp spread change. Exact source hashes, acquisition
+times, monthly cache recovery, and the same decimal-rate tolerance are recorded
+in the automatic-month section of [M3 validation](m3_validation.md).
+
+
+Lesson month exploration now reuses those source benchmarks for a hypothetical
++10 bp revision on arbitrary second dates. October 30's 4.94% becomes 5.04%;
+the original observation remains intact. Python/API checks distinguish missing
+observations from genuine zero. The lesson/deployment section of
+[M3 validation](m3_validation.md) records exact spread cases and UI checks.

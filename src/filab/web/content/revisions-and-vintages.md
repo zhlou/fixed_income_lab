@@ -18,13 +18,15 @@ If $\delta=0.0010$, the ten-year yield is revised upward by 10 bp and the spread
 
 ## Reproduce two versions
 
-The published February 18 example is ten-year **4.55%**, two-year **4.29%**, spread **26 bp**. Against February 14's **21 bp**, the spread change is **+5 bp**.
+The published November 6 example is ten-year **4.86%**, two-year **4.51%**, spread **35 bp**. Against November 5's **38 bp**, the spread change is **−3 bp**.
 
-Toggle **Hypothetical revised ten-year yield** in the experiment. Its second-date ten-year rate is increased by **0.10 percentage point**, to **4.65%** on the default dates. The hypothetical second spread is **36 bp** and the hypothetical spread change is **+15 bp**. The chart, table, and label describe that hypothetical scenario. The source snapshot remains intact.
+Toggle **Hypothetical revised ten-year yield** in the experiment. Its second-date ten-year rate is increased by **0.10 percentage point**, to **4.96%** on the default dates. The hypothetical second spread is **45 bp** and the hypothetical spread change is **+7 bp**. The chart, table, and label describe that hypothetical scenario. The source snapshot remains intact.
 
 ## Predict, then experiment
 
 Predict whether the first-date spread will change when only the second-date ten-year observation is revised. Toggle the version, reconcile both spreads, and return to the published sample. Compare the provenance identifier before and after: the hypothetical calculation is tied to the same source snapshot and is explicitly labeled as a modification.
+
+Use either calendar to explore another month, then compare your chosen dates. The hypothetical revision always adds 10 bp to the selected second date's published ten-year yield; its description follows that date and its original yield. A missing observation cannot be revised. The exploration notice separates your selected data from the worked example above. **Reset example** restores the pinned November dates, source observations, and published-sample setting.
 
 In the full viewer, save or note a snapshot identifier, refresh a selected year range, and reopen the old version with the saved-dataset radio cards. A completed refresh offers a new dataset without switching your current comparison. Identical normalized observations reuse a version. An unsuccessful refresh cannot activate a partially imported range.
 

@@ -29,7 +29,7 @@ def changed(raw=RAW, value='4.65', field='BC_10YEAR'):
 
 
 def test_official_fixture_matches_independent_published_table():
-    snapshot = pinned_snapshot()
+    snapshot = pinned_snapshot('series-introduction')
     assert len(snapshot['rows']) == 19
     result = compare(snapshot, '2025-02-14', '2025-02-18')
     # Treasury's displayed hundredths of a percent are exact decimal inputs.
@@ -55,7 +55,7 @@ def test_missing_null_zero_and_common_date_sample():
     root = ET.fromstring(raw)
     row = next(p for p in root.iter(META + 'properties') if p.findtext(DATA + 'NEW_DATE').startswith('2025-02-18'))
     row.find(DATA + 'BC_10YEAR').set(META + 'null', 'true')
-    snapshot = deepcopy(pinned_snapshot())
+    snapshot = deepcopy(pinned_snapshot('series-introduction'))
     snapshot['rows'] = normalize(ET.tostring(root), START, END)
     result = compare(snapshot, '2025-02-18', '2025-02-18')
     assert result['spread_bp'] == [None, None]
@@ -66,7 +66,7 @@ def test_missing_null_zero_and_common_date_sample():
 
 @pytest.mark.parametrize('day,state', [('2025-02-17','no_published_row'), ('2025-02-15','no_published_row'), ('2025-03-03','outside_coverage')])
 def test_exact_dates_never_shift(day, state):
-    result = compare(pinned_snapshot(), day, '2025-02-18')
+    result = compare(pinned_snapshot('series-introduction'), day, '2025-02-18')
     assert result['dates'][0] == day
     assert result['date_states'] == [state, 'published']
     assert result['spread_bp'] == [None, 26]
@@ -75,7 +75,7 @@ def test_exact_dates_never_shift(day, state):
 
 
 def test_reverse_dates_and_equal_dates():
-    snapshot = pinned_snapshot()
+    snapshot = pinned_snapshot('series-introduction')
     assert compare(snapshot, '2025-02-18', '2025-02-14')['spread_change_bp'] == -5
     result = compare(snapshot, '2025-02-14', '2025-02-14')
     assert result['spread_change_bp'] == 0
@@ -107,7 +107,7 @@ def test_readonly_fresh_offline_store_never_creates_cache(tmp_path):
     root = tmp_path / 'not-created'
     store = SnapshotStore(root)
     identifier = store.catalog()['bundled_snapshot_id']
-    assert compare(store.get(identifier), '2025-02-14', '2025-02-18')['spread_change_bp'] == 5
+    assert compare(store.get(identifier), '2026-11-05', '2026-11-06')['spread_change_bp'] == -3
     assert not root.exists()
 
 
@@ -131,8 +131,8 @@ def test_year_merge_and_failed_range_preserves_active_snapshot(tmp_path):
     first = store.refresh(2025, 2025, lambda year: acquisition())
     raw24 = RAW.replace(b'2025-02-', b'2024-02-')
     both = store.refresh(2024, 2024, lambda year: acquisition(raw24, year))
-    assert len(store.get(both)['rows']) == 38
-    assert store.get(both)['coverage'] == [['2024-01-01','2024-12-31'],['2025-01-01','2025-12-31']]
+    assert len(store.get(both)['rows']) == 38 + len(store.viewer['rows'])
+    assert store.get(both)['coverage'] == [['2024-01-01','2025-12-31']] + store.viewer['coverage']
     def failure(year):
         if year == 2025:
             raise TimeoutError('network failure')
@@ -187,3 +187,35 @@ def test_hash_mismatch_and_extreme_value_rejected(tmp_path):
         store.refresh(2025,2025,lambda year:(raw,metadata))
     with pytest.raises(DataError,match='precision'):
         normalize(changed(value='1e999'),START,END)
+
+
+def test_recent_official_example_and_partial_month_boundary():
+    snapshot=pinned_snapshot()
+    assert len(snapshot['rows'])==5
+    assert snapshot['coverage']==[['2026-11-01','2026-11-07']]
+    result=compare(snapshot,'2026-11-05','2026-11-06')
+    # Treasury's November table: 4.46/4.84 then 4.51/4.86 percent.
+    assert result['spread_bp']==[38,35]
+    assert result['spread_change_bp']==-3
+    values={row['field']:row for row in result['tenors']}
+    assert values['BC_2YEAR']['first']['rate']==pytest.approx(.0446,abs=1e-15)
+    assert values['BC_2YEAR']['second']['rate']==pytest.approx(.0451,abs=1e-15)
+    assert values['BC_10YEAR']['first']['rate']==pytest.approx(.0484,abs=1e-15)
+    assert values['BC_10YEAR']['second']['rate']==pytest.approx(.0486,abs=1e-15)
+    assert values['BC_2YEAR']['change_bp']==5
+    assert values['BC_10YEAR']['change_bp']==2
+    assert not result['excluded_tenors']
+    assert compare(snapshot,'2026-11-07','2026-11-06')['date_states']==['no_published_row','published']
+    assert compare(snapshot,'2026-11-08','2026-11-06')['date_states']==['outside_coverage','published']
+    assert compare(snapshot,'2026-11-04','2026-11-05')['spread_change_bp']==6
+
+
+def test_both_bundled_examples_reopen_offline_without_a_catalog(tmp_path):
+    store=SnapshotStore(tmp_path/'not-created')
+    catalog=store.catalog()
+    assert len(catalog['snapshots'])==3
+    assert catalog['example_defaults']['first']=='2026-11-05'
+    reference=store.get(catalog['reference_snapshot_id'])
+    assert reference['id']=='0cc891c2abf9e5793c54012eaa8344ba3e8eeeab522b8c57eda4dfc54b525651'
+    assert compare(reference,'2025-02-14','2025-02-18')['spread_change_bp']==5
+    assert not store.database.exists()

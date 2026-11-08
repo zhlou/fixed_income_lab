@@ -2,7 +2,7 @@
 
 The observation date tells you which day's curve a row describes. Publication tells you when the source made information available. Retrieval tells you when your application obtained a particular response. These answer different questions.
 
-**Goal:** Identify which timing claims the evidence supports. Prerequisite: [missing observations](/lessons/missing-observations).
+**Goal:** Identify which timing claims the evidence supports. Prerequisite: [par yields and comparable observations](/lessons/par-yields-and-quotes).
 
 Treasury uses indicative quotations obtained at or near **3:30 p.m.** each trading day and says rates are usually available by **6 p.m. Eastern**, subject to delays. Neither statement establishes the exact publication time of each historical row. This application records that time as **unknown**. Midnight in an XML observation-date field is a date encoding, not a market-opening release time.
 
@@ -18,15 +18,17 @@ Here $O$ is a date and the other symbols are timestamps with time zones. Substit
 
 ## Reproduce the source evidence
 
-Select February 18, 2025. Its published ten-year value is 4.55%. In the provenance panel, read the observation date, the actual UTC retrieval timestamp of the bundled response, and the unknown publication-time statement. The response was acquired in November 2026, so this archived value alone cannot prove what someone could access on the morning of February 18, 2025.
+Select November 6, 2026. Its published ten-year value is 4.86%. In the provenance panel, read the observation date, the actual UTC retrieval timestamp of the bundled response, and the unknown publication-time statement. The pinned response was acquired after these observation dates. It cannot establish the exact original release time or prove what someone could access on the morning of November 6.
 
 The XML feed's **updated** timestamp can describe the generated feed. It is preserved in the raw response, but it is not promoted to the publication time of every old observation. Its presence does not create a point-in-time vintage archive.
 
 ## Predict, then experiment
 
-Before changing the dates, predict which evidence will change. Compare February 14 and 18, then switch the second date to February 19. Observation dates and values change. The bundled response's retrieval time and hash remain the same because those rows came from the same acquisition.
+Before changing the dates, predict which evidence will change. Compare November 5 and 6, then switch the first date to November 4. Observation dates and values change. The bundled response's retrieval time and hash remain the same because those rows came from the same acquisition.
 
-Open the full viewer and explicitly refresh a year if online. Inspect the newly saved dataset's retrieval time. A new retrieval does not necessarily mean the underlying observations changed. Opening a lesson and comparing cached dates make no request to Treasury.
+Change a calendar to October, choose an October date, and compare it with November. Inspect the separate retrieval times and hashes for the contributing responses; an observation date does not become its retrieval date. The exploration notice marks the change from the worked example, and **Reset example** restores the pinned November data. Uncached months load online; cached months remain usable offline.
+
+Open the full viewer and explicitly refresh a year if online. Inspect the newly saved dataset's retrieval time. A new retrieval does not necessarily mean the underlying observations changed. Opening a lesson, resetting its example, and using its pinned month make no request to Treasury. Exploring other months can acquire new observations.
 
 ## Misconceptions and limits
 

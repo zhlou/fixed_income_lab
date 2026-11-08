@@ -4,7 +4,7 @@
 
 **Primary daily use:** Research bond strategies and historical returns.
 
-**Current release:** Seventeen lessons, regular-bond pricing, M1 risk tools, M2 return accounting, and M3 versioned Treasury observations.
+**Current release:** Sixteen lessons, regular-bond pricing, M1 risk tools, M2 return accounting, and M3 versioned Treasury observations.
 
 **Next release:** M4 discount curves and the historical-adapter feasibility gate.
 
@@ -102,6 +102,14 @@ Re-estimate M4 at 20–32 focused hours (including 4–8 for that initial gate),
 M5 at 24–40 conditional hours, and defer delivery dates until curve validation.
 M4–M7 now total 72–116 provisional hours. These are planning judgments, not a
 record of learning time or a successful historical-adapter implementation.
+
+### M3 teaching refinement — November 7, 2026
+
+The baseline release was committed as `01ac172`. The current sequence has three
+M3 lessons (sixteen overall): lesson 14 now incorporates missing observations,
+followed by timing and vintages. History charts default to log maturity spacing
+with a linear alternative. All 479 tests pass after consolidation. This changes
+the teaching interface and sequence, with financial and source conventions intact.
 
 ### Three separate measures of success
 
@@ -273,8 +281,34 @@ a shorter-horizon realized return.
 
 ### M3 — Historical data with provenance
 
-**Lessons:** par observations versus security quotes; missing dates; observation,
-publication, and retrieval time; revisions/vintages.
+**Lessons:** par observations versus security quotes, including a short comparable-
+observations checkpoint; observation/publication/retrieval time; revisions/vintages.
+Lesson 14 contains missing-tenor, missing-date, and common-sample checks rather
+than giving data-quality categories a separate full lesson. The M3 sequence now
+ends at lesson 16.
+
+The default pinned example is November 5/6, 2026, using November 1–7 coverage
+(five published dates). Retain February 2025 as the historical series-introduction
+example within lesson 14. A partial month must not mark future dates as known
+nonpublication days. Lesson inputs and prose must agree with the named sample.
+
+The standalone viewer additionally bundles October 2026 plus November through
+November 7 (26 published rows). Client calendar navigation loads months through
+the local server; cached complete months are reused, and the current month is
+checked at most hourly. Preserve period-level source evidence when merging
+months within a year. Update calendar availability on acquisition, but require
+Compare to replace the displayed financial result. Lessons start from pinned
+examples and allow month exploration with a visible notice when controls differ
+from the written exercise. Reset restores the original November sample; the
+hypothetical revision follows the selected date and source yield. Failed
+or interrupted requests retain good snapshots, offer retry, and never manufacture
+coverage. Future months are not requested. Explicit annual refresh remains the
+way to check complete historical years for revisions.
+
+Use logarithmic maturity spacing by default in the shared historical-curve chart,
+with an explicit Linear choice and a linear yield axis. Label the spacing and
+month/year ticks; switching axes must preserve observations and gaps. Deeper
+missing-data policy choices belong in the strategy experiment in M5.
 
 Start with one official Treasury nominal par dataset and a small pinned fixture,
 then expand history. Preserve raw responses, source/series, observation date,
@@ -283,7 +317,10 @@ Record known release timing or mark it unknown. Keep raw revisions and define
 normalization/duplicate policies. Missing rates must never become zero.
 
 **Tool:** historical curve comparison, tenor changes, 2s10s spread, coverage
-and data-quality tables. This is not yet a bond return calculator.
+and data-quality tables. Snapshot-aware date calendars distinguish published rows,
+missing rows within coverage, and dates outside cached coverage before comparison.
+All valid dates remain selectable; calendar markers do not imply complete tenor
+coverage. This is not yet a bond return calculator.
 
 **Gate:** idempotent imports, fixture/source agreement, identifiable missing tenors
 and nonpublication days, failed-refresh recovery, and offline cached use. Define

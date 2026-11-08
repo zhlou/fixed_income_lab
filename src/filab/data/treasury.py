@@ -5,6 +5,7 @@ updated field describes the feed, not the historical availability of a row.
 """
 from dataclasses import dataclass
 from datetime import date, datetime, timezone
+from calendar import monthrange
 from decimal import Decimal, InvalidOperation
 import hashlib
 import json
@@ -64,7 +65,7 @@ def source_url(year=None, month=None):
     return f'{FEED}?data={SERIES}&{key}={value}'
 
 
-def normalize(raw, start, end):
+def normalize(raw, start, end, *, allow_empty=False):
     """Validate a complete response; absent/null tenors stay None, zero stays zero.
 
     Identical date duplicates collapse; conflicts and unknown rate fields fail
@@ -110,7 +111,7 @@ def normalize(raw, start, end):
             if key in rows and rows[key] != rates:
                 raise DataError(f'Conflicting duplicate observation on {key}.')
             rows[key] = rates
-        if not rows:
+        if not rows and not allow_empty:
             raise DataError('Source returned no observations; previous data is retained.')
         return dict(sorted(rows.items()))
     except (ET.ParseError, InvalidOperation, ValueError) as exc:
@@ -125,9 +126,28 @@ def snapshot_id(rows, coverage):
     return digest(encode({'version': NORMALIZER_VERSION, 'rows': values, 'coverage': coverage}).encode())
 
 
+def month_bounds(year, month):
+    """Inclusive acquired coverage; future dates are never marked unpublished."""
+    if not (type(year) is int and type(month) is int and 1990 <= year <= today().year and 1 <= month <= 12):
+        raise DataError('Choose a month from January 1990 through the current month.')
+    start = date(year, month, 1)
+    if start > today():
+        raise DataError('Future months cannot be loaded.')
+    return start, min(date(year, month, monthrange(year, month)[1]), today())
+
+
+def fetch_month(year, month):
+    """Acquire one official monthly response; validation belongs to the store."""
+    month_bounds(year, month)
+    return _fetch(source_url(month=f'{year:04d}{month:02d}'))
+
+
 def fetch_year(year):
     """Fetch only the fixed official annual endpoint, with a timeout and size cap."""
-    url = source_url(year=year)
+    return _fetch(source_url(year=year))
+
+
+def _fetch(url):
     try:
         with urlopen(Request(url, headers={'User-Agent': 'FixedIncomeLab/0.1'}), timeout=45) as response:
             raw = response.read(4_000_001)
@@ -140,17 +160,54 @@ def fetch_year(year):
         raise DataError('Treasury could not be reached; cached observations are unchanged.') from exc
 
 
-def pinned_snapshot():
+def pinned_snapshot(sample="recent"):
+    """Load a frozen official response; partial months stop at acquisition coverage.
+
+    The recent example is the default. The series-introduction example preserves
+    the historical missing-tenor exercise and its original numerical benchmark.
+    """
+    files = {'recent': 'treasury-202611', 'series-introduction': 'treasury-202502'}
+    if sample not in files:
+        raise DataError('Unknown bundled example.')
     folder = Path(__file__).resolve().parent / 'fixtures'
-    raw = (folder / 'treasury-202502.xml').read_bytes()
-    metadata = json.loads((folder / 'treasury-202502.json').read_text())
+    raw = (folder / (files[sample] + '.xml')).read_bytes()
+    metadata = json.loads((folder / (files[sample] + '.json')).read_text())
     if digest(raw) != metadata['sha256']:
         raise DataError('Bundled sample hash does not match its provenance.')
-    coverage = [['2025-02-01', '2025-02-28']]
-    rows = normalize(raw, date(2025, 2, 1), date(2025, 2, 28))
+    coverage = [metadata['coverage']]
+    rows = normalize(raw, *(date.fromisoformat(value) for value in coverage[0]))
     return {'id': snapshot_id(rows, coverage), 'series': SERIES, 'rate_type': 'nominal_par',
             'normalizer_version': NORMALIZER_VERSION, 'coverage': coverage, 'rows': rows,
-            'sources': {'2025': metadata}, 'created_at': metadata['retrieved_at'], 'bundled': True}
+            'sources': {coverage[0][0][:4]: metadata}, 'created_at': metadata['retrieved_at'],
+            'bundled': True, 'example': metadata['example'], 'label': metadata['example']['label']}
+
+
+def bundled_history():
+    """Offline viewer starter, separate from the frozen teaching examples."""
+    folder = Path(__file__).resolve().parent / 'fixtures'
+    rows, sources = {}, {}
+    for month in ('202610', '202611'):
+        raw = (folder / f'treasury-cache-{month}.xml').read_bytes()
+        metadata = json.loads((folder / f'treasury-cache-{month}.json').read_text())
+        if digest(raw) != metadata['sha256']:
+            raise DataError('Bundled history hash does not match its provenance.')
+        rows.update(normalize(raw, *(date.fromisoformat(v) for v in metadata['coverage'])))
+        sources[metadata['sha256']] = {**metadata, 'coverage': [metadata['coverage']]}
+    coverage = [[sources[next(iter(sources))]['coverage'][0][0], metadata['coverage'][1]]]
+    return {'id': snapshot_id(rows, coverage), 'series': SERIES, 'rate_type': 'nominal_par',
+            'normalizer_version': NORMALIZER_VERSION, 'rows': dict(sorted(rows.items())),
+            'coverage': coverage, 'sources': sources, 'created_at': metadata['retrieved_at'],
+            'bundled': True, 'label': 'Starter history · October–November 2026'}
+
+
+def revision_scenario(snapshot, day):
+    """A hypothetical +10 bp ten-year revision, retaining the source observation."""
+    original = snapshot['rows'].get(day, {}).get('BC_10YEAR')
+    revised = None
+    if original is not None:
+        percentage = Decimal(original['original_percent']) + Decimal('0.10')
+        revised = {'original_percent': str(percentage), 'rate': float(percentage / 100)}
+    return {'date': day, 'change_bp': 10, 'original': original, 'revised': revised}
 
 
 def compare(snapshot, first, second):
@@ -182,4 +239,5 @@ def compare(snapshot, first, second):
             'spread_sample_dates': sorted(available), 'spread_excluded_dates': sorted(set(snapshot['rows']) - available),
             'missing_counts': {t.label: sum(row[t.field] is None for row in snapshot['rows'].values()) for t in TENORS},
             'sources': snapshot['sources'], 'rate_type': snapshot['rate_type'],
-            'publication_time': None, 'created_at': snapshot['created_at']}
+            'publication_time': None, 'created_at': snapshot['created_at'],
+            'sample_label': snapshot.get('label', 'Saved dataset')}

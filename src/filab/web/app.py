@@ -3,6 +3,7 @@
 from math import fsum, isclose
 from dataclasses import asdict
 from datetime import date, timedelta
+from hashlib import sha256
 from pathlib import Path
 from typing import Literal
 
@@ -20,6 +21,7 @@ from filab.pricing import fixed_coupon_cashflows, price_coupon_bond, price_zero_
 from filab.pricing import coupon_schedule, settled_bond_valuation, settled_yield_to_maturity, treasury_bill
 from filab.pricing.settlement import SettlementError
 
+from filab.data.treasury import pinned_snapshot
 from filab.risk.explorer import compare_bonds
 from .history_api import router as history_router
 from .curriculum import LESSONS, ROADMAP
@@ -27,6 +29,8 @@ from .returns_api import router as returns_router
 from .return_lessons import RETURN_LESSONS, lesson_spec, router as return_lesson_router
 
 HERE = Path(__file__).resolve().parent
+HISTORY_EXAMPLE = pinned_snapshot()["example"]
+HISTORY_REFERENCE = pinned_snapshot("series-introduction")["example"]
 
 markdown = MarkdownIt("commonmark", {"html": False}).enable("table").use(
     dollarmath_plugin, allow_space=False, allow_digits=False,
@@ -51,6 +55,10 @@ def optional_code(tokens, idx, options, env):
 
 markdown.renderer.rules["fence"] = optional_code
 templates = Jinja2Templates(directory=str(HERE / "templates"))
+templates.env.globals['asset_versions'] = {
+    path.name: sha256(path.read_bytes()).hexdigest()[:16]
+    for path in (HERE / 'static').iterdir() if path.suffix in {'.js', '.css'}
+}
 app = FastAPI(title="Fixed-Income Lab", version="0.1.0")
 app.include_router(history_router)
 app.include_router(returns_router)
@@ -145,6 +153,7 @@ def lesson(request: Request, slug: str):
     return templates.TemplateResponse(request=request, name="lesson.html", context={
         "lessons": LESSONS, "lesson": item, "lesson_number": index + 1,
         "active": slug, "page_title": item["title"], "body": markdown.render(content),
+        "history_example": HISTORY_EXAMPLE, "history_reference": HISTORY_REFERENCE,
         "return_experiment": lesson_spec(slug) if slug in RETURN_LESSONS else None,
         "implementation": markdown.render((HERE / "content" / "pricing.md").read_text(), {"expand_code": True}) if slug == "present-value" else None,
         "previous": LESSONS[index - 1] if index > 0 else None,
@@ -398,4 +407,5 @@ def return_tool(request: Request):
 def history_tool(request: Request):
     return templates.TemplateResponse(request=request, name='history.html', context={
         'lessons': LESSONS, 'active': 'treasury-history', 'page_title': 'Treasury History Viewer',
+        'history_example': HISTORY_EXAMPLE, 'history_reference': HISTORY_REFERENCE,
     })
