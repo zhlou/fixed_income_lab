@@ -1,21 +1,22 @@
 {% from 'controls.html' import choices %}
-<section data-curve-synthetic data-experiment="{{ lesson.experiment if lesson is defined else 'tool' }}">
-<form class="card" data-curve-form>
-<h2>Price the same payments</h2>
-<p>Hypothetical · $100 face · 4% annual coupon · semiannual payments · exact half-year periods. Coupon cash earns 0%; no fees.</p>
-{% if lesson is not defined or lesson.experiment == 'curve-pricing' %}
-<label for="curve-calibration">Two-year 6% calibration bond price ($ per $100 face)</label>
-<input id="curve-calibration" name="calibration_price" type="number" step="0.01" min="8.71" max="300" value="101.40" required>
-<p class="tiny-note">Keep D(0.5) = 0.99, D(1) = 0.97, and D(1.5) = 0.94. Recover D(2) from this price.</p>
-<p>Change the calibration price to $100.37. Inspect the recovered two-year factor and the 4% note’s price.</p>
+{% set experiment = lesson.experiment if lesson is defined else 'tool' %}
+<section {% if lesson is defined %}class="workspace"{% endif %} data-curve-synthetic data-experiment="{{ experiment }}">
+<form class="card{% if lesson is defined %} controls{% endif %}" data-curve-form>
+<h2>{{ 'Age the bond' if experiment == 'curve-aging' else 'Price the same payments' }}</h2>
+{% if experiment != 'curve-aging' %}
+<div class="control"><label for="curve-calibration">Two-year 6% calibration bond price ($ per $100 face)</label>
+<div class="number-wrap"><input id="curve-calibration" name="calibration_price" type="number" step="0.01" min="8.71" max="300" value="101.40" aria-describedby="curve-calibration-hint" required></div>
+<small id="curve-calibration-hint">Keep D(0.5) = 0.99, D(1) = 0.97, and D(1.5) = 0.94. Recover D(2) from this price.</small></div>
+<p class="experiment-instruction">Change the calibration price to $100.37. Inspect the recovered two-year factor and the 4% note’s price.</p>
 {% else %}<input type="hidden" name="calibration_price" value="101.40">{% endif %}
-{% if lesson is not defined or lesson.experiment == 'curve-aging' %}
+{% if experiment != 'curve-pricing' %}
 {{ choices('curve-horizon', 'horizon', 'Value immediately after payment at', [('0', 'Today', 'All four payments remain'), ('0.5', 'Six months', 'One coupon received'), ('1', 'One year', 'Two coupons received'), ('1.5', '18 months', 'Three coupons received'), ('2', 'Maturity', 'Principal and coupons in cash')], '', selected='0.5') }}
-<p>Advance from six months to one year. Reconcile the remaining price with the payments received.</p>
+<p class="experiment-instruction">Advance from six months to one year. Reconcile the remaining price with the payments received.</p>
 {% else %}<input type="hidden" name="horizon" value="0">{% endif %}
 <div class="history-actions"><button class="button primary" type="submit">Calculate</button><button class="reset" type="button" data-curve-reset>↺ Reset example</button></div>
 <p class="error" role="alert" data-curve-error></p>
+<p class="convention">Hypothetical · $100 face · 4% annual coupon · semiannual payments · exact half-year periods. Coupon cash earns 0% with no fees.</p>
+{% if lesson is defined %}<a href="/tools/discount-curves">Explore curves and Fed history ↗</a>{% endif %}
 </form>
-<div data-curve-results aria-live="polite" aria-busy="true"></div>
-{% if lesson is defined %}<p><a href="/tools/discount-curves">Explore curves and Fed history ↗</a></p>{% endif %}
+<div class="results" data-curve-results aria-live="polite" aria-busy="true"></div>
 </section>

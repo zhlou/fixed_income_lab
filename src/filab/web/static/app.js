@@ -7,16 +7,19 @@ const colors = ['#356b58', '#bb6a43', '#527d9c'];
 let tooltipSequence = 0;
 function element(tag, text, className) { const node=document.createElement(tag); if(text !== undefined) node.textContent=text; if(className) node.className=className; return node; }
 function svgElement(tag, attributes={}, text) { const node=document.createElementNS('http://www.w3.org/2000/svg',tag); for(const [key,value] of Object.entries(attributes)) node.setAttribute(key,String(value)); if(text !== undefined) node.textContent=text; return node; }
+function roundedAxis(minimum, maximum, minimumStep) {
+  const target = Number(Math.max((maximum - minimum) / 5, minimumStep).toPrecision(12));
+  const decade = 10 ** Math.floor(Math.log10(target));
+  const step = [1, 2, 5, 10].find(multiple => multiple * decade >= target) * decade;
+  const first = Math.floor(minimum / step);
+  const last = Math.max(first + 1, Math.ceil(maximum / step));
+  const ticks = Array.from({length: last - first + 1}, (_, i) => Number(((first + i) * step).toPrecision(12)));
+  return {minimum: ticks[0], maximum: ticks.at(-1), step, ticks};
+}
 function niceAxis(minimum,maximum,percentage=false){
-  // Choose a 1/2/5 decade step, with at least 5 displayed units.
-  // Sub-dollar charts use cents, and percentage charts use percentage points.
-  const scale=percentage?100:(Math.max(Math.abs(minimum),Math.abs(maximum))<1?100:1);
-  const low=minimum*scale,high=maximum*scale;
-  const rough=Math.max((high-low)/5,percentage?0.05:5),decade=10**Math.floor(Math.log10(rough));
-  const step=[1,2,5,10].find(value=>value*decade>=rough-1e-10)*decade;
-  const start=Math.floor(low/step),end=Math.max(start+1,Math.ceil(high/step));
-  const ticks=Array.from({length:end-start+1},(_,i)=>Number(((start+i)*step/scale).toPrecision(12)));
-  return {minimum:ticks[0],maximum:ticks.at(-1),step:step/scale,ticks};
+  // Existing price and rate charts use $5 (5¢ for sub-dollar values) or 0.05 percentage points.
+  const subDollar = Math.max(Math.abs(minimum), Math.abs(maximum)) < 1;
+  return roundedAxis(minimum, maximum, percentage ? 0.0005 : subDollar ? 0.05 : 5);
 }
 function table(container, headers, rows, totals) {
   const result=element('table'), head=element('thead'), tr=element('tr');

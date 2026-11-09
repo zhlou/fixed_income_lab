@@ -167,6 +167,9 @@ The core uses a continuing $100-face, 4% semiannual note. An annual-coupon examp
 On desktop windows at least 1200 pixels wide, lessons place the experiment on the
 left and the explanation on the right. Each side scrolls independently, so the
 chart stays in place while you read. The experiment receives most of the width.
+Lessons 8 and 9 place the calibration price or aging horizon to the left of the
+plot on desktop and above it on phones. Discount-factor ticks use three decimal
+places with spacing that adjusts to the plotted range.
 Hover over the lesson position in the header to choose from the same nine-lesson reading order shown on the homepage and sidebar.
 The counter pads both numbers to two digits, showing **Lesson 05 of 07** on desktop and **05 of 07** on phones.
 

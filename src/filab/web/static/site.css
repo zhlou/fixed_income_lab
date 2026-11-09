@@ -323,5 +323,8 @@
 [data-fed-results] p {overflow-wrap:anywhere;}
 .curve-stale {opacity:.55;}
 .curve-stale::before {content:'Inputs changed. Calculate or compare to update this result.'; display:block; padding:.75rem; font-weight:600;}
-[data-curve-synthetic] .card, [data-curve-history] .card {padding:1.5rem;}
+[data-curve-synthetic] .card:not(.controls), [data-curve-history] .card {padding:1.5rem;}
 [data-curve-synthetic] input[type="number"], [data-curve-history] input[type="number"] {padding:.65rem; border:1px solid var(--line, #cbd4cd); border-radius:5px; font:inherit; background:white; color:inherit;}
+[data-curve-synthetic] .controls {display:block; margin-bottom:0;}
+[data-curve-form] .history-actions .reset {margin:0;}
+[data-curve-results] .chart svg text, [data-fed-results] .chart svg text {font-size:12px;}

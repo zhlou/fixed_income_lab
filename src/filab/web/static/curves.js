@@ -23,24 +23,24 @@
     const node=element('div',undefined,'metrics');
     values.forEach(([label,value])=>{const cell=element('div',undefined,'metric');cell.append(element('span',label),element('strong',value));node.append(cell);});return node;
   }
-  function chart(container, series, label) {
+  function chart(container, series, label, minimumStep) {
     container.replaceChildren();
     const points=series.flatMap(s=>s.points);
     if(!points.length){container.append(element('p','No data'));return;}
     const width=Math.max(260,container.clientWidth),height=300,left=62,right=width-22,top=70,bottom=250;
     const maxX=Math.max(...points.map(p=>p[0])),minY=Math.min(...points.map(p=>p[1])),maxY=Math.max(...points.map(p=>p[1]));
-    const padding=Math.max((maxY-minY)*.1,.001),lo=minY-padding,hi=maxY+padding;
-    const x=v=>left+v/maxX*(right-left),y=v=>bottom-(v-lo)/(hi-lo)*(bottom-top);
+    const padding=minY===maxY ? minimumStep : 0;
+    const axis=roundedAxis(minY-padding,maxY+padding,minimumStep);
+    const x=v=>left+v/maxX*(right-left),y=v=>bottom-(v-axis.minimum)/(axis.maximum-axis.minimum)*(bottom-top);
     const svg=svgElement('svg',{viewBox:`0 0 ${width} ${height}`,role:'img','aria-label':`${label}. Linear maturity spacing in years. Values follow in the table.`});
-    svg.append(svgElement('text',{x:left,y:16,'font-size':12},label));
-    for(let i=0;i<=4;i++){
-      const v=lo+(hi-lo)*i/4;
-      svg.append(svgElement('line',{x1:left,x2:right,y1:y(v),y2:y(v),stroke:'#ddd'}),svgElement('text',{x:left-6,y:y(v)+4,'text-anchor':'end','font-size':11},v.toFixed(3)));
+    svg.append(svgElement('text',{x:0,y:16,'font-size':12},label));
+    for(const v of axis.ticks){
+      svg.append(svgElement('line',{x1:left,x2:right,y1:y(v),y2:y(v),stroke:'#ddd'}),svgElement('text',{x:left-6,y:y(v)+4,'text-anchor':'end','font-size':11,'data-axis-tick':'y'},v.toFixed(3)));
     }
     [0,.25,.5,.75,1].forEach(part=>svg.append(svgElement('text',{x:x(maxX*part),y:272,'text-anchor':'middle','font-size':11},`${(maxX*part).toFixed(1)}y`)));
     series.forEach((s,index)=>{
       const color=colors[index%colors.length];
-      svg.append(svgElement('text',{x:left,y:35+index*17,fill:color,'font-size':12},s.name));
+      svg.append(svgElement('text',{x:0,y:35+index*17,fill:color,'font-size':12},s.name));
       let previous=null;
       s.points.forEach(([t,v])=>{
         if(previous)svg.append(svgElement('line',{x1:x(previous[0]),y1:y(previous[1]),x2:x(t),y2:y(v),stroke:color,'stroke-width':2,'stroke-dasharray':index?'5 3':'none'}));
@@ -59,7 +59,7 @@
       const pricing=root.dataset.experiment==='curve-pricing';
       results.append(metrics(pricing ? [['4% note price',money(data.initial_price)],['Recovered D(2)',factor(data.nodes[4][1])],['6% calibration price',money(data.calibration_price)]] : [['Initial 4% note price',money(data.initial_price)],['Remaining note price',money(data.remaining_price)],['Payments received',money(data.cash_received)]]));
       const plot=card('Hypothetical discount factors'),canvas=element('div',undefined,'chart');plot.append(canvas);results.append(plot);
-      chart(canvas,[{name:'Unchanged curve by remaining maturity',points:data.nodes}],'Discount factor · dollars today per $1');
+      chart(canvas,[{name:'Unchanged curve by remaining maturity',points:data.nodes}],'Discount factor · dollars today per $1',0.005);
       plot.append(element('p','Calculations interpolate linearly in log discount factors between the listed nodes. Chart lines connect the supplied nodes. D(0) = 1. Factors above one imply negative spot rates. Payments beyond the final node are outside this curve’s support.'));
       plot.append(grid(['Years','Discount factor'],data.nodes.map(([t,d])=>[t,factor(d)])));
       const payments=card('Remaining payments after settlement');payments.append(grid(['Years remaining','Payment','Discount factor','Present value'],data.cashflows.map(f=>[f.time_years,money(f.amount),factor(f.discount_factor),money(f.present_value)])));
@@ -133,7 +133,7 @@
       [data.first,data.second].forEach(d=>source.append(element('p',`${d.date} · ${d.status}${d.supported_range?` · published maturity range ${d.supported_range.join('–')} years`:''}${d.reconstruction_matches===false?' · parameter reconstruction differs from published yields beyond rounding precision':''}`)));
       results.append(source);
       const plot=card('Continuously compounded zero yields'),canvas=element('div',undefined,'chart');plot.append(canvas);results.append(plot);
-      chart(canvas,[data.first,data.second].map(d=>({name:d.date,points:d.nodes.map(n=>[n.maturity,n.zero_rate*100])})),'Annual zero yield (%)');
+      chart(canvas,[data.first,data.second].map(d=>({name:d.date,points:d.nodes.map(n=>[n.maturity,n.zero_rate*100])})),'Annual zero yield (%)',0.001);
       plot.append(element('p','Dots show published nodes. Connecting lines guide the eye. Discount factors in the table use published zero yields.'));
       plot.append(grid(['Years',data.first.date,data.second.date,'Zero-yield change (bp)'],data.changes.map(n=>[n.maturity,rate(n.first),rate(n.second),n.change_bp===null?'—':n.change_bp.toFixed(4)])));
       [data.first,data.second].forEach(d=>plot.append(element('h3',d.date),grid(['Years','Zero rate','Discount factor','Instantaneous forward','Par yield'],d.nodes.map(n=>[n.maturity,rate(n.zero_rate),factor(n.discount_factor),rate(n.forward_rate),rate(n.par_rate)]))));
