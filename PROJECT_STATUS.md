@@ -581,6 +581,11 @@ in `src/filab/risk/`. The [README](README.md) documents these interfaces.
   accessibility content inside its panel, preventing blank outer-page scrolling.
   Add Overview, Previous, Next, and the lesson position to the top bar.
 - Display the lesson counter with two digits for both numbers, such as **05 of 07**, on desktop and mobile.
+- Keep the top-right lesson picker compact with 2px row gaps and 10px outer
+  vertical padding. Its nine-lesson menu measures 344px tall on desktop and
+  434px on mobile, with 44px mobile touch targets. Browser checks at 1440,
+  1024, 390 and 320 pixels covered keyboard opening, Tab, Escape/focus return,
+  lesson selection, formulas and horizontal overflow.
 - Teach each relationship once and reuse it through the reading order. Pricing and YTM share one experiment with reversible input direction.
 - Show discrete choices as visible radio option cards, rather than dropdowns.
 - Order payment frequencies **Annual → Semiannual → Quarterly**, followed
