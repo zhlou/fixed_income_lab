@@ -170,6 +170,8 @@ chart stays in place while you read. The experiment receives most of the width.
 Lessons 8 and 9 place the calibration price or aging horizon to the left of the
 plot on desktop and above it on phones. Discount-factor ticks use three decimal
 places with spacing that adjusts to the plotted range.
+Selecting an aging horizon immediately recalculates the results in lesson 9 and
+the synthetic Discount Curve Explorer. Lesson 9 offers Reset without a Calculate button.
 Hover over the lesson position in the header to choose from the same nine-lesson reading order shown on the homepage and sidebar.
 The counter pads both numbers to two digits, showing **Lesson 05 of 07** on desktop and **05 of 07** on phones.
 

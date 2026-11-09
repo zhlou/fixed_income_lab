@@ -77,6 +77,7 @@
       finally{if(current===epoch)results.setAttribute('aria-busy','false');}
     }
     form.addEventListener('input',invalidate);
+    form.addEventListener('change',event=>{if(event.target.name==='horizon')form.requestSubmit();});
     form.elements.calibration_price.addEventListener('change',()=>{const input=form.elements.calibration_price;if(input.value&&Number.isFinite(input.valueAsNumber||Number(input.value)))input.value=Number(input.value).toFixed(2);});
     form.addEventListener('submit',event=>{event.preventDefault();calculate();});
     root.querySelector('[data-curve-reset]').addEventListener('click',()=>{form.reset();calculate();});

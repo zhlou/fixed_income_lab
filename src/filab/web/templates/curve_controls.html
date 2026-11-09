@@ -13,7 +13,7 @@
 {{ choices('curve-horizon', 'horizon', 'Value immediately after payment at', [('0', 'Today', 'All four payments remain'), ('0.5', 'Six months', 'One coupon received'), ('1', 'One year', 'Two coupons received'), ('1.5', '18 months', 'Three coupons received'), ('2', 'Maturity', 'Principal and coupons in cash')], '', selected='0.5') }}
 <p class="experiment-instruction">Advance from six months to one year. Reconcile the remaining price with the payments received.</p>
 {% else %}<input type="hidden" name="horizon" value="0">{% endif %}
-<div class="history-actions"><button class="button primary" type="submit">Calculate</button><button class="reset" type="button" data-curve-reset>↺ Reset example</button></div>
+<div class="history-actions">{% if experiment != 'curve-aging' %}<button class="button primary" type="submit">Calculate</button>{% endif %}<button class="reset" type="button" data-curve-reset>↺ Reset example</button></div>
 <p class="error" role="alert" data-curve-error></p>
 <p class="convention">Hypothetical · $100 face · 4% annual coupon · semiannual payments · exact half-year periods. Coupon cash earns 0% with no fees.</p>
 {% if lesson is defined %}<a href="/tools/discount-curves">Explore curves and Fed history ↗</a>{% endif %}

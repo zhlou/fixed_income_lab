@@ -24,6 +24,16 @@ questions or demonstrated the learning checkpoints.
 
 ## Completed work
 
+### Immediate aging-horizon updates — November 8, 2026
+
+Lesson 9 and the synthetic Discount Curve Explorer now recalculate when an aging
+horizon is selected, including by keyboard. Lesson 9 omits the redundant Calculate
+button and keeps Reset. The existing form validation, Reset,
+and stale-response protection remain in use. All 23 curve and curve API tests
+passed, along with a JavaScript syntax check. Browser checks covered all five
+horizons, Reset, keyboard selection, and desktop/mobile layouts; no console or
+formula errors or mobile page overflow were observed.
+
 ### Dependency files and Docker cache — November 8, 2026
 
 Moved dependency lists into `requirements/base.txt`, `web.txt`, `dev.txt`, and
