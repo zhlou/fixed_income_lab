@@ -142,3 +142,21 @@ records the independent synthetic arithmetic, full Fed source reproduction audit
 and short-maturity support decision. Historical coupon-note valuation retains
 an open coverage gate; supported zero-coupon principal and synthetic scenarios
 can be valued.
+
+## Lesson 8 par and spot yields — November 8, 2026
+
+The hypothetical comparison uses D(0.5)=0.99, D(1)=0.97, D(1.5)=0.94 and D(2)=0.90.
+The nominal semiannual spot conversion and par-yield identity follow equations
+(3) and (7) in sections 2.1–2.2 of the
+[Fed methodology](https://www.federalreserve.gov/pubs/feds/2006/200628/index.html).
+The two-year spot yield is 5.3380192161%. Exact rational arithmetic gives a
+half-year par coupon of $10/3.80 and annual par yield of 5.2631578947%.
+Independent cash-flow valuation reprices that coupon bond to $100 within absolute
+1e-12 dollars. Its YTM at $100 matches its coupon rate within absolute 1e-14
+in decimal rates.
+
+Changing the calibration price to $100.37 gives D(2)=0.89, par yield 5.8047493404%
+and spot yield 5.9123969077%. The zero-coupon YTM solver independently reproduced
+both spot yields. Synthetic API factors matched within absolute 1e-14.
+Lesson-route, table and collapsed-answer checks passed, and all 32 formulas
+rendered with bundled KaTeX. No fresh browser layout review was performed.

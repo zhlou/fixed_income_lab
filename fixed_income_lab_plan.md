@@ -319,7 +319,7 @@ security price nor necessarily the YTM of a particular bond.
 
 ### M4 — Discount curves and historical valuation
 
-**Two lessons:** How do you price payments at different maturities? → Why can a bond change price on an unchanged curve? Derive discount factors from a small synthetic example, recover the next factor from a coupon bond, and reprice it. Then age one bond, derive a forward from adjacent discount factors, and distinguish that implied rate from a forecast. Put interpolation, source conventions, and short-end coverage in the curve tool and validation notes. Historical valuation depends on the feasibility gate below.
+**Two lessons:** How do you price payments at different maturities? → Why can a bond change price on an unchanged curve? Derive discount factors from a small synthetic example, compare the spot and par yields at the same maturity, recover the next factor from a coupon bond, and reprice it. Explain the yield difference through the coupon payment dates, using the same semiannual quotation convention. Then age one bond, derive a forward from adjacent discount factors, and distinguish that implied rate from a forecast. Put interpolation, source conventions, and short-end coverage in the curve tool and validation notes. Historical valuation depends on the feasibility gate below.
 
 Implement discount-factor cash-flow valuation and recover a known synthetic curve
 from consistent instruments. Start with linear interpolation in log discount

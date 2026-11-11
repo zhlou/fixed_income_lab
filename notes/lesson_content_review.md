@@ -142,3 +142,39 @@ Experiment copy was reviewed separately. Focused pricing has one input direction
 - Local links, packaged-resource routes, and whitespace were checked. The temporary local Uvicorn server was stopped after verification.
 
 Learner exercise answers remain personal work. No completion-time or learner-usability study was performed. Source application validation does not record a deployment.
+
+## Lesson 8 clarification — November 8, 2026
+
+Defined cash-flow subscripts through the four promised payments and spot rates
+through a single-payment purchase. The lesson now derives the semiannual
+spot-rate/discount-factor conversion and pairs all four rates with factors and
+payment PVs. It connects Treasury par quotes to coupon accounting before the
+bootstrap example. References to lesson 1 fell from six to one opening link.
+Continuous compounding stays in the expandable conventions calculation.
+The rate conventions and par-yield relationship follow sections 2.1–2.2 of the
+[Fed methodology](https://www.federalreserve.gov/pubs/feds/2006/200628/index.html).
+
+Targeted checks verified the lesson route, table, collapsed details and remaining
+recall link. All four spot rates round to the displayed four decimal places in
+percent, with factor round trips agreeing within absolute 1e-14. Both note prices
+and the displayed YTM were reproduced. All 24 formulas rendered with bundled
+KaTeX. Visible article copy measures 735 whitespace-delimited words including
+math and table text, excluding closed details. The experiment instructions still
+assign the $101.40 → $100.37 calibration change and Reset restores $101.40.
+This documentation check did not include a fresh browser layout review.
+
+## Lesson 8 par and spot comparison — November 8, 2026
+
+Added a worked comparison using the existing factors. A two-year single payment
+gives a 5.3380% spot yield. Solving for the coupon that makes a two-year note worth
+$100 gives a 5.2632% par yield. The explanation connects the difference to earlier
+coupon dates and states the flat-curve boundary. The existing changed-input
+question now asks for both yields after the calibration-price change. Lesson 1
+has one opening recall link.
+
+Targeted numerical, route and bundled-KaTeX checks passed, including the changed
+case. All 32 formulas rendered. Visible article copy is 963 whitespace-delimited
+words, including math/table text and excluding closed details. Sources,
+tolerances and numerical results are recorded in
+[the reference validation](phase_1_validation.md#lesson-8-par-and-spot-yields--november-8-2026).
+These were documentation checks without a fresh browser layout review.
